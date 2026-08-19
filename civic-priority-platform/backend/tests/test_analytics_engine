@@ -1,0 +1,46 @@
+import pytest
+
+from app.analytics.geospatial import engine as geospatial_module
+from app.analytics.geospatial import GeospatialEngine
+from app.analytics.ranking import RankingEngine
+
+
+def test_geospatial_fallback_is_deterministic(monkeypatch):
+    monkeypatch.setattr(geospatial_module, "np", None)
+    monkeypatch.setattr(geospatial_module, "DBSCAN", None)
+
+    coordinates = [(0.0, 0.0), (0.001, 0.001), (1.0, 1.0)]
+    engine = GeospatialEngine()
+
+    first = engine.detect_hotspots(coordinates, eps_km=1.0, min_samples=2)
+    second = engine.detect_hotspots(coordinates, eps_km=1.0, min_samples=2)
+
+    assert first == second == [0, 0, -1]
+
+
+def test_geospatial_fallback_rejects_invalid_coordinates(monkeypatch):
+    monkeypatch.setattr(geospatial_module, "np", None)
+    monkeypatch.setattr(geospatial_module, "DBSCAN", None)
+
+    with pytest.raises(ValueError, match="latitude"):
+        GeospatialEngine().detect_hotspots([(91.0, 0.0)])
+
+
+def test_ranking_is_deterministic_for_equal_scores():
+    engine = RankingEngine()
+    items = [
+        {"id": "first", "severity": 1},
+        {"id": "second", "severity": 1},
+        {"id": "third", "severity": 2},
+    ]
+
+    result = engine.rank(items, {"severity": 1.0})
+
+    assert [item["id"] for item in result] == ["third", "first", "second"]
+    assert [item["rank"] for item in result] == [1, 2, 3]
+    assert [item["priority_score"] for item in result] == [2.0, 1.0, 1.0]
+
+
+def test_ranking_rejects_zero_total_weight():
+    with pytest.raises(ValueError, match="greater than zero"):
+        RankingEngine().rank([{"severity": 1}], {"severity": 0})
