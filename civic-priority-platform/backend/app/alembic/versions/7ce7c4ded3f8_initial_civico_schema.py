@@ -1,0 +1,222 @@
+"""initial civico schema
+
+Revision ID: 7ce7c4ded3f8
+Revises:
+Create Date: 2026-08-20
+"""
+import geoalchemy2
+from typing import Sequence, Union
+
+
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+
+
+# revision identifiers, used by Alembic.
+revision: str = "7ce7c4ded3f8"
+down_revision: Union[str, Sequence[str], None] = None
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    """Create CIVICO application tables and indexes."""
+    op.create_table(
+        "projects",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("name", sa.String(length=200), nullable=False),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("constituency_id", postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column("status", sa.String(length=30), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_projects_status", "projects", ["status"], unique=False)
+
+    op.create_table(
+        "audit_logs",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("actor_id", postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column("action", sa.String(length=100), nullable=False),
+        sa.Column("entity_type", sa.String(length=100), nullable=False),
+        sa.Column("entity_id", postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("metadata", sa.JSON(), nullable=True),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_audit_logs_actor_id", "audit_logs", ["actor_id"], unique=False)
+    op.create_index("ix_audit_logs_action", "audit_logs", ["action"], unique=False)
+    op.create_index("ix_audit_logs_entity_id", "audit_logs", ["entity_id"], unique=False)
+    op.create_index("ix_audit_logs_entity_type", "audit_logs", ["entity_type"], unique=False)
+
+    op.create_table(
+        "data_sources",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("project_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("name", sa.String(length=200), nullable=False),
+        sa.Column("source_type", sa.String(length=50), nullable=False),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("storage_key", sa.String(length=500), nullable=True),
+        sa.Column("metadata", sa.JSON(), nullable=True),
+        sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_data_sources_project_id", "data_sources", ["project_id"], unique=False)
+    op.create_index("ix_data_sources_source_type", "data_sources", ["source_type"], unique=False)
+
+    op.create_table(
+        "issues",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("project_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("title", sa.String(length=200), nullable=False),
+        sa.Column("description", sa.Text(), nullable=False),
+        sa.Column("category", sa.String(length=100), nullable=True),
+        sa.Column("language", sa.String(length=20), nullable=False),
+        sa.Column("status", sa.String(length=30), nullable=False),
+        sa.Column(
+            "location",
+            geoalchemy2.types.Geography(
+                geometry_type="POINT",
+                srid=4326,
+                dimension=2,
+                from_text="ST_GeogFromText",
+                name="geography",
+            ),
+            nullable=True,
+        ),
+        sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_issues_category", "issues", ["category"], unique=False)
+    op.create_index("ix_issues_project_id", "issues", ["project_id"], unique=False)
+    op.create_index("ix_issues_status", "issues", ["status"], unique=False)
+    op.create_index(
+        "idx_issues_location",
+        "issues",
+        ["location"],
+        unique=False,
+        postgresql_using="gist",
+    )
+
+    op.create_table(
+        "portfolios",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("project_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("name", sa.String(length=200), nullable=False),
+        sa.Column("status", sa.String(length=30), nullable=False),
+        sa.Column("total_estimated_cost", sa.Float(), nullable=True),
+        sa.Column("interventions", sa.JSON(), nullable=True),
+        sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_portfolios_project_id", "portfolios", ["project_id"], unique=False)
+    op.create_index("ix_portfolios_status", "portfolios", ["status"], unique=False)
+
+    op.create_table(
+        "priorities",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("project_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("title", sa.String(length=200), nullable=False),
+        sa.Column("category", sa.String(length=100), nullable=False),
+        sa.Column("rank", sa.Integer(), nullable=False),
+        sa.Column("score", sa.Float(), nullable=False),
+        sa.Column("issue_count", sa.Integer(), nullable=False),
+        sa.Column("confidence", sa.Float(), nullable=True),
+        sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_priorities_category", "priorities", ["category"], unique=False)
+    op.create_index("ix_priorities_project_id", "priorities", ["project_id"], unique=False)
+    op.create_index("ix_priorities_rank", "priorities", ["rank"], unique=False)
+
+    op.create_table(
+        "analyses",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("issue_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("project_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("status", sa.String(length=30), nullable=False),
+        sa.Column("category", sa.String(length=100), nullable=True),
+        sa.Column("summary", sa.Text(), nullable=True),
+        sa.Column("sentiment", sa.String(length=50), nullable=True),
+        sa.Column("confidence", sa.Float(), nullable=True),
+        sa.Column("themes", sa.JSON(), nullable=True),
+        sa.Column("metadata", sa.JSON(), nullable=True),
+        sa.ForeignKeyConstraint(["issue_id"], ["issues.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_analyses_issue_id", "analyses", ["issue_id"], unique=False)
+    op.create_index("ix_analyses_project_id", "analyses", ["project_id"], unique=False)
+    op.create_index("ix_analyses_status", "analyses", ["status"], unique=False)
+
+    op.create_table(
+        "evidence",
+        sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("issue_id", postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column("source_type", sa.String(length=50), nullable=False),
+        sa.Column("source_id", postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column("storage_key", sa.String(length=500), nullable=True),
+        sa.Column("excerpt", sa.Text(), nullable=True),
+        sa.Column("confidence", sa.Float(), nullable=True),
+        sa.Column("metadata", sa.JSON(), nullable=True),
+        sa.ForeignKeyConstraint(["issue_id"], ["issues.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index("ix_evidence_issue_id", "evidence", ["issue_id"], unique=False)
+    op.create_index("ix_evidence_source_id", "evidence", ["source_id"], unique=False)
+    op.create_index("ix_evidence_source_type", "evidence", ["source_type"], unique=False)
+
+
+def downgrade() -> None:
+    """Drop only CIVICO-owned objects; preserve PostGIS-managed objects."""
+    op.drop_index("ix_evidence_source_type", table_name="evidence")
+    op.drop_index("ix_evidence_source_id", table_name="evidence")
+    op.drop_index("ix_evidence_issue_id", table_name="evidence")
+    op.drop_table("evidence")
+
+    op.drop_index("ix_analyses_status", table_name="analyses")
+    op.drop_index("ix_analyses_project_id", table_name="analyses")
+    op.drop_index("ix_analyses_issue_id", table_name="analyses")
+    op.drop_table("analyses")
+
+    op.drop_index("ix_priorities_rank", table_name="priorities")
+    op.drop_index("ix_priorities_project_id", table_name="priorities")
+    op.drop_index("ix_priorities_category", table_name="priorities")
+    op.drop_table("priorities")
+
+    op.drop_index("ix_portfolios_status", table_name="portfolios")
+    op.drop_index("ix_portfolios_project_id", table_name="portfolios")
+    op.drop_table("portfolios")
+
+    op.drop_index("idx_issues_location", table_name="issues")
+    op.drop_index("ix_issues_status", table_name="issues")
+    op.drop_index("ix_issues_project_id", table_name="issues")
+    op.drop_index("ix_issues_category", table_name="issues")
+    op.drop_table("issues")
+
+    op.drop_index("ix_data_sources_source_type", table_name="data_sources")
+    op.drop_index("ix_data_sources_project_id", table_name="data_sources")
+    op.drop_table("data_sources")
+
+    op.drop_index("ix_audit_logs_entity_type", table_name="audit_logs")
+    op.drop_index("ix_audit_logs_entity_id", table_name="audit_logs")
+    op.drop_index("ix_audit_logs_action", table_name="audit_logs")
+    op.drop_index("ix_audit_logs_actor_id", table_name="audit_logs")
+    op.drop_table("audit_logs")
+
+    op.drop_index("ix_projects_status", table_name="projects")
+    op.drop_table("projects")

@@ -1,31 +1,41 @@
-from uuid import UUID
-
-from fastapi import APIRouter, Header, HTTPException, status
-
-from app.schemas.uploads import UploadInitRequest, UploadInitResponse, UploadResponse
-
-router = APIRouter()
+from fastapi import APIRouter
+from app.api.geocoding import router as geocoding_router
 
 
-@router.post("/init", response_model=UploadInitResponse, status_code=status.HTTP_201_CREATED)
-async def initialize_upload(
-    payload: UploadInitRequest,
-    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
-) -> UploadInitResponse:
-    if not idempotency_key:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Idempotency-Key is required for upload initialization.",
-        )
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Object storage adapter is not configured.",
-    )
+from app.api.context import router as context_router
+from app.api.v1 import (
+    dashboard,
+    feedback,
+    hotspots,
+    issues,
+    maps,
+    optimization,
+    portfolios,
+    priorities,
+    ranking,
+    reports,
+    submissions,
+)
+
+api_router = APIRouter()
+
+api_router.include_router(geocoding_router)
 
 
-@router.get("/{upload_id}", response_model=UploadResponse)
-async def get_upload(upload_id: UUID) -> UploadResponse:
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail=f"Upload {upload_id} repository is not connected.",
-    )
+# Context router (Census, Ward, Sanitation datasets)
+api_router.include_router(context_router)
+
+# PRD Endpoints
+api_router.include_router(submissions.router, prefix="/submissions", tags=["submissions"])
+api_router.include_router(hotspots.router, prefix="/hotspots", tags=["hotspots"])
+api_router.include_router(ranking.router, prefix="/ranking", tags=["ranking"])
+api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
+api_router.include_router(portfolios.router, prefix="/portfolios", tags=["portfolios"])
+api_router.include_router(optimization.router, prefix="/optimization", tags=["optimization"])
+api_router.include_router(priorities.router, prefix="/priorities", tags=["priorities"])
+api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
+
+# Core Domain Endpoints
+api_router.include_router(issues.router, prefix="/issues", tags=["issues"])
+api_router.include_router(maps.router, prefix="/maps", tags=["maps"])
+api_router.include_router(feedback.router, prefix="/feedback", tags=["feedback"])

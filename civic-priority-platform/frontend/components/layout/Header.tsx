@@ -6,8 +6,8 @@ import { Menu, UserCircle2 } from "lucide-react";
 import Navigation from "./Navigation";
 
 import { Button } from "@/components/ui/button";
-import LanguageSelector from "@/components/common/LanguageSelector";
 import MobileMenu from "./MobileMenu";
+
 
 /* -------------------------------------------------------------------------- */
 /*                               Header Component                             */
@@ -87,34 +87,10 @@ export default function Header() {
         {/* ---------------------------------------------------------- */}
 
         <div className="flex items-center gap-3">
-          {/* Language Selector */}
-
-          <div className="hidden md:block">
-            <LanguageSelector
-              languages={[
-                { code: "or", label: "Odia", nativeLabel: "ଓଡ଼ିଆ" },
-                { code: "hi", label: "Hindi", nativeLabel: "हिंदी" },
-                { code: "en", label: "English", nativeLabel: "English" },
-              ]}
-              value="or"
-              onChange={() => {}}
-            />
-          </div>
-
-          {/* Authentication */}
-
-          <Button
-            variant="outline"
-            className="hidden items-center gap-2 rounded-xl border-black bg-white text-black font-semibold hover:bg-black hover:text-white transition lg:inline-flex"
-          >
-            <UserCircle2 className="h-4 w-4" />
-
-            <span>Sign In</span>
-          </Button>
-
           {/* Mobile Navigation */}
 
           <div className="lg:hidden">
+
             <MobileMenu>
               <Button
                 variant="ghost"

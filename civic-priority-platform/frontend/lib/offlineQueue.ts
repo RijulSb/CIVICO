@@ -1,3 +1,5 @@
+import { createSubmission } from "./api";
+
 /**
  * offlineQueue.ts — IndexedDB + Network Status offline queue system for CIVICO PWA.
  * Serializes submission payloads locally when network connection is absent/weak,
@@ -139,12 +141,27 @@ export async function autoSyncQueue(): Promise<number> {
   let syncedCount = 0;
   for (const item of queue) {
     try {
-      // Simulate API payload upload
-      await new Promise((res) => setTimeout(res, 600));
+      const langMap: Record<string, "odia" | "hindi" | "english"> = {
+        or: "odia",
+        hi: "hindi",
+        en: "english",
+      };
+      await createSubmission({
+        constituency: "khordha",
+        language: langMap[item.language] || "odia",
+        submission_type: item.audioBlob ? "voice" : item.photoBlob ? "photo" : "text",
+        content: item.text || (item.audioBlob ? "[Voice Recording Attached]" : "[Photo Evidence Attached]"),
+        location: {
+          ward: item.wardId || "Ward 5",
+          block: "Khordha Block",
+          latitude: item.latitude ?? 20.1874,
+          longitude: item.longitude ?? 85.6178,
+        },
+      });
       await removeQueuedSubmission(item.id);
       syncedCount++;
-    } catch {
-      // Keep in queue for next sync attempt
+    } catch (err) {
+      console.warn("Failed to auto-sync offline submission:", err);
     }
   }
 

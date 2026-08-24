@@ -1,518 +1,763 @@
 "use client";
 
-import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useFeedback } from "@/components/feedback/FeedbackHub";
-// import { LineChart, BarChart } from "@/components/ui/chart"; // or Recharts
+  ArrowRight,
+  CheckCircle2,
+  Download,
+  FileDown,
+  FileText,
+  Loader2,
+  Settings2,
+  Upload,
+} from "lucide-react";
+import Link from "next/link";
 
-const reportFormSchema = z.object({
-  areaId: z.string().min(1, "Area is required"),
-  period: z.enum(["7d", "30d", "90d", "custom"]),
-  reportType: z.enum(["summary", "theme", "hotspot", "portfolio"]),
-  fromDate: z.string().optional(),
-  toDate: z.string().optional(),
-});
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_PREFIX = `${API_BASE}/api/v1`;
 
-type ReportFormValues = z.infer<typeof reportFormSchema>;
+type OutputFormat = "pdf" | "csv";
 
-type ReportSnapshot = {
-  id: string;
-  areaName: string;
-  periodLabel: string;
-  reportType: "summary" | "theme" | "hotspot" | "portfolio";
-  totalComplaints: number;
-  topThemes: { theme: string; count: number }[];
-  topHotspots: { name: string; theme: string; count: number }[];
-  trendSeries: { date: string; count: number }[];
+type SourceRun = {
+  runId: string;
+  createdAt: string;
+  budget: number;
+  selectedProjectCount: number;
+  totalCost: number;
+  totalBenefit: number;
+  status: "completed";
 };
 
-type ExportJobStatus = "idle" | "pending" | "ready" | "failed";
+type PreviewProject = {
+  priority: number;
+  projectId: string;
+  title: string;
+  ward: string;
+  estimatedCost: number;
+  timelineMonths: number;
+  benefitScore: number;
+  selectionReason: string;
+  evidence: {
+    submissionCount: number;
+    affectedPopulation: number;
+    voiceReports: number;
+    photoReports: number;
+  };
+  whySelected: string[];
+};
 
-export default function ReportCenter() {
-  const { showSuccess, showError, showInfo } = useFeedback();
+type PreviewPayload = {
+  runId: string;
+  constituency: string;
+  status: string;
+  summary: {
+    budget: number;
+    totalAllocated: number;
+    remainingBudget: number;
+    selectedProjectCount: number;
+    wardCoverage: number;
+    totalWards: number;
+    timelineMonths: number;
+    totalBenefit: number;
+  };
+  selectedProjects: PreviewProject[];
+  constraintValidation: Array<{
+    label: string;
+    status: "passed" | "failed";
+    message: string;
+  }>;
+  provenance: string[];
+};
 
-  const [report, setReport] = useState<ReportSnapshot | null>(null);
-  const [loadingReport, setLoadingReport] = useState(false);
+type ReportHistoryItem = {
+  reportId: string;
+  title: string;
+  portfolioRun: string;
+  createdAt: string;
+  status: string;
+  format: OutputFormat;
+  downloadUrl: string;
+};
 
-  const [exportStatus, setExportStatus] = useState<ExportJobStatus>("idle");
-  const [exportFormat, setExportFormat] = useState<
-    "pdf" | "csv" | "json" | null
-  >(null);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+type ReportSettings = {
+  title: string;
+  format: OutputFormat;
+  includeHotspotMap: boolean;
+  includeRejectedProjects: boolean;
+  includeCitizenEvidence: boolean;
+};
 
-  const form = useForm<ReportFormValues>({
-    resolver: zodResolver(reportFormSchema),
-    defaultValues: {
-      areaId: "",
-      period: "30d",
-      reportType: "summary",
-      fromDate: "",
-      toDate: "",
+const DEFAULT_SETTINGS: ReportSettings = {
+  title: "Khordha Development Priority Decision Brief",
+  format: "pdf",
+  includeHotspotMap: true,
+  includeRejectedProjects: false,
+  includeCitizenEvidence: true,
+};
+
+function inr(value: number) {
+  return `Rs ${(value / 10000000).toFixed(1)} Cr`;
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options?.headers ?? {}),
     },
   });
+  if (!response.ok) throw new Error(await response.text());
+  return response.json() as Promise<T>;
+}
 
-  const areaId = form.watch("areaId");
-  const period = form.watch("period");
-
-  // Simple rule: show date pickers only for "custom"
-  const isCustomPeriod = period === "custom";
-
-  async function onGenerateReport(data: ReportFormValues) {
-    setLoadingReport(true);
-    setReport(null);
-    setExportStatus("idle");
-    setDownloadUrl(null);
-
-    try {
-      const res = await fetch("/api/reports/preview", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(errText || "Failed to load report");
-      }
-
-      const snapshot: ReportSnapshot = await res.json();
-      setReport(snapshot);
-      showSuccess("Report generated successfully.");
-    } catch (e) {
-      showError("Failed to generate report. Please try again.");
-      console.error(e);
-    } finally {
-      setLoadingReport(false);
-    }
-  }
-
-  async function requestExport(format: "pdf" | "csv" | "json") {
-    if (!report) {
-      showError("Generate a report before exporting.");
-      return;
-    }
-
-    setExportFormat(format);
-    setExportStatus("pending");
-    setDownloadUrl(null);
-
-    try {
-      const res = await fetch("/api/reports/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reportId: report.id,
-          format,
-          // You can also pass areaId/period/reportType again if your backend prefers.
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Export request failed");
-      }
-
-      const { jobId } = await res.json();
-
-      showInfo("Export started. We’ll notify you when it’s ready.");
-
-      // Simple polling; replace with WebSocket if you have it.
-      let attempts = 0;
-      const maxAttempts = 60; // e.g., 30 seconds with 500ms interval
-      const poll = async () => {
-        attempts += 1;
-        const statusRes = await fetch(`/api/reports/export/${jobId}/status`);
-        const statusData = await statusRes.json();
-
-        if (statusData.status === "completed") {
-          setExportStatus("ready");
-          setDownloadUrl(statusData.downloadUrl);
-          showSuccess(
-            `Your ${format.toUpperCase()} report is ready to download.`,
-          );
-          return;
-        }
-
-        if (statusData.status === "failed") {
-          setExportStatus("failed");
-          showError("Export failed. Please try again.");
-          return;
-        }
-
-        if (attempts < maxAttempts) {
-          setTimeout(poll, 500);
-        } else {
-          setExportStatus("failed");
-          showError("Export is taking too long. Please try again later.");
-        }
-      };
-
-      poll();
-    } catch (e) {
-      setExportStatus("failed");
-      showError("Export request failed. Please try again.");
-      console.error(e);
-    }
-  }
-
-  async function onSubmitReportFeedback(payload: {
-    rating: "yes" | "no";
-    comment?: string;
-  }) {
-    if (!report) return;
-    try {
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          targetType: "report",
-          targetId: report.id,
-          rating: payload.rating,
-          comment: payload.comment,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Feedback submit failed");
-
-      showSuccess("Thanks! Your feedback has been recorded.");
-    } catch {
-      showError("Failed to send feedback. Please try again.");
-    }
-  }
-
+function SummaryTile({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="space-y-6">
-      {/* 1. Report configuration form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Configure Report</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={form.handleSubmit(onGenerateReport)}
-            className="grid gap-4 md:grid-cols-4"
-          >
-            <div className="md:col-span-1">
-              <label className="mb-1 block text-sm">Area</label>
-              <Controller
-                name="areaId"
-                control={form.control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select area" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {/* Populate from your areas/constituencies */}
-                      <SelectItem value="area-1">Ward 1</SelectItem>
-                      <SelectItem value="area-2">Ward 2</SelectItem>
-                      <SelectItem value="area-3">Ward 3</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {form.formState.errors.areaId && (
-                <p className="mt-1 text-xs text-red-600">
-                  {form.formState.errors.areaId.message}
-                </p>
-              )}
-            </div>
-
-            <div className="md:col-span-1">
-              <label className="mb-1 block text-sm">Period</label>
-              <Controller
-                name="period"
-                control={form.control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="7d">Last 7 days</SelectItem>
-                      <SelectItem value="30d">Last 30 days</SelectItem>
-                      <SelectItem value="90d">Last 90 days</SelectItem>
-                      <SelectItem value="custom">Custom</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div className="md:col-span-1">
-              <label className="mb-1 block text-sm">Report Type</label>
-              <Controller
-                name="reportType"
-                control={form.control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="summary">Summary</SelectItem>
-                      <SelectItem value="theme">Theme-wise</SelectItem>
-                      <SelectItem value="hotspot">Hotspot-wise</SelectItem>
-                      <SelectItem value="portfolio">
-                        Portfolio Proposal
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div className="flex items-end">
-              <Button type="submit" disabled={loadingReport}>
-                {loadingReport ? "Generating..." : "Generate Preview"}
-              </Button>
-            </div>
-
-            {isCustomPeriod && (
-              <>
-                <div>
-                  <label className="mb-1 block text-sm">From</label>
-                  <input
-                    type="date"
-                    className="w-full rounded-md border px-2 py-1"
-                    {...form.register("fromDate")}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm">To</label>
-                  <input
-                    type="date"
-                    className="w-full rounded-md border px-2 py-1"
-                    {...form.register("toDate")}
-                  />
-                </div>
-              </>
-            )}
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* 2. Report preview card */}
-      {loadingReport && (
-        <Card>
-          <CardContent className="flex items-center justify-center p-8">
-            <p>Generating report…</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!loadingReport && report && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {report.areaName} – {report.periodLabel} ({report.reportType})
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
-              <StatBlock
-                label="Total Complaints"
-                value={report.totalComplaints}
-              />
-              <StatBlock
-                label="Top Theme"
-                value={report.topThemes[0]?.theme ?? "—"}
-                sub={report.topThemes[0]?.count.toString()}
-              />
-              <StatBlock
-                label="Top Hotspot"
-                value={report.topHotspots[0]?.name ?? "—"}
-                sub={`${report.topHotspots[0]?.count} issues`}
-              />
-            </div>
-
-            {/* Simple trend chart placeholder */}
-            <div>
-              <h4 className="mb-2 text-sm font-medium">Trend (last period)</h4>
-              <div className="h-40 rounded-md border bg-muted/30 p-4">
-                {/* Replace with real chart component */}
-                <p className="text-sm text-muted-foreground">
-                  Trend chart goes here (e.g., Recharts line/bar).
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <h4 className="mb-2 text-sm font-medium">Top Themes</h4>
-                <ul className="space-y-1 text-sm">
-                  {report.topThemes.map((t) => (
-                    <li key={t.theme} className="flex justify-between">
-                      <span>{t.theme}</span>
-                      <span className="font-medium">{t.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="mb-2 text-sm font-medium">Top Hotspots</h4>
-                <ul className="space-y-1 text-sm">
-                  {report.topHotspots.map((h) => (
-                    <li key={h.name} className="flex justify-between">
-                      <span>{h.name}</span>
-                      <span className="font-medium">
-                        {h.count} ({h.theme})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* 3. Export controls */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm">Export:</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => requestExport("pdf")}
-                disabled={exportStatus === "pending"}
-              >
-                PDF
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => requestExport("csv")}
-                disabled={exportStatus === "pending"}
-              >
-                CSV
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => requestExport("json")}
-                disabled={exportStatus === "pending"}
-              >
-                JSON
-              </Button>
-
-              {exportStatus === "pending" && (
-                <span className="text-sm text-muted-foreground">
-                  Preparing {exportFormat?.toUpperCase()} export…
-                </span>
-              )}
-
-              {exportStatus === "ready" && downloadUrl && (
-                <a
-                  href={downloadUrl}
-                  className="text-sm font-medium underline"
-                  download
-                >
-                  Download {exportFormat?.toUpperCase()}
-                </a>
-              )}
-
-              {exportStatus === "failed" && (
-                <span className="text-sm text-red-600">
-                  Export failed. Try again.
-                </span>
-              )}
-            </div>
-
-            {/* 4. Quick feedback on report */}
-            <ReportFeedbackCard onSubmit={onSubmitReportFeedback} />
-          </CardContent>
-        </Card>
-      )}
+    <div className="rounded-lg border border-[#171817]/12 bg-white p-4">
+      <p className="text-xs font-bold uppercase tracking-wider text-[#171817]/50">
+        {label}
+      </p>
+      <p className="mt-2 text-2xl font-black text-[#171817]">{value}</p>
     </div>
   );
 }
 
-function StatBlock({
+function Toggle({
   label,
-  value,
-  sub,
+  checked,
+  onChange,
 }: {
   label: string;
-  value: string | number;
-  sub?: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="rounded-md border p-4">
-      <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="mt-1 text-2xl font-semibold">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
-    </div>
+    <label className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-[#171817]/12 bg-white px-3 py-2 text-sm font-semibold text-[#171817]">
+      <span>{label}</span>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="h-4 w-4 accent-[#171817]"
+      />
+    </label>
   );
 }
 
-function ReportFeedbackCard({
-  onSubmit,
-}: {
-  onSubmit: (payload: { rating: "yes" | "no"; comment?: string }) => void;
-}) {
-  const [rating, setRating] = useState<"yes" | "no" | null>(null);
-  const [comment, setComment] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+export default function ReportCenter() {
+  const [runs, setRuns] = useState<SourceRun[]>([]);
+  const [selectedRunId, setSelectedRunId] = useState("");
+  const [preview, setPreview] = useState<PreviewPayload | null>(null);
+  const [history, setHistory] = useState<ReportHistoryItem[]>([]);
+  const [settings, setSettings] = useState<ReportSettings>(DEFAULT_SETTINGS);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [uploadMessage, setUploadMessage] = useState("");
+  const [generatedReport, setGeneratedReport] = useState<ReportHistoryItem | null>(
+    null,
+  );
 
-  async function handleSubmit() {
-    if (!rating) return;
-    setLoading(true);
-    await onSubmit({ rating, comment: comment.trim() || undefined });
-    setLoading(false);
-    setSubmitted(true);
-  }
+  const selectedRun = useMemo(
+    () => runs.find((run) => run.runId === selectedRunId) ?? null,
+    [runs, selectedRunId],
+  );
 
-  if (submitted) {
-    return (
-      <div className="rounded-md border bg-muted/30 p-4 text-sm">
-        Thank you! Your feedback on this report has been recorded.
-      </div>
+  const loadHistory = useCallback(async () => {
+    const reports = await fetchJson<ReportHistoryItem[]>(
+      `${API_PREFIX}/reports?constituency=khordha`,
     );
+    setHistory(reports);
+  }, []);
+
+  const loadPreview = useCallback(async (runId: string) => {
+    const payload = await fetchJson<PreviewPayload>(
+      `${API_PREFIX}/reports/preview?runId=${encodeURIComponent(runId)}`,
+    );
+    setPreview(payload);
+  }, []);
+
+  const loadInitialData = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const source = await fetchJson<{ runs: SourceRun[] }>(
+        `${API_PREFIX}/reports/source-runs?constituency=khordha`,
+      );
+      setRuns(source.runs);
+      const latestRun = source.runs[0];
+      if (latestRun) {
+        setSelectedRunId(latestRun.runId);
+        await loadPreview(latestRun.runId);
+      }
+      await loadHistory();
+    } catch {
+      setError(
+        "No report-ready portfolio yet. Run portfolio optimization after defining wards, candidate projects, budget, and constraints.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [loadHistory, loadPreview]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      loadInitialData();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadInitialData]);
+
+  async function handleRunChange(runId: string) {
+    setSelectedRunId(runId);
+    setGeneratedReport(null);
+    setError("");
+    try {
+      await loadPreview(runId);
+    } catch {
+      setError("The selected optimization run is incomplete or unavailable.");
+    }
   }
+
+  async function handleCsvUpload(file: File | null) {
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    setUploadMessage("");
+    setGeneratedReport(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch(`${API_PREFIX}/reports/upload-source`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const payload = (await response.json()) as {
+        run: SourceRun;
+        preview: PreviewPayload;
+      };
+      setRuns((current) => [
+        payload.run,
+        ...current.filter((run) => run.runId !== payload.run.runId),
+      ]);
+      setSelectedRunId(payload.run.runId);
+      setPreview(payload.preview);
+      setUploadMessage(
+        `${file.name} loaded. Reports will use this uploaded priorities CSV.`,
+      );
+    } catch {
+      setError(
+        "Could not read this CSV. Upload the allocation plan CSV exported from Priorities.",
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function generateBrief() {
+    if (!selectedRunId) return;
+    setGenerating(true);
+    setError("");
+    try {
+      const response = await fetchJson<{
+        reportId: string;
+        format: OutputFormat;
+        createdAt: string;
+        downloadUrl: string;
+      }>(`${API_PREFIX}/reports`, {
+        method: "POST",
+        body: JSON.stringify({
+          runId: selectedRunId,
+          title: settings.title,
+          format: settings.format,
+          includeHotspotMap: settings.includeHotspotMap,
+          includeRejectedProjects: settings.includeRejectedProjects,
+          includeCitizenEvidence: settings.includeCitizenEvidence,
+        }),
+      });
+      const item: ReportHistoryItem = {
+        reportId: response.reportId,
+        title: settings.title,
+        portfolioRun: selectedRunId,
+        createdAt: response.createdAt,
+        status: "Draft",
+        format: response.format,
+        downloadUrl: response.downloadUrl,
+      };
+      setGeneratedReport(item);
+      await loadHistory();
+    } catch {
+      setError(
+        "We could not generate this report. The selected optimization run is incomplete or its project data is unavailable.",
+      );
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function downloadUrl(item: ReportHistoryItem, format = item.format) {
+    return `${API_BASE}${item.downloadUrl}?format=${format}`;
+  }
+
+  const reportReady = Boolean(selectedRun && preview);
 
   return (
-    <div className="rounded-md border p-4">
-      <h4 className="mb-2 text-sm font-medium">Was this report useful?</h4>
-      <div className="mb-3 flex gap-2">
-        <Button
-          variant={rating === "yes" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setRating("yes")}
-        >
-          Yes
-        </Button>
-        <Button
-          variant={rating === "no" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setRating("no")}
-        >
-          No
-        </Button>
-      </div>
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+      <section className="flex flex-wrap items-start justify-between gap-4 rounded-lg border border-[#171817]/15 bg-white p-5 shadow-sm">
+        <div>
+          <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#e25a45]">
+            Reports
+          </p>
+          <h1 className="mt-2 text-3xl font-black text-[#171817]">
+            Development Priority Decision Brief
+          </h1>
+          <p className="mt-2 max-w-3xl text-sm text-[#171817]/60">
+            Turn the latest recommended portfolio into a review-ready plan for
+            officials to preview, download, and retrieve from history.
+          </p>
+        </div>
 
-      {rating && (
-        <>
-          <textarea
-            className="mb-2 w-full rounded-md border p-2 text-sm"
-            rows={3}
-            placeholder="What should we improve? (optional)"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-          <Button size="sm" onClick={handleSubmit} disabled={loading}>
-            {loading ? "Sending…" : "Send feedback"}
-          </Button>
-        </>
+        <button
+          type="button"
+          onClick={generateBrief}
+          disabled={!reportReady || generating}
+          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#171817] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e25a45] disabled:cursor-not-allowed disabled:bg-[#171817]/35 sm:w-auto"
+        >
+          {generating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <FileText className="h-4 w-4" />
+          )}
+          Generate Decision Brief
+        </button>
+      </section>
+
+      {error && (
+        <section className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="font-bold text-amber-900">{error}</p>
+          <Link
+            href="/priorities"
+            className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-[#171817] underline underline-offset-2"
+          >
+            Go to Priorities <ArrowRight className="h-4 w-4" />
+          </Link>
+        </section>
       )}
+
+      <section className="flex flex-wrap items-center gap-3 rounded-lg border border-[#171817]/15 bg-white p-4 shadow-sm">
+        <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-dashed border-[#171817]/30 bg-slate-50 px-4 text-sm font-bold text-[#171817] hover:border-[#171817]">
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+          Upload Priorities CSV
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            disabled={uploading}
+            onChange={(event) => {
+              handleCsvUpload(event.target.files?.[0] ?? null);
+              event.currentTarget.value = "";
+            }}
+            className="sr-only"
+          />
+        </label>
+
+        <select
+          value={selectedRunId}
+          onChange={(event) => handleRunChange(event.target.value)}
+          disabled={loading || runs.length === 0}
+          className="min-h-11 min-w-[260px] rounded-lg border border-[#171817]/20 bg-white px-3 py-2 text-sm font-bold text-[#171817]"
+        >
+          {runs.length === 0 ? (
+            <option>No completed run</option>
+          ) : (
+            runs.map((run) => (
+              <option key={run.runId} value={run.runId}>
+                Latest completed run - {run.runId}
+              </option>
+            ))
+          )}
+        </select>
+
+        <div className="inline-flex min-h-11 overflow-hidden rounded-lg border border-[#171817]/20">
+          {(["pdf", "csv"] as OutputFormat[]).map((format) => (
+            <button
+              key={format}
+              type="button"
+              onClick={() => setSettings((current) => ({ ...current, format }))}
+              className={`px-4 text-sm font-bold uppercase ${
+                settings.format === format
+                  ? "bg-[#171817] text-white"
+                  : "bg-white text-[#171817]/65"
+              }`}
+            >
+              {format}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setSettingsOpen((value) => !value)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#171817]/20 bg-white px-4 text-sm font-bold text-[#171817]"
+        >
+          <Settings2 className="h-4 w-4" />
+          Settings
+        </button>
+
+        {uploadMessage && (
+          <p className="basis-full text-xs font-semibold text-emerald-700">
+            {uploadMessage}
+          </p>
+        )}
+      </section>
+
+      {settingsOpen && (
+        <section className="grid gap-3 rounded-lg border border-[#171817]/15 bg-white p-4 shadow-sm md:grid-cols-2">
+          <label className="md:col-span-2">
+            <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-[#171817]/50">
+              Report title
+            </span>
+            <input
+              value={settings.title}
+              onChange={(event) =>
+                setSettings((current) => ({
+                  ...current,
+                  title: event.target.value,
+                }))
+              }
+              className="min-h-11 w-full rounded-lg border border-[#171817]/20 px-3 text-sm font-semibold outline-none"
+            />
+          </label>
+          <Toggle
+            label="Include hotspot map"
+            checked={settings.includeHotspotMap}
+            onChange={(value) =>
+              setSettings((current) => ({ ...current, includeHotspotMap: value }))
+            }
+          />
+          <Toggle
+            label="Include rejected proposals"
+            checked={settings.includeRejectedProjects}
+            onChange={(value) =>
+              setSettings((current) => ({
+                ...current,
+                includeRejectedProjects: value,
+              }))
+            }
+          />
+          <Toggle
+            label="Include citizen evidence quotes"
+            checked={settings.includeCitizenEvidence}
+            onChange={(value) =>
+              setSettings((current) => ({
+                ...current,
+                includeCitizenEvidence: value,
+              }))
+            }
+          />
+        </section>
+      )}
+
+      {loading ? (
+        <section className="rounded-lg border border-[#171817]/15 bg-white p-8 shadow-sm">
+          <div className="flex items-center gap-3 text-[#171817]">
+            <Loader2 className="h-5 w-5 animate-spin" />
+            <div>
+              <p className="font-black">Preparing your Decision Brief</p>
+              <p className="text-sm text-[#171817]/55">
+                Collecting selected projects, verifying constraints, and
+                summarizing citizen evidence.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="grid gap-6 lg:grid-cols-[minmax(280px,0.75fr)_minmax(520px,1.25fr)]">
+          <aside className="space-y-4">
+            <div className="rounded-lg border border-[#171817]/15 bg-white p-5 shadow-sm">
+              <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#e25a45]">
+                Report Summary
+              </p>
+              {preview ? (
+                <div className="mt-4 grid gap-3">
+                  <SummaryTile label="Budget" value={inr(preview.summary.budget)} />
+                  <SummaryTile
+                    label="Recommended allocation"
+                    value={inr(preview.summary.totalAllocated)}
+                  />
+                  <SummaryTile
+                    label="Selected projects"
+                    value={preview.summary.selectedProjectCount}
+                  />
+                  <SummaryTile
+                    label="Coverage"
+                    value={`${preview.summary.wardCoverage} wards`}
+                  />
+                  <SummaryTile
+                    label="Created from"
+                    value={preview.runId.replace("run_", "Run #")}
+                  />
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-[#171817]/55">
+                  No optimized portfolio is available yet.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={generateBrief}
+              disabled={!reportReady || generating}
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#171817] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e25a45] disabled:cursor-not-allowed disabled:bg-[#171817]/35"
+            >
+              {generating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="h-4 w-4" />
+              )}
+              Generate Decision Brief
+            </button>
+          </aside>
+
+          <article className="rounded-lg border border-[#171817]/15 bg-white p-5 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#e25a45]">
+                  Report Preview
+                </p>
+                <h2 className="mt-1 text-2xl font-black text-[#171817]">
+                  Khordha Constituency Development Decision Brief
+                </h2>
+                <p className="mt-1 text-sm font-semibold text-amber-700">
+                  Status: Draft recommendation - requires authority review
+                </p>
+              </div>
+              {generatedReport && (
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={downloadUrl(generatedReport, "pdf")}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#171817]/20 px-4 text-sm font-bold text-[#171817]"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download PDF
+                  </a>
+                  <a
+                    href={downloadUrl(generatedReport, "csv")}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#171817]/20 px-4 text-sm font-bold text-[#171817]"
+                  >
+                    <FileDown className="h-4 w-4" />
+                    Download CSV
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {preview ? (
+              <div className="mt-6 space-y-6">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <SummaryTile
+                    label="Planning budget"
+                    value={inr(preview.summary.budget)}
+                  />
+                  <SummaryTile
+                    label="Unallocated reserve"
+                    value={inr(preview.summary.remainingBudget)}
+                  />
+                  <SummaryTile
+                    label="Timeline"
+                    value={`${preview.summary.timelineMonths} months`}
+                  />
+                </div>
+
+                <p className="rounded-lg bg-slate-50 p-4 text-sm text-[#171817]/70">
+                  This portfolio maximizes citizen-demand-weighted public benefit
+                  while respecting budget, timeline, geographic coverage, and
+                  project dependency constraints.
+                </p>
+
+                <div>
+                  <h3 className="mb-3 text-lg font-black text-[#171817]">
+                    Recommended projects
+                  </h3>
+                  <div className="overflow-x-auto rounded-lg border border-[#171817]/12">
+                    <table className="w-full min-w-[720px] text-left text-sm">
+                      <thead className="bg-slate-50 text-xs uppercase tracking-wider text-[#171817]/55">
+                        <tr>
+                          <th className="px-3 py-3">Priority</th>
+                          <th className="px-3 py-3">Project</th>
+                          <th className="px-3 py-3">Ward</th>
+                          <th className="px-3 py-3">Cost</th>
+                          <th className="px-3 py-3">Expected Benefit</th>
+                          <th className="px-3 py-3">Timeline</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#171817]/10">
+                        {preview.selectedProjects.slice(0, 6).map((project) => (
+                          <tr key={project.projectId}>
+                            <td className="px-3 py-3 font-bold">
+                              {project.priority}
+                            </td>
+                            <td className="px-3 py-3 font-semibold">
+                              {project.title}
+                            </td>
+                            <td className="px-3 py-3">{project.ward}</td>
+                            <td className="px-3 py-3">
+                              {inr(project.estimatedCost)}
+                            </td>
+                            <td className="px-3 py-3">
+                              {project.evidence.affectedPopulation.toLocaleString()}{" "}
+                              residents
+                            </td>
+                            <td className="px-3 py-3">
+                              {project.timelineMonths} months
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="mb-3 text-lg font-black text-[#171817]">
+                    Why these projects were selected
+                  </h3>
+                  <div className="space-y-3">
+                    {preview.selectedProjects.slice(0, 3).map((project) => (
+                      <section
+                        key={project.projectId}
+                        className="rounded-lg border border-[#171817]/12 p-4"
+                      >
+                        <h4 className="font-black text-[#171817]">
+                          Priority {project.priority}: {project.title}
+                        </h4>
+                        <ul className="mt-2 space-y-1 text-sm text-[#171817]/65">
+                          {project.whySelected.map((reason) => (
+                            <li key={reason}>- {reason}</li>
+                          ))}
+                        </ul>
+                      </section>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="mb-3 text-lg font-black text-[#171817]">
+                    Portfolio validation
+                  </h3>
+                  <div className="grid gap-2">
+                    {preview.constraintValidation.map((item) => (
+                      <div
+                        key={item.label}
+                        className="flex gap-2 rounded-lg bg-slate-50 p-3 text-sm text-[#171817]/70"
+                      >
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                        <span>
+                          <strong className="text-[#171817]">{item.label}:</strong>{" "}
+                          {item.message}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 rounded-lg bg-slate-50 p-8 text-center">
+                <p className="font-black text-[#171817]">
+                  No optimized portfolio is available yet.
+                </p>
+                <Link
+                  href="/priorities"
+                  className="mt-3 inline-flex items-center gap-1 font-bold text-[#171817] underline underline-offset-2"
+                >
+                  Go to Priorities <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            )}
+          </article>
+        </section>
+      )}
+
+      <section className="rounded-lg border border-[#171817]/15 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#e25a45]">
+              Report History
+            </p>
+            <h2 className="text-xl font-black text-[#171817]">
+              Recent decision briefs
+            </h2>
+          </div>
+        </div>
+
+        {history.length === 0 ? (
+          <p className="rounded-lg bg-slate-50 p-4 text-sm text-[#171817]/55">
+            Generated reports will appear here as immutable historical snapshots.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <thead className="border-b border-[#171817]/10 text-xs uppercase tracking-wider text-[#171817]/50">
+                <tr>
+                  <th className="py-3 pr-3">Report</th>
+                  <th className="py-3 pr-3">Portfolio Run</th>
+                  <th className="py-3 pr-3">Created</th>
+                  <th className="py-3 pr-3">Status</th>
+                  <th className="py-3 pr-3">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#171817]/10">
+                {history.map((item) => (
+                  <tr key={item.reportId}>
+                    <td className="py-3 pr-3 font-semibold text-[#171817]">
+                      {item.title}
+                      <span className="block text-xs text-[#171817]/45">
+                        {item.reportId}
+                      </span>
+                    </td>
+                    <td className="py-3 pr-3">{item.portfolioRun}</td>
+                    <td className="py-3 pr-3">{formatDate(item.createdAt)}</td>
+                    <td className="py-3 pr-3">{item.status}</td>
+                    <td className="py-3 pr-3">
+                      <div className="flex gap-2">
+                        <a
+                          href={downloadUrl(item, "pdf")}
+                          className="font-bold underline underline-offset-2"
+                        >
+                          PDF
+                        </a>
+                        <a
+                          href={downloadUrl(item, "csv")}
+                          className="font-bold underline underline-offset-2"
+                        >
+                          CSV
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

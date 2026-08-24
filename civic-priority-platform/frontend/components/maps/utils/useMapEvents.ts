@@ -13,6 +13,7 @@ export function useMapEvents() {
 
   const handleMapClick = useCallback(
     (event: LeafletMouseEvent) => {
+      clearSelection();
       if (!isPinMode) return;
 
       setPinLocation({
@@ -20,7 +21,7 @@ export function useMapEvents() {
         lng: event.latlng.lng,
       });
     },
-    [isPinMode, setPinLocation],
+    [isPinMode, setPinLocation, clearSelection],
   );
 
   useLeafletMapEvents({

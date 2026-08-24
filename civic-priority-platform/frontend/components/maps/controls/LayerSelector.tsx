@@ -55,7 +55,7 @@ export default function LayerSelector() {
   const { layers, toggleLayer } = useCivicMap();
 
   return (
-    <div className="absolute left-4 top-4 z-[1000] w-56 rounded-xl border bg-background/95 p-3 shadow-lg backdrop-blur-sm">
+    <div className="absolute left-4 top-4 z-[1000] w-auto max-w-[calc(100vw-2rem)] sm:w-56 rounded-xl border bg-background/95 p-3 shadow-lg backdrop-blur-sm">
       <div className="mb-3 flex items-center gap-2">
         <Layers className="h-4 w-4" />
 

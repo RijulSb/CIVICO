@@ -69,19 +69,13 @@ const navigationItems: NavigationItem[] = [
     requiresAuth: true,
     roles: ["official"],
   },
-  {
-    label: "My Requests",
-    href: "/submissions",
-    icon: ClipboardList,
-    requiresAuth: true,
-    roles: ["citizen"],
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
-    requiresAuth: true,
-  },
+  // {
+  //   label: "My Requests",
+  //   href: "/submissions",
+  //   icon: ClipboardList,
+  //   requiresAuth: true,
+  //   roles: ["citizen"],
+  // },
 ];
 
 export default function Navigation() {
@@ -114,11 +108,17 @@ export default function Navigation() {
             <Icon
               className={cn(
                 "h-4 w-4 transition-transform duration-200",
-                isActive ? "scale-110 !text-white" : "!text-[#171817] group-hover:scale-105",
+                isActive
+                  ? "scale-110 !text-white"
+                  : "!text-[#171817] group-hover:scale-105",
               )}
             />
 
-            <span className={cn(isActive ? "!text-white font-bold" : "!text-[#171817]")}>
+            <span
+              className={cn(
+                isActive ? "!text-white font-bold" : "!text-[#171817]",
+              )}
+            >
               {item.label}
             </span>
           </Link>

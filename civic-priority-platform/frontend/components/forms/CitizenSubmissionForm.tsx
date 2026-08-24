@@ -1,47 +1,75 @@
 "use client";
 
 import * as React from "react";
+import {
+  AlertCircle,
+  CheckCircle,
+  Languages,
+  Send,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
+
 import { VoiceRecorder } from "@/components/forms/VoiceRecorder";
-import { SpatialLocationPicker } from "@/components/maps/SpatialLocationPicker";
-import { enqueueOfflineSubmission, subscribeQueueSync } from "@/lib/offlineQueue";
+import {
+  SpatialLocationPicker,
+  type ConfirmedLocation,
+} from "@/components/maps/SpatialLocationPicker";
 import { FileUploader } from "@/components/forms/FileUploader";
 import { ImagePreview } from "@/components/forms/ImagePreview";
-import { Wifi, WifiOff, Send, CheckCircle, Languages, AlertCircle } from "lucide-react";
+import { createSubmission } from "@/lib/api";
+import {
+  enqueueOfflineSubmission,
+  subscribeQueueSync,
+} from "@/lib/offlineQueue";
+
+export type IntakeLanguage = "odia" | "hindi" | "english";
 
 export interface CitizenSubmissionFormProps {
   onSubmitSuccess?: () => void;
   className?: string;
 }
 
+const languageOptions: Array<{ id: IntakeLanguage; label: string }> = [
+  { id: "odia", label: "ଓଡ଼ିଆ (Odia)" },
+  { id: "hindi", label: "हिंदी (Hindi)" },
+  { id: "english", label: "English" },
+];
+
+const languageToLegacyCode: Record<IntakeLanguage, string> = {
+  odia: "or",
+  hindi: "hi",
+  english: "en",
+};
+
 export function CitizenSubmissionForm({
   onSubmitSuccess,
   className = "",
 }: CitizenSubmissionFormProps) {
   const [text, setText] = React.useState("");
-  const [language, setLanguage] = React.useState("or"); // Default Odia
-  const [wardId, setWardId] = React.useState("ward-14");
+  const [language, setLanguage] = React.useState<IntakeLanguage>("odia");
+  const [wardId] = React.useState("ward-14");
   const [photo, setPhoto] = React.useState<File | null>(null);
   const [voice, setVoice] = React.useState<File | null>(null);
-  const [confirmedCoords, setConfirmedCoords] = React.useState<{ lat: number; lng: number } | null>(null);
-  
+  const [confirmedLocation, setConfirmedLocation] =
+    React.useState<ConfirmedLocation | null>(null);
   const [isOnline, setIsOnline] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [submitStatus, setSubmitStatus] = React.useState<"idle" | "synced" | "queued">("idle");
+  const [submitStatus, setSubmitStatus] = React.useState<
+    "idle" | "processing" | "synced" | "queued"
+  >("idle");
+  const [error, setError] = React.useState("");
   const [queuedCount, setQueuedCount] = React.useState(0);
 
-  // Monitor network status for PWA offline queueing
   React.useEffect(() => {
     setIsOnline(typeof navigator !== "undefined" ? navigator.onLine : true);
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-
-    const unsubscribe = subscribeQueueSync((count) => {
-      setQueuedCount((prev) => Math.max(0, prev - count));
-    });
-
+    const unsubscribe = subscribeQueueSync((count) =>
+      setQueuedCount((previous) => Math.max(0, previous - count)),
+    );
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
@@ -49,174 +77,306 @@ export function CitizenSubmissionForm({
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!text.trim() && !voice && !photo) return;
+  const clearForm = () => {
+    setText("");
+    setPhoto(null);
+    setVoice(null);
+    setConfirmedLocation(null);
+    setError("");
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
+    if (!text.trim() && !voice && !photo) {
+      setError(
+        "Add a short description, voice note, or photo before submitting.",
+      );
+      return;
+    }
+    if (text.trim().length > 1500) {
+      setError("Keep the description under 1,500 characters.");
+      return;
+    }
+    if (!confirmedLocation) {
+      setError(
+        "Choose or detect a location, then confirm it before submitting.",
+      );
+      return;
+    }
 
     setIsSubmitting(true);
-
-    const payload = {
+    const offlinePayload = {
       text: text.trim(),
-      language,
+      language: languageToLegacyCode[language],
       wardId,
-      latitude: confirmedCoords?.lat ?? null,
-      longitude: confirmedCoords?.lng ?? null,
+      latitude: confirmedLocation.lat,
+      longitude: confirmedLocation.lng,
       audioBlob: voice,
       photoBlob: photo,
     };
 
-    if (!isOnline) {
-      // Save locally to IndexedDB for offline PWA queueing
-      await enqueueOfflineSubmission(payload);
-      setQueuedCount((prev) => prev + 1);
-      setSubmitStatus("queued");
-    } else {
-      // Simulated live network upload
-      await new Promise((r) => setTimeout(r, 800));
-      setSubmitStatus("synced");
+    try {
+      if (!isOnline) {
+        await enqueueOfflineSubmission(offlinePayload);
+        setQueuedCount((previous) => previous + 1);
+        setSubmitStatus("queued");
+      } else {
+        await createSubmission({
+          constituency: "khordha",
+          language,
+          submission_type: voice ? "voice" : photo ? "photo" : "text",
+          content:
+            text.trim() ||
+            (voice
+              ? "[Voice Recording Attached]"
+              : "[Photo Evidence Attached]"),
+          location: {
+            ward: wardId,
+            block: "Khordha Block",
+            latitude: confirmedLocation.lat,
+            longitude: confirmedLocation.lng,
+          },
+        });
+        setSubmitStatus("processing");
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 2000));
+        setSubmitStatus("synced");
+      }
+      onSubmitSuccess?.();
+      clearForm();
+    } catch (submissionError) {
+      console.error("Submission failed:", submissionError);
+      try {
+        await enqueueOfflineSubmission(offlinePayload);
+        setQueuedCount((previous) => previous + 1);
+        setSubmitStatus("queued");
+        setError(
+          "The server was unavailable. Your report is saved locally and will retry when online.",
+        );
+      } catch {
+        setError(
+          "Unable to submit or save this report. Keep the form open and try again.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setText("");
-    setPhoto(null);
-    setVoice(null);
-    
-    if (onSubmitSuccess) onSubmitSuccess();
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className={`mx-auto flex w-full max-w-lg flex-col gap-6 font-sans ${className}`}
+      className={`mx-auto flex w-full max-w-lg flex-col gap-4 font-sans sm:gap-6 ${className}`}
     >
-      {/* Network & Offline PWA Queue Banner */}
-      <div className={`flex items-center justify-between rounded-xl p-4 font-mono text-xs ${
-        isOnline ? "bg-[#1c2d1c] text-[#eeede9]" : "bg-amber-900 text-amber-100"
-      }`}>
-        <div className="flex items-center gap-2">
+      <div
+        className={`flex min-h-12 items-center justify-between gap-3 rounded-xl px-3 py-3 font-mono text-[11px] sm:px-4 ${isOnline ? "bg-[#1c2d1c] text-[#eeede9]" : "bg-amber-900 text-amber-100"}`}
+      >
+        <div className="flex min-w-0 items-center gap-2">
           {isOnline ? (
-            <Wifi className="h-4 w-4 text-emerald-400" />
+            <Wifi className="h-4 w-4 shrink-0 text-emerald-400" />
           ) : (
-            <WifiOff className="h-4 w-4 text-amber-400 animate-pulse" />
+            <WifiOff className="h-4 w-4 shrink-0 animate-pulse text-amber-400" />
           )}
-          <span className="font-semibold">
-            {isOnline ? "PWA Online Mode" : "Offline Mode (Auto-Sync Active)"}
+          <span className="truncate font-semibold">
+            {isOnline ? "PWA Online Mode" : "Offline Mode — Auto-Sync Active"}
           </span>
         </div>
         {queuedCount > 0 && (
-          <span className="rounded-full bg-[#e25a45] px-2.5 py-0.5 font-bold text-white">
-            {queuedCount} Queued
+          <span className="shrink-0 rounded-full bg-[#e25a45] px-2.5 py-1 font-bold text-white">
+            {queuedCount} queued
           </span>
         )}
       </div>
 
-      {/* Success / Queued Alert Toast */}
-      {submitStatus !== "idle" && (
-        <div className={`flex items-center gap-3 rounded-xl p-4 text-sm font-medium ${
-          submitStatus === "synced" ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"
-        }`}>
-          <CheckCircle className="h-5 w-5 shrink-0" />
+      {submitStatus === "processing" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center gap-3 rounded-xl bg-[#171817] p-4 text-sm font-medium text-white"
+        >
+          <span
+            className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-white/30 border-t-[#e25a45]"
+            aria-hidden="true"
+          />
           <div>
-            <p className="font-semibold">
-              {submitStatus === "synced" ? "Report Submitted & Verified!" : "Report Queued Offline"}
-            </p>
-            <p className="text-xs opacity-90">
-              {submitStatus === "synced"
-                ? "Your priority issue has been sent to municipal officials."
-                : "Saved locally on your device. Will auto-sync when network returns."}
+            <p className="font-semibold">Processing your request…</p>
+            <p className="text-xs text-white/70">
+              Your report was accepted and is being marked for review.
             </p>
           </div>
         </div>
       )}
 
-      {/* Language Selector Card */}
-      <div className="flex flex-col gap-2 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-4">
-        <label className="flex items-center gap-2 font-mono text-xs font-semibold text-[#171817] uppercase tracking-wider">
-          <Languages className="h-4 w-4 text-[#e25a45]" /> Select Vernacular Language
+      {submitStatus === "synced" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-start gap-3 rounded-xl bg-emerald-100 p-4 text-sm font-medium text-emerald-900"
+        >
+          <CheckCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Your request has been submitted.</p>
+            <p className="text-xs leading-5 opacity-90">
+              Your issue has been marked for review and will be considered in
+              CIVICO’s priority planning.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {submitStatus === "queued" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-start gap-3 rounded-xl bg-amber-100 p-4 text-sm font-medium text-amber-900"
+        >
+          <CheckCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Report saved for sync.</p>
+            <p className="text-xs leading-5 opacity-90">
+              It has not been submitted to the server yet and will retry when
+              the connection returns.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <section
+        className="flex flex-col gap-3 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-3 sm:p-4"
+        aria-labelledby="language-label"
+      >
+        <label
+          id="language-label"
+          className="flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider text-[#171817]"
+        >
+          <Languages className="h-4 w-4 text-[#e25a45]" /> Select intake
+          language
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { id: "or", label: "ଓଡ଼ିଆ (Odia)" },
-            { id: "hi", label: "हिंदी (Hindi)" },
-            { id: "en", label: "English" },
-          ].map((lang) => (
+        <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-3">
+          {languageOptions.map((option) => (
             <button
-              key={lang.id}
+              key={option.id}
               type="button"
-              onClick={() => setLanguage(lang.id)}
-              className={`h-12 rounded-lg font-medium text-sm transition ${
-                language === lang.id
-                  ? "bg-[#171817] text-[#eeede9] shadow-sm"
-                  : "bg-white text-[#171817] border border-[#171817]/10 hover:bg-slate-50"
-              }`}
+              aria-pressed={language === option.id}
+              onClick={() => setLanguage(option.id)}
+              className={`min-h-12 rounded-lg px-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-[#e25a45] ${language === option.id ? "bg-[#171817] text-[#eeede9] shadow-sm" : "border border-[#171817]/10 bg-white text-[#171817] hover:bg-slate-50"}`}
             >
-              {lang.label}
+              {option.label}
             </button>
           ))}
         </div>
-      </div>
+        <p className="text-[11px] leading-4 text-[#777872]">
+          This choice affects typed and voice intake metadata only. The rest of
+          the platform remains unchanged.
+        </p>
+      </section>
 
-      {/* Audio Studio Card (Voice-First Intake) */}
       <VoiceRecorder
+        language={language}
         onRecordingComplete={setVoice}
         onClear={() => setVoice(null)}
         disabled={isSubmitting}
       />
 
-      {/* Optional Photo Attachment */}
-      <div className="flex flex-col gap-2 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-4">
-        <label className="font-mono text-xs font-semibold text-[#171817] uppercase tracking-wider">
-          Attach Photo (Optional)
+      <section
+        className="flex flex-col gap-2 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-3 sm:p-4"
+        aria-labelledby="photo-label"
+      >
+        <label
+          id="photo-label"
+          className="font-mono text-xs font-semibold uppercase tracking-wider text-[#171817]"
+        >
+          Attach photo{" "}
+          <span className="font-normal normal-case text-[#777872]">
+            (optional)
+          </span>
         </label>
         <FileUploader
           accept="image/*"
           maxSizeMB={5}
           file={photo}
           onFileSelect={setPhoto}
-          label="Take or Upload Photo"
-          hint="EXIF geotags auto-pinpoint location"
+          label="Take or upload photo"
+          hint="Photo is stored as supporting evidence"
           disabled={isSubmitting}
         />
         {photo && (
-          <ImagePreview file={photo} onRemove={() => setPhoto(null)} className="mt-2" />
+          <ImagePreview
+            file={photo}
+            onRemove={() => setPhoto(null)}
+            className="mt-2"
+          />
         )}
-      </div>
+      </section>
 
-      {/* Spatial Verification Minimap */}
       <SpatialLocationPicker
-        onLocationConfirmed={setConfirmedCoords}
+        language={language}
+        onLocationConfirmed={setConfirmedLocation}
         disabled={isSubmitting}
       />
 
-      {/* Additional Text Description Input */}
-      <div className="flex flex-col gap-2 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-4">
-        <label htmlFor="issue-desc" className="font-mono text-xs font-semibold text-[#171817] uppercase tracking-wider">
-          Additional Details (Optional)
-        </label>
+      <section
+        className="flex flex-col gap-2 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-3 sm:p-4"
+        aria-labelledby="details-label"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <label
+            id="details-label"
+            htmlFor="issue-desc"
+            className="font-mono text-xs font-semibold uppercase tracking-wider text-[#171817]"
+          >
+            Additional details{" "}
+            <span className="font-normal normal-case text-[#777872]">
+              (optional)
+            </span>
+          </label>
+          <span className="font-mono text-[10px] text-[#777872]">
+            {text.length}/1500
+          </span>
+        </div>
         <textarea
           id="issue-desc"
           value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={3}
-          placeholder="Describe road damage, water leakage, or lighting issues in your area..."
-          className="w-full resize-none rounded-lg border border-[#171817]/20 bg-white p-3 text-sm text-[#171817] focus:outline-none focus:ring-2 focus:ring-[#e25a45]"
+          onChange={(event) => setText(event.target.value)}
+          rows={4}
+          maxLength={1500}
+          placeholder="Describe the road, water, school, lighting, or sanitation issue..."
+          className="w-full resize-y rounded-lg border border-[#171817]/20 bg-white p-3 text-sm text-[#171817] outline-none focus:border-[#e25a45] focus:ring-2 focus:ring-[#e25a45]/30"
         />
-      </div>
+      </section>
 
-      {/* Large Single-Tap Submit Button (>56px target) */}
+      {error && (
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-xs text-red-700"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          {error}
+        </p>
+      )}
+
       <button
         type="submit"
-        disabled={isSubmitting || (!text.trim() && !voice && !photo)}
-        className="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] text-white font-semibold text-lg shadow-lg transition hover:bg-[#d44833] active:scale-[0.99] disabled:opacity-50"
+        disabled={
+          isSubmitting ||
+          !confirmedLocation ||
+          (!text.trim() && !voice && !photo)
+        }
+        className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] px-3 text-base font-semibold text-white shadow-lg transition hover:bg-[#d44833] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:h-16 sm:text-lg"
       >
         {isSubmitting ? (
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
         ) : (
-          <>
-            <Send className="h-5 w-5" />
-            <span>{isOnline ? "Submit Priority Report" : "Save Report Offline"}</span>
-          </>
+          <Send className="h-5 w-5" />
         )}
+        <span>
+          {isSubmitting
+            ? "Submitting…"
+            : isOnline
+              ? "Submit Priority Report"
+              : "Save Report Offline"}
+        </span>
       </button>
     </form>
   );

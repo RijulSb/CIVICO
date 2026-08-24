@@ -11,10 +11,10 @@ from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 class Issue(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "issues"
 
-    project_id: Mapped[UUID] = mapped_column(
+    project_id: Mapped[UUID | None] = mapped_column(
         PGUUID(as_uuid=True),
         ForeignKey("projects.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
     title: Mapped[str] = mapped_column(String(200), nullable=False)
@@ -23,7 +23,7 @@ class Issue(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     language: Mapped[str] = mapped_column(String(20), nullable=False, default="en")
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="submitted", index=True)
     location = mapped_column(
-        Geography(geometry_type="POINT", srid=4326, spatial_index=True),
+        Geography(geometry_type="POINT", srid=4326, spatial_index=False),
         nullable=True,
     )
 

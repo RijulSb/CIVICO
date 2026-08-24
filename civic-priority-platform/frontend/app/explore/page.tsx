@@ -16,9 +16,7 @@ const CivicMap = dynamic(() => import("@/components/maps/CivicMap"), {
 export default function ExplorePage() {
   return (
     <main className="relative h-[calc(100vh-4rem)] w-full overflow-hidden">
-      <MapProvider>
-        <CivicMap />
-      </MapProvider>
+      <CivicMap />
     </main>
   );
 }

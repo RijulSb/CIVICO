@@ -1,31 +1,36 @@
 from datetime import datetime
-from uuid import UUID
+from typing import Literal
 
-from pydantic import Field
-
-from app.schemas.common import APIModel
-from app.schemas.priorities import PriorityResponse
+from pydantic import BaseModel, Field
 
 
-class ReportCreate(APIModel):
-    constituency_id: UUID
-    title: str = Field(min_length=1, max_length=200)
-    description: str | None = Field(default=None, max_length=5_000)
-    issue_ids: list[UUID] = Field(default_factory=list, max_length=500)
+class ReportCreate(BaseModel):
+    runId: str
+    title: str = Field(
+        default="Khordha Development Priority Decision Brief",
+        min_length=1,
+        max_length=180,
+    )
+    format: Literal["pdf", "csv"] = "pdf"
+    includeHotspotMap: bool = True
+    includeRejectedProjects: bool = False
+    includeCitizenEvidence: bool = True
 
 
-class ReportJobResponse(APIModel):
-    report_id: UUID
-    status: str
-    created_at: datetime
-    location: str | None = None
+class ReportJobResponse(BaseModel):
+    reportId: str
+    status: Literal["generated"]
+    format: Literal["pdf", "csv"]
+    createdAt: datetime
+    downloadUrl: str
+    previewUrl: str
 
 
-class ReportResponse(APIModel):
-    id: UUID
+class ReportResponse(BaseModel):
+    reportId: str
     title: str
+    portfolioRun: str
+    createdAt: datetime
     status: str
-    executive_summary: str | None = None
-    priorities: list[PriorityResponse] = Field(default_factory=list)
-    created_at: datetime
-    completed_at: datetime | None = None
+    format: Literal["pdf", "csv"]
+    downloadUrl: str

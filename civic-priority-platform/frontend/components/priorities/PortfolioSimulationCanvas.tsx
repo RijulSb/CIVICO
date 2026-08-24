@@ -13,6 +13,8 @@ import {
   ArrowRightLeft,
   Sparkles,
   FileCheck,
+  Sliders,
+  ShieldCheck,
 } from "lucide-react";
 
 export interface OptimizedProject {
@@ -26,6 +28,7 @@ export interface OptimizedProject {
   ward: string;
   selectedPlanA: boolean;
   selectedPlanB: boolean;
+  displacedProjectCode?: string;
 }
 
 const mockProjects: OptimizedProject[] = [
@@ -88,11 +91,13 @@ const mockProjects: OptimizedProject[] = [
     ward: "Ward 22",
     selectedPlanA: false,
     selectedPlanB: false,
+    displacedProjectCode: "PROJ-105 Evicted by Knapsack Solver to stay in Budget",
   },
 ];
 
 export function PortfolioSimulationCanvas() {
   const [activePlan, setActivePlan] = React.useState<"planA" | "planB" | "compare">("compare");
+  const [activeConstraintScenario, setActiveConstraintScenario] = React.useState<"baseline" | "strict_equity">("baseline");
 
   // Plan A Metrics
   const planAProjects = mockProjects.filter((p) => p.selectedPlanA);
@@ -111,10 +116,10 @@ export function PortfolioSimulationCanvas() {
         <div>
           <div className="flex items-center gap-2 font-mono text-xs text-[#e25a45] uppercase tracking-wider">
             <Briefcase className="h-4 w-4 animate-pulse" />
-            <span>Simulation Canvas • Scenario Sandbox</span>
+            <span>Simulation Canvas • Optimization Constraint Sandbox</span>
           </div>
           <h2 className="mt-1 text-lg font-bold tracking-tight text-white">
-            Portfolio Allocation & Tradeoff Analysis
+            Portfolio Allocation & Tradeoff Analysis (Ward Level)
           </h2>
         </div>
 
@@ -123,7 +128,7 @@ export function PortfolioSimulationCanvas() {
           <button
             type="button"
             onClick={() => setActivePlan("planA")}
-            className={`rounded-lg px-3 py-1.5 font-semibold transition ${
+            className={`rounded-lg px-3 py-1.5 font-semibold transition cursor-pointer ${
               activePlan === "planA" ? "bg-[#e25a45] text-white" : "text-white/70 hover:bg-white/10"
             }`}
           >
@@ -132,7 +137,7 @@ export function PortfolioSimulationCanvas() {
           <button
             type="button"
             onClick={() => setActivePlan("planB")}
-            className={`rounded-lg px-3 py-1.5 font-semibold transition ${
+            className={`rounded-lg px-3 py-1.5 font-semibold transition cursor-pointer ${
               activePlan === "planB" ? "bg-[#3b82f6] text-white" : "text-white/70 hover:bg-white/10"
             }`}
           >
@@ -141,32 +146,34 @@ export function PortfolioSimulationCanvas() {
           <button
             type="button"
             onClick={() => setActivePlan("compare")}
-            className={`rounded-lg px-3 py-1.5 font-semibold transition ${
+            className={`rounded-lg px-3 py-1.5 font-semibold transition cursor-pointer ${
               activePlan === "compare" ? "bg-white text-[#171817]" : "text-white/70 hover:bg-white/10"
             }`}
           >
             <ArrowRightLeft className="h-3.5 w-3.5 inline mr-1" />
-            Compare Side-by-Side
+            Compare Optimization Constraints
           </button>
         </div>
       </div>
 
       {/* Main Sandbox Canvas */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        {/* Scenario Comparison Sandbox Panel */}
+        {/* Compare Optimization Constraints Panel */}
         {activePlan === "compare" && (
-          <div className="rounded-xl border border-[#171817]/20 bg-white p-5 shadow-sm space-y-4">
+          <div className="rounded-2xl border border-[#171817]/20 bg-white p-5 shadow-sm space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 font-mono text-xs font-bold text-[#171817] uppercase tracking-wider">
-                <ArrowRightLeft className="h-4 w-4 text-[#e25a45]" />
-                <span>Scenario Comparison Sandbox (Plan A vs. Plan B)</span>
+                <Sliders className="h-4 w-4 text-[#e25a45]" />
+                <span>Compare Optimization Constraints (Plan A vs Plan B)</span>
               </div>
-              <span className="font-mono text-xs text-emerald-700 font-semibold flex items-center gap-1">
-                <Sparkles className="h-3.5 w-3.5" /> Automated Tradeoff Engine Active
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-emerald-700 font-semibold flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                  <Sparkles className="h-3.5 w-3.5 text-emerald-600" /> PuLP ILP Solver Active
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-5">
               {/* Plan A Column */}
               <div className="rounded-xl border border-[#e25a45]/30 bg-[#eeede9]/50 p-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -177,6 +184,13 @@ export function PortfolioSimulationCanvas() {
                     OPTIMAL IMPACT
                   </span>
                 </div>
+
+                <div className="space-y-1 font-mono text-[11px] text-[#777872] bg-white p-2.5 rounded-lg border border-slate-200">
+                  <p>• CAPEX Limit: <strong className="text-[#171817]">₹ 45.0 Cr</strong></p>
+                  <p>• Regional Equity Cap: <strong className="text-[#171817]">35% max / ward</strong></p>
+                  <p>• Max Ward Projects: <strong className="text-[#171817]">3 per ward</strong></p>
+                </div>
+
                 <div className="grid grid-cols-2 gap-2 font-mono text-xs bg-white p-3 rounded-lg border border-slate-200">
                   <div>
                     <span className="text-[#777872] text-[10px]">CAPEX Spent</span>
@@ -187,6 +201,7 @@ export function PortfolioSimulationCanvas() {
                     <p className="font-bold text-[#e25a45] text-base">{planALives.toLocaleString()}</p>
                   </div>
                 </div>
+
                 <p className="font-mono text-xs text-[#777872]">
                   Efficiency Metric: <strong className="text-[#171817]">₹ {( (planACost * 10000000) / planALives ).toFixed(0)} / Person Affected</strong>
                 </p>
@@ -202,6 +217,13 @@ export function PortfolioSimulationCanvas() {
                     EQUITY BALANCED
                   </span>
                 </div>
+
+                <div className="space-y-1 font-mono text-[11px] text-[#777872] bg-white p-2.5 rounded-lg border border-slate-200">
+                  <p>• CAPEX Limit: <strong className="text-[#171817]">₹ 35.0 Cr</strong></p>
+                  <p>• Regional Equity Cap: <strong className="text-[#171817]">25% max / ward</strong></p>
+                  <p>• Max Ward Projects: <strong className="text-[#171817]">2 per ward</strong></p>
+                </div>
+
                 <div className="grid grid-cols-2 gap-2 font-mono text-xs bg-white p-3 rounded-lg border border-slate-200">
                   <div>
                     <span className="text-[#777872] text-[10px]">CAPEX Spent</span>
@@ -212,6 +234,7 @@ export function PortfolioSimulationCanvas() {
                     <p className="font-bold text-[#3b82f6] text-base">{planBLives.toLocaleString()}</p>
                   </div>
                 </div>
+
                 <p className="font-mono text-xs text-[#777872]">
                   Efficiency Metric: <strong className="text-[#171817]">₹ {( (planBCost * 10000000) / planBLives ).toFixed(0)} / Person Affected</strong>
                 </p>
@@ -220,10 +243,10 @@ export function PortfolioSimulationCanvas() {
           </div>
         )}
 
-        {/* Project Selection & Allocation List */}
+        {/* Project Selection & Allocation Matrix List */}
         <div className="space-y-3">
           <div className="flex items-center justify-between font-mono text-xs text-[#777872]">
-            <span>Candidate Capital Projects ({mockProjects.length})</span>
+            <span>Candidate Capital Projects ({mockProjects.length}) — Ward Allocation</span>
             <span>Knapsack Selection Matrix</span>
           </div>
 
@@ -251,6 +274,13 @@ export function PortfolioSimulationCanvas() {
                     <p className="text-[11px] text-[#777872]">Estimated CAPEX</p>
                   </div>
                 </div>
+
+                {proj.displacedProjectCode && (
+                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-2 font-mono text-[10px] text-amber-900 flex items-center gap-1.5">
+                    <AlertCircle className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                    <span>Tradeoff Note: {proj.displacedProjectCode}</span>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100 font-mono text-xs">
                   <div className="flex items-center gap-4 text-[#777872]">
@@ -283,10 +313,10 @@ export function PortfolioSimulationCanvas() {
 
       {/* Canvas Footer */}
       <div className="border-t border-[#171817]/15 bg-[#e2e1db] p-3 font-mono text-xs text-[#777872] flex items-center justify-between">
-        <span>Optimization Algorithm: Branch & Bound Knapsack</span>
+        <span>Optimization Algorithm: Branch & Bound 0/1 Knapsack (PuLP ILP Engine)</span>
         <button
           type="button"
-          className="flex items-center gap-1 font-bold text-[#171817] hover:text-[#e25a45] transition"
+          className="flex items-center gap-1 font-bold text-[#171817] hover:text-[#e25a45] transition cursor-pointer"
         >
           <FileCheck className="h-4 w-4 text-[#e25a45]" />
           <span>Formally Sanction Portfolio Allocation</span>

@@ -1,29 +1,52 @@
 "use client";
 
 import * as React from "react";
-import { Mic, Square, Trash2, Play, Pause, Radio, Languages, Sparkles } from "lucide-react";
+import {
+  Mic,
+  Square,
+  Trash2,
+  Play,
+  Pause,
+  Radio,
+  Sparkles,
+  Loader2,
+} from "lucide-react";
+
+export type IntakeLanguage = "odia" | "hindi" | "english";
 
 export interface VoiceRecorderProps {
   onRecordingComplete: (file: File) => void;
   onClear?: () => void;
+  language?: IntakeLanguage;
   maxDurationSeconds?: number;
   disabled?: boolean;
   className?: string;
 }
 
-type RecorderState = "idle" | "requesting" | "recording" | "recorded" | "denied";
+const languageLabels: Record<IntakeLanguage, string> = {
+  odia: "Odia",
+  hindi: "Hindi",
+  english: "English",
+};
+
+type RecorderState =
+  | "idle"
+  | "requesting"
+  | "recording"
+  | "recorded"
+  | "denied";
 
 export function VoiceRecorder({
   onRecordingComplete,
   onClear,
-  maxDurationSeconds = 180,
+  language = "english",
+  maxDurationSeconds = 120,
   disabled = false,
   className = "",
 }: VoiceRecorderProps) {
   const [state, setState] = React.useState<RecorderState>("idle");
   const [elapsed, setElapsed] = React.useState(0);
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null);
-  const [detectedLanguage, setDetectedLanguage] = React.useState<string | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   const recorderRef = React.useRef<MediaRecorder | null>(null);
@@ -43,58 +66,72 @@ export function VoiceRecorder({
     }
   };
 
+  const cleanupAudio = () => {
+    stopTimer();
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (animFrameRef.current !== null)
+      cancelAnimationFrame(animFrameRef.current);
+    animFrameRef.current = null;
+    if (audioContextRef.current) void audioContextRef.current.close();
+    audioContextRef.current = null;
+    analyserRef.current = null;
+  };
+
   const drawWaveform = () => {
     if (!canvasRef.current || !analyserRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    const bufferLength = analyserRef.current.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const analyser = analyserRef.current;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
     const render = () => {
       if (!analyserRef.current) return;
-      analyserRef.current.getByteFrequencyData(dataArray);
-
+      analyser.getByteFrequencyData(dataArray);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const barWidth = (canvas.width / bufferLength) * 2.5;
+      const barWidth = (canvas.width / dataArray.length) * 2.5;
       let x = 0;
-
-      for (let i = 0; i < bufferLength; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height;
+      for (const value of dataArray) {
+        const barHeight = (value / 255) * canvas.height;
         ctx.fillStyle = "#e25a45";
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
         x += barWidth + 2;
       }
-
       animFrameRef.current = requestAnimationFrame(render);
     };
-
     render();
   };
 
   const startRecording = async () => {
+    if (
+      typeof navigator === "undefined" ||
+      !navigator.mediaDevices?.getUserMedia
+    ) {
+      setState("denied");
+      return;
+    }
     setState("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-
-      // Setup Web Audio API Wave Visualizer
-      const audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-      audioContextRef.current = audioCtx;
-      const source = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
+      const audioContext = new (
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext
+      )();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
       analyser.fftSize = 64;
       source.connect(analyser);
       analyserRef.current = analyser;
 
       const recorder = new MediaRecorder(stream);
       chunksRef.current = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
       };
-
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, {
           type: recorder.mimeType || "audio/webm",
@@ -104,16 +141,7 @@ export function VoiceRecorder({
         });
         setAudioUrl(URL.createObjectURL(blob));
         setState("recorded");
-
-        // Simulated AI Indic Language Detector (Odia / Hindi / English)
-        const sampleLangs = ["Odia (ଓଡ଼ିଆ)", "Hindi (हिंदी)", "English"];
-        const detected = sampleLangs[Math.floor(Math.random() * sampleLangs.length)];
-        setDetectedLanguage(detected);
-
-        stream.getTracks().forEach((t) => t.stop());
-        if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-        if (audioContextRef.current) audioContextRef.current.close();
-
+        cleanupAudio();
         onRecordingComplete(file);
       };
 
@@ -122,106 +150,134 @@ export function VoiceRecorder({
       setState("recording");
       setElapsed(0);
       drawWaveform();
-
       timerRef.current = window.setInterval(() => {
-        setElapsed((prev) => {
-          const next = prev + 1;
+        setElapsed((previous) => {
+          const next = previous + 1;
           if (next >= maxDurationSeconds) recorder.stop();
           return next;
         });
       }, 1000);
     } catch {
+      cleanupAudio();
       setState("denied");
     }
   };
 
   const stopRecording = () => {
-    recorderRef.current?.stop();
+    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
     stopTimer();
   };
 
   const clear = () => {
-    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    const audio = audioElemRef.current;
+    audio?.pause();
+    audio?.removeAttribute("src");
+    audio?.load();
     setAudioUrl(null);
     setState("idle");
     setElapsed(0);
-    setDetectedLanguage(null);
     setIsPlaying(false);
     onClear?.();
   };
 
   const togglePlayback = () => {
-    if (!audioElemRef.current) return;
+    const audio = audioElemRef.current;
+    if (!audio) return;
     if (isPlaying) {
-      audioElemRef.current.pause();
+      audio.pause();
       setIsPlaying(false);
     } else {
-      audioElemRef.current.play();
+      void audio.play();
       setIsPlaying(true);
     }
   };
 
-  const formatTime = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
+  const formatTime = (seconds: number) =>
+    `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
-  React.useEffect(() => {
-    return () => {
-      stopTimer();
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+  React.useEffect(
+    () => () => {
+      cleanupAudio();
+      const audio = audioElemRef.current;
+      audio?.pause();
+      audio?.removeAttribute("src");
+      audio?.load();
       if (audioUrl) URL.revokeObjectURL(audioUrl);
-    };
-  }, [audioUrl]);
+    },
+    [audioUrl],
+  );
 
   return (
-    <div className={`flex flex-col gap-3 rounded-xl border border-[#171817]/20 bg-[#eeede9] p-4 ${className}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 font-mono text-xs text-[#171817]">
-          <Radio className="h-4 w-4 text-[#e25a45] animate-pulse" />
-          <span className="font-semibold uppercase tracking-wider">Audio Studio</span>
+    <div
+      className={`flex min-w-0 flex-col gap-3 rounded-xl border border-[#171817]/20 bg-[#eeede9] p-3 sm:p-4 ${className}`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2 font-mono text-xs text-[#171817]">
+          <Radio
+            className="h-4 w-4 shrink-0 animate-pulse text-[#e25a45]"
+            aria-hidden="true"
+          />
+          <span className="truncate font-semibold uppercase tracking-wider">
+            Audio Studio
+          </span>
         </div>
-        {detectedLanguage && (
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#1c2d1c] px-3 py-1 font-mono text-xs text-[#eeede9]">
-            <Sparkles className="h-3 w-3 text-[#e25a45]" />
-            <span>{detectedLanguage}</span>
-          </div>
-        )}
+        <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#1c2d1c] px-2.5 py-1 font-mono text-[10px] text-[#eeede9]">
+          <Sparkles className="h-3 w-3 text-[#e25a45]" aria-hidden="true" />
+          <span>Intake: {languageLabels[language]}</span>
+        </div>
       </div>
 
-      {/* Waveform Visualizer Canvas */}
-      <div className="relative flex h-16 w-full items-center justify-center rounded-lg border border-[#171817]/10 bg-[#1c2d1c]/5 px-4 overflow-hidden">
+      <div className="relative flex h-16 w-full items-center justify-center overflow-hidden rounded-lg border border-[#171817]/10 bg-[#1c2d1c]/5 px-4">
         {state === "recording" ? (
-          <canvas ref={canvasRef} width={300} height={48} className="w-full h-12" />
+          <canvas
+            ref={canvasRef}
+            width={300}
+            height={48}
+            className="h-12 w-full"
+            aria-label="Recording waveform"
+          />
         ) : state === "recorded" ? (
-          <div className="flex items-center gap-1 w-full justify-center">
-            {Array.from({ length: 28 }).map((_, i) => (
+          <div
+            className="flex w-full items-center justify-center gap-1"
+            aria-label="Recording ready"
+          >
+            {Array.from({ length: 28 }).map((_, index) => (
               <div
-                key={i}
-                className="w-1.5 bg-[#171817]/40 rounded-full"
-                style={{ height: `${Math.max(12, Math.sin(i * 0.5) * 40)}px` }}
+                key={index}
+                className="w-1.5 rounded-full bg-[#171817]/40"
+                style={{
+                  height: `${Math.max(12, Math.sin(index * 0.5) * 40)}px`,
+                }}
               />
             ))}
           </div>
         ) : (
           <p className="font-mono text-xs text-[#777872]">
-            Tap the large button below to speak your report
+            Tap below to record your report in {languageLabels[language]}.
           </p>
         )}
       </div>
 
-      {/* Large Touch Target Controls (>56px height) */}
       {state === "idle" && (
         <button
           type="button"
           onClick={startRecording}
           disabled={disabled}
-          className="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] text-white font-semibold text-lg shadow-md transition hover:bg-[#d44833] active:scale-[0.99] disabled:opacity-50"
+          className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] px-3 text-base font-semibold text-white shadow-md transition hover:bg-[#d44833] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <Mic className="h-6 w-6" />
-          <span>Record Voice Note (Tap to Speak)</span>
+          <Mic className="h-6 w-6 shrink-0" aria-hidden="true" />
+          <span>Record Voice Note</span>
+        </button>
+      )}
+
+      {state === "requesting" && (
+        <button
+          type="button"
+          disabled
+          className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] px-3 text-base font-semibold text-white opacity-70"
+        >
+          <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+          <span>Requesting microphone…</span>
         </button>
       )}
 
@@ -229,9 +285,12 @@ export function VoiceRecorder({
         <button
           type="button"
           onClick={stopRecording}
-          className="flex h-16 w-full items-center justify-center gap-3 rounded-xl bg-[#171817] text-white font-semibold text-lg shadow-md transition hover:bg-[#353833] active:scale-[0.99]"
+          className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#171817] px-3 text-base font-semibold text-white shadow-md transition hover:bg-[#353833] active:scale-[0.99]"
         >
-          <Square className="h-6 w-6 text-[#e25a45] fill-current" />
+          <Square
+            className="h-6 w-6 fill-current text-[#e25a45]"
+            aria-hidden="true"
+          />
           <span>Stop Recording ({formatTime(elapsed)})</span>
         </button>
       )}
@@ -244,20 +303,27 @@ export function VoiceRecorder({
             onEnded={() => setIsPlaying(false)}
             className="hidden"
           />
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={togglePlayback}
-              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-xl bg-[#171817] text-white font-medium text-base shadow-sm hover:bg-[#353833]"
+              className="flex min-h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl bg-[#171817] px-3 text-base font-medium text-white hover:bg-[#353833]"
             >
-              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-              <span>{isPlaying ? "Pause Playback" : "Listen to Recording"}</span>
+              {isPlaying ? (
+                <Pause className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5" />
+              )}
+              <span className="truncate">
+                {isPlaying ? "Pause Playback" : "Listen to Recording"}
+              </span>
             </button>
             <button
               type="button"
               onClick={clear}
-              className="flex h-14 w-14 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-600 transition hover:bg-red-100"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-600 transition hover:bg-red-100"
               title="Delete recording"
+              aria-label="Delete recording"
             >
               <Trash2 className="h-5 w-5" />
             </button>
@@ -266,8 +332,12 @@ export function VoiceRecorder({
       )}
 
       {state === "denied" && (
-        <div className="rounded-lg bg-red-50 p-3 text-xs text-red-600">
-          Microphone access denied. Please grant permission to record audio.
+        <div
+          role="alert"
+          className="rounded-lg bg-red-50 p-3 text-xs text-red-600"
+        >
+          Microphone access is unavailable. You can continue with typed text or
+          a photo.
         </div>
       )}
     </div>

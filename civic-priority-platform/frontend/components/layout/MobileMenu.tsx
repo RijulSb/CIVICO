@@ -99,11 +99,6 @@ const navigationItems: NavigationItem[] = [
     href: "/submissions",
     icon: ClipboardList,
   },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
 ];
 
 export default function MobileMenu({ children }: MobileMenuProps) {
@@ -203,13 +198,6 @@ export default function MobileMenu({ children }: MobileMenuProps) {
               onChange={() => {}}
             />
           </div>
-
-          {/* Authentication */}
-
-          <Button className="w-full justify-center gap-2" variant="default">
-            <LogIn className="h-4 w-4" />
-            Sign In
-          </Button>
 
           {/* Trust */}
 

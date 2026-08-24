@@ -32,14 +32,20 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+
 if settings.cors_origin_list:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "X-Request-ID"],
-    )
+        allow_methods=["*"],
+        allow_headers=["*"],
+        )
+    #     allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
+    #     allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "X-Request-ID"],
+    # )
 
 
 @app.middleware("http")
@@ -111,4 +117,4 @@ async def process_readiness() -> dict[str, object]:
     }
 
 
-app.include_router(api_router)
+#app.include_router(api_router, prefix=settings.api_v1_prefix)

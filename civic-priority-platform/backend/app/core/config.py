@@ -1,31 +1,40 @@
-from uuid import UUID
+from functools import lru_cache
 
-from fastapi import APIRouter, Header, HTTPException, status
-
-from app.schemas.uploads import UploadInitRequest, UploadInitResponse, UploadResponse
-
-router = APIRouter()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-@router.post("/init", response_model=UploadInitResponse, status_code=status.HTTP_201_CREATED)
-async def initialize_upload(
-    payload: UploadInitRequest,
-    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
-) -> UploadInitResponse:
-    if not idempotency_key:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Idempotency-Key is required for upload initialization.",
-        )
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Object storage adapter is not configured.",
+class Settings(BaseSettings):
+    app_name: str = "civico-backend"
+    app_version: str = "0.1.0"
+    environment: str = "development"
+    api_v1_prefix: str = "/api/v1"
+    database_url: str = "postgresql+asyncpg://civico:civico@localhost:5432/civico"
+    readiness_timeout_seconds: float = 1.0
+    cors_origins: str = ""
+    log_level: str = "INFO"
+    jwt_secret_key: str = "development-only-change-me"
+    database_url: str = "postgresql+asyncpg://civico:change-me-local-only@127.0.0.1:5432/civico"
+    database_pool_size: int = 5
+    database_max_overflow: int = 10
+    database_pool_timeout: float = 30.0
+
+    model_config = SettingsConfigDict(
+        env_file=".env.local",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
     )
 
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
-@router.get("/{upload_id}", response_model=UploadResponse)
-async def get_upload(upload_id: UUID) -> UploadResponse:
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail=f"Upload {upload_id} repository is not connected.",
-    )
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() == "production"
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+settings = get_settings()
