@@ -1,0 +1,8 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/civic-priority-platform/backend/.venv/Scripts/python.exe",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/civic-priority-platform/backend/.venv/Lib/site-packages",
+    "${workspaceFolder}/civic-priority-platform/backend"
+  ],
+  "python.analysis.autoSearchPaths": true
+}

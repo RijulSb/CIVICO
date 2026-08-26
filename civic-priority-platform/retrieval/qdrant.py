@@ -1,7 +1,7 @@
 import asyncio
 from typing import Any
 
-from app.core.exceptions import ExternalToolUnavailable
+from backend.app.core.exceptions import ExternalToolUnavailable
 
 
 class CivicRetriever:

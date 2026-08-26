@@ -58,6 +58,9 @@ export function VoiceRecorder({
   const analyserRef = React.useRef<AnalyserNode | null>(null);
   const animFrameRef = React.useRef<number | null>(null);
   const audioElemRef = React.useRef<HTMLAudioElement | null>(null);
+  // Track the current blob URL in a ref so we can revoke it only on unmount,
+  // not every time the audioUrl state changes (which caused ERR_FILE_NOT_FOUND).
+  const audioBlobUrlRef = React.useRef<string | null>(null);
 
   const stopTimer = () => {
     if (timerRef.current !== null) {
@@ -139,7 +142,9 @@ export function VoiceRecorder({
         const file = new File([blob], `civico-voice-${Date.now()}.webm`, {
           type: blob.type,
         });
-        setAudioUrl(URL.createObjectURL(blob));
+        const url = URL.createObjectURL(blob);
+        audioBlobUrlRef.current = url;
+        setAudioUrl(url);
         setState("recorded");
         cleanupAudio();
         onRecordingComplete(file);
@@ -173,6 +178,11 @@ export function VoiceRecorder({
     audio?.pause();
     audio?.removeAttribute("src");
     audio?.load();
+    // Revoke the blob URL when explicitly clearing
+    if (audioBlobUrlRef.current) {
+      URL.revokeObjectURL(audioBlobUrlRef.current);
+      audioBlobUrlRef.current = null;
+    }
     setAudioUrl(null);
     setState("idle");
     setElapsed(0);
@@ -195,6 +205,9 @@ export function VoiceRecorder({
   const formatTime = (seconds: number) =>
     `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 
+  // Cleanup only on unmount — do NOT put audioUrl in deps, otherwise the blob
+  // URL gets revoked the moment React runs the previous effect's cleanup
+  // (i.e. immediately after a new recording) which causes ERR_FILE_NOT_FOUND.
   React.useEffect(
     () => () => {
       cleanupAudio();
@@ -202,9 +215,13 @@ export function VoiceRecorder({
       audio?.pause();
       audio?.removeAttribute("src");
       audio?.load();
-      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      if (audioBlobUrlRef.current) {
+        URL.revokeObjectURL(audioBlobUrlRef.current);
+        audioBlobUrlRef.current = null;
+      }
     },
-    [audioUrl],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   return (

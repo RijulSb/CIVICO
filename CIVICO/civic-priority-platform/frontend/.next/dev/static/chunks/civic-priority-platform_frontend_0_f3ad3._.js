@@ -1,0 +1,4012 @@
+(globalThis["TURBOPACK"] || (globalThis["TURBOPACK"] = [])).push([typeof document === "object" ? document.currentScript : undefined,
+"[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>CivicMap
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$MapContainer$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/MapContainer.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$TileLayer$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/TileLayer.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/hooks.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$BaseMapSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$HotspotLayer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$IssueLayer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/layers/IssueLayer.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$ContextLayers$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/layers/ContextLayers.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$controls$2f$MapControls$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$controls$2f$LayerSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$controls$2f$WardIssueDirectory$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$utils$2f$useMapEvents$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/utils/useMapEvents.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/lib/api.ts [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature(), _s3 = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+;
+const DEFAULT_CENTER = [
+    20.2961,
+    85.8245
+];
+const DEFAULT_ZOOM = 12;
+function MapInstanceBridge() {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(5);
+    if ($[0] !== "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2") {
+        for(let $i = 0; $i < 5; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2";
+    }
+    const map = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMap"])();
+    const { setMap } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    let t0;
+    let t1;
+    if ($[1] !== map || $[2] !== setMap) {
+        t0 = ({
+            "MapInstanceBridge[useEffect()]": ()=>{
+                setMap(map);
+                return ()=>{
+                    setMap(null);
+                };
+            }
+        })["MapInstanceBridge[useEffect()]"];
+        t1 = [
+            map,
+            setMap
+        ];
+        $[1] = map;
+        $[2] = setMap;
+        $[3] = t0;
+        $[4] = t1;
+    } else {
+        t0 = $[3];
+        t1 = $[4];
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t0, t1);
+    return null;
+}
+_s(MapInstanceBridge, "kuDZ4ueF7U4DK89wVUHJOVw6NYs=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMap"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = MapInstanceBridge;
+function MapInteractionBridge() {
+    _s1();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(1);
+    if ($[0] !== "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2") {
+        for(let $i = 0; $i < 1; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2";
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$utils$2f$useMapEvents$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMapEvents"])();
+    return null;
+}
+_s1(MapInteractionBridge, "Ld/tk8Iz8AdZhC1l7acENaOEoCo=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$utils$2f$useMapEvents$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMapEvents"]
+    ];
+});
+_c1 = MapInteractionBridge;
+function MapContent() {
+    _s2();
+    const { layers } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    const [hotspots, setHotspots] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [issues, setIssues] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [contextData, setContextData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "MapContent.useEffect": ()=>{
+            let isMounted = true;
+            async function loadMapData() {
+                try {
+                    // 1. Fetch DBSCAN Hotspots
+                    const hotspotRes = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["generateHotspots"])({
+                        constituency: "khordha"
+                    });
+                    if (isMounted && hotspotRes.hotspots && hotspotRes.hotspots.length > 0) {
+                        const mappedHotspots = hotspotRes.hotspots.map({
+                            "MapContent.useEffect.loadMapData.mappedHotspots": (h, i)=>({
+                                    id: `hotspot-${i + 1}`,
+                                    latitude: h.latitude,
+                                    longitude: h.longitude,
+                                    count: h.submission_count,
+                                    score: Math.min(0.55 + h.submission_count * 0.008, 0.98),
+                                    dominantTheme: h.theme,
+                                    label: `${h.theme.replace("_", " ").toUpperCase()} Cluster — ${h.ward}`
+                                })
+                        }["MapContent.useEffect.loadMapData.mappedHotspots"]);
+                        setHotspots(mappedHotspots);
+                    }
+                    // 2. Fetch GeoJSON Submissions
+                    const issuesGeoJson = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getMapIssues"])();
+                    if (isMounted && issuesGeoJson.features) {
+                        const mappedIssues = issuesGeoJson.features.map({
+                            "MapContent.useEffect.loadMapData.mappedIssues": (f, i_0)=>{
+                                const props = f.properties || {};
+                                const coords = f.geometry?.coordinates || [
+                                    85.8245,
+                                    20.2961
+                                ];
+                                return {
+                                    id: props.id || `issue-${i_0 + 1}`,
+                                    latitude: coords[1],
+                                    longitude: coords[0],
+                                    title: `${(props.category || "civic").replace("_", " ").toUpperCase()} in ${props.ward || "Khordha"}`,
+                                    description: `Reported issue status: ${props.status || "open"}. Type: ${props.submission_type || "text"}.`,
+                                    theme: props.category || "roads",
+                                    source: "citizen",
+                                    createdAt: props.created_at || new Date().toISOString(),
+                                    status: props.status || "open"
+                                };
+                            }
+                        }["MapContent.useEffect.loadMapData.mappedIssues"]);
+                        setIssues(mappedIssues);
+                    }
+                    // 3. Fetch Ward Context for Boundaries & Demographics
+                    const wards = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$lib$2f$api$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getWardsContext"])();
+                    if (isMounted && wards && wards.length > 0) {
+                        const boundaryFeatures = wards.map({
+                            "MapContent.useEffect.loadMapData.boundaryFeatures": (w, idx)=>{
+                                const centerLat = 20.18 + idx % 3 * 0.06;
+                                const centerLng = 85.58 + Math.floor(idx / 3) * 0.08;
+                                const delta = 0.025;
+                                return {
+                                    type: "Feature",
+                                    geometry: {
+                                        type: "Polygon",
+                                        coordinates: [
+                                            [
+                                                [
+                                                    centerLng - delta,
+                                                    centerLat - delta
+                                                ],
+                                                [
+                                                    centerLng + delta,
+                                                    centerLat - delta
+                                                ],
+                                                [
+                                                    centerLng + delta,
+                                                    centerLat + delta
+                                                ],
+                                                [
+                                                    centerLng - delta,
+                                                    centerLat + delta
+                                                ],
+                                                [
+                                                    centerLng - delta,
+                                                    centerLat - delta
+                                                ]
+                                            ]
+                                        ]
+                                    },
+                                    properties: {
+                                        ward_id: w.ward_id,
+                                        ward_name: w.ward_name,
+                                        population: w.population_thousands * 1000,
+                                        area: w.area_sq_km
+                                    }
+                                };
+                            }
+                        }["MapContent.useEffect.loadMapData.boundaryFeatures"]);
+                        const boundariesGeoJson = {
+                            type: "FeatureCollection",
+                            features: boundaryFeatures
+                        };
+                        setContextData({
+                            boundaries: boundariesGeoJson,
+                            demographics: boundariesGeoJson
+                        });
+                    }
+                } catch (err) {
+                    console.error("Error fetching map layers:", err);
+                }
+            }
+            loadMapData();
+            return ({
+                "MapContent.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["MapContent.useEffect"];
+        }
+    }["MapContent.useEffect"], []);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$TileLayer$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TileLayer"], {
+                attribution: "© OpenStreetMap contributors",
+                url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            }, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 161,
+                columnNumber: 7
+            }, this),
+            layers.showHotspots && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$HotspotLayer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                hotspots: hotspots
+            }, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 163,
+                columnNumber: 31
+            }, this),
+            layers.showIssues && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$IssueLayer$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                issues: issues
+            }, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 165,
+                columnNumber: 29
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$ContextLayers$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                showDemographics: layers.showDemographics,
+                showInfrastructure: layers.showInfrastructure,
+                showBoundaries: layers.showBoundaries,
+                data: contextData
+            }, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 167,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$controls$2f$MapControls$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 169,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$controls$2f$LayerSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 171,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$controls$2f$WardIssueDirectory$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 173,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$layers$2f$BaseMapSelector$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 175,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MapInstanceBridge, {}, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 177,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MapInteractionBridge, {}, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 179,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+        lineNumber: 160,
+        columnNumber: 10
+    }, this);
+}
+_s2(MapContent, "PR0JgInaUjXwvLTkF1O0Xa3CCDw=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c2 = MapContent;
+function MapViewport(t0) {
+    _s3();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(6);
+    if ($[0] !== "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2") {
+        for(let $i = 0; $i < 6; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2";
+    }
+    const { center, zoom } = t0;
+    const map = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMap"])();
+    let t1;
+    let t2;
+    if ($[1] !== center || $[2] !== map || $[3] !== zoom) {
+        t1 = ({
+            "MapViewport[useEffect()]": ()=>{
+                const currentCenter = map.getCenter();
+                const currentZoom = map.getZoom();
+                const centerChanged = Math.abs(currentCenter.lat - center[0]) > 0.0001 || Math.abs(currentCenter.lng - center[1]) > 0.0001;
+                const zoomChanged = currentZoom !== zoom;
+                if (centerChanged || zoomChanged) {
+                    map.setView(center, zoom, {
+                        animate: true
+                    });
+                }
+            }
+        })["MapViewport[useEffect()]"];
+        t2 = [
+            center,
+            zoom,
+            map
+        ];
+        $[1] = center;
+        $[2] = map;
+        $[3] = zoom;
+        $[4] = t1;
+        $[5] = t2;
+    } else {
+        t1 = $[4];
+        t2 = $[5];
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t1, t2);
+    return null;
+}
+_s3(MapViewport, "IoceErwr5KVGS9kN4RQ1bOkYMAg=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMap"]
+    ];
+});
+_c3 = MapViewport;
+function CivicMap(t0) {
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(12);
+    if ($[0] !== "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2") {
+        for(let $i = 0; $i < 12; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "66a7005084be44abd8bc1e7f80cc918672c3c5dc359904bfe4650ffb09d79df2";
+    }
+    const { center: t1, zoom: t2, className: t3 } = t0;
+    const center = t1 === undefined ? DEFAULT_CENTER : t1;
+    const zoom = t2 === undefined ? DEFAULT_ZOOM : t2;
+    const className = t3 === undefined ? "" : t3;
+    const t4 = `relative h-full min-h-[500px] w-full overflow-hidden rounded-xl bg-[#d9ded2] ${className}`;
+    let t5;
+    if ($[1] !== center || $[2] !== zoom) {
+        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MapViewport, {
+            center: center,
+            zoom: zoom
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+            lineNumber: 247,
+            columnNumber: 10
+        }, this);
+        $[1] = center;
+        $[2] = zoom;
+        $[3] = t5;
+    } else {
+        t5 = $[3];
+    }
+    let t6;
+    if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
+        t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(MapContent, {}, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+            lineNumber: 256,
+            columnNumber: 10
+        }, this);
+        $[4] = t6;
+    } else {
+        t6 = $[4];
+    }
+    let t7;
+    if ($[5] !== center || $[6] !== t5 || $[7] !== zoom) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MapProvider"], {
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$MapContainer$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["MapContainer"], {
+                center: center,
+                zoom: zoom,
+                scrollWheelZoom: true,
+                className: "h-full min-h-[500px] w-full",
+                children: [
+                    t5,
+                    t6
+                ]
+            }, void 0, true, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+                lineNumber: 263,
+                columnNumber: 23
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+            lineNumber: 263,
+            columnNumber: 10
+        }, this);
+        $[5] = center;
+        $[6] = t5;
+        $[7] = zoom;
+        $[8] = t7;
+    } else {
+        t7 = $[8];
+    }
+    let t8;
+    if ($[9] !== t4 || $[10] !== t7) {
+        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: t4,
+            children: t7
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx",
+            lineNumber: 273,
+            columnNumber: 10
+        }, this);
+        $[9] = t4;
+        $[10] = t7;
+        $[11] = t8;
+    } else {
+        t8 = $[11];
+    }
+    return t8;
+}
+_c4 = CivicMap;
+var _c, _c1, _c2, _c3, _c4;
+__turbopack_context__.k.register(_c, "MapInstanceBridge");
+__turbopack_context__.k.register(_c1, "MapInteractionBridge");
+__turbopack_context__.k.register(_c2, "MapContent");
+__turbopack_context__.k.register(_c3, "MapViewport");
+__turbopack_context__.k.register(_c4, "CivicMap");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx [app-client] (ecmascript, next/dynamic entry)", (function(__turbopack_context__){
+
+__turbopack_context__.n(__turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/CivicMap.tsx [app-client] (ecmascript)"));
+}),
+"[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "MapProvider",
+    ()=>MapProvider,
+    "useCivicMap",
+    ()=>useCivicMap
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature();
+"use client";
+;
+;
+/* -------------------------------------------------------------------------- */ /*                              DEFAULT STATE                                 */ /* -------------------------------------------------------------------------- */ const DEFAULT_CENTER = [
+    20.2961,
+    85.8245
+];
+const DEFAULT_ZOOM = 11;
+const DEFAULT_FILTERS = {
+    themeFilter: "all",
+    timeRange: "30d",
+    sourceFilter: "all"
+};
+const DEFAULT_LAYERS = {
+    showHotspots: true,
+    showIssues: true,
+    showDemographics: false,
+    showInfrastructure: false,
+    showBoundaries: true
+};
+/* -------------------------------------------------------------------------- */ /*                                  CONTEXT                                   */ /* -------------------------------------------------------------------------- */ const CivicMapContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])(null);
+function MapProvider(t0) {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(25);
+    if ($[0] !== "37e39536944c517245be775a84625ed9b93f4abb16a02a5855f4d0ac37aea91f") {
+        for(let $i = 0; $i < 25; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "37e39536944c517245be775a84625ed9b93f4abb16a02a5855f4d0ac37aea91f";
+    }
+    const { children } = t0;
+    const [map, setMap] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [filters, setFilters] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(DEFAULT_FILTERS);
+    const [layers, setLayers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(DEFAULT_LAYERS);
+    const [selectedClusterId, setSelectedClusterId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [selectedIssueId, setSelectedIssueId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [isPinMode, setIsPinMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [pinLocation, setPinLocationState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    let t1;
+    if ($[1] !== map) {
+        t1 = ({
+            "MapProvider[setCenter]": (lat, lng, zoom)=>{
+                if (!map) {
+                    return;
+                }
+                map.flyTo([
+                    lat,
+                    lng
+                ], zoom ?? map.getZoom(), {
+                    duration: 0.8
+                });
+            }
+        })["MapProvider[setCenter]"];
+        $[1] = map;
+        $[2] = t1;
+    } else {
+        t1 = $[2];
+    }
+    const setCenter = t1;
+    let t2;
+    if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
+        t2 = ({
+            "MapProvider[selectCluster]": (clusterId)=>{
+                setSelectedClusterId(clusterId);
+                setSelectedIssueId(null);
+            }
+        })["MapProvider[selectCluster]"];
+        $[3] = t2;
+    } else {
+        t2 = $[3];
+    }
+    const selectCluster = t2;
+    let t3;
+    if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
+        t3 = ({
+            "MapProvider[selectIssue]": (issueId)=>{
+                setSelectedIssueId(issueId);
+                setSelectedClusterId(null);
+            }
+        })["MapProvider[selectIssue]"];
+        $[4] = t3;
+    } else {
+        t3 = $[4];
+    }
+    const selectIssue = t3;
+    let t4;
+    if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
+        t4 = ({
+            "MapProvider[clearSelection]": ()=>{
+                setSelectedClusterId(null);
+                setSelectedIssueId(null);
+            }
+        })["MapProvider[clearSelection]"];
+        $[5] = t4;
+    } else {
+        t4 = $[5];
+    }
+    const clearSelection = t4;
+    let t5;
+    if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
+        t5 = ({
+            "MapProvider[setPinMode]": (enabled)=>{
+                setIsPinMode(enabled);
+                if (!enabled) {
+                    setPinLocationState(null);
+                }
+            }
+        })["MapProvider[setPinMode]"];
+        $[6] = t5;
+    } else {
+        t5 = $[6];
+    }
+    const setPinMode = t5;
+    let t6;
+    if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
+        t6 = ({
+            "MapProvider[setPinLocation]": (location)=>{
+                setPinLocationState(location);
+            }
+        })["MapProvider[setPinLocation]"];
+        $[7] = t6;
+    } else {
+        t6 = $[7];
+    }
+    const setPinLocation = t6;
+    let t7;
+    if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
+        t7 = ({
+            "MapProvider[updateFilters]": (updates)=>{
+                setFilters({
+                    "MapProvider[updateFilters > setFilters()]": (current)=>({
+                            ...current,
+                            ...updates
+                        })
+                }["MapProvider[updateFilters > setFilters()]"]);
+            }
+        })["MapProvider[updateFilters]"];
+        $[8] = t7;
+    } else {
+        t7 = $[8];
+    }
+    const updateFilters = t7;
+    let t8;
+    if ($[9] === Symbol.for("react.memo_cache_sentinel")) {
+        t8 = ({
+            "MapProvider[toggleLayer]": (layer)=>{
+                setLayers({
+                    "MapProvider[toggleLayer > setLayers()]": (current_0)=>({
+                            ...current_0,
+                            [layer]: !current_0[layer]
+                        })
+                }["MapProvider[toggleLayer > setLayers()]"]);
+            }
+        })["MapProvider[toggleLayer]"];
+        $[9] = t8;
+    } else {
+        t8 = $[9];
+    }
+    const toggleLayer = t8;
+    let t9;
+    if ($[10] !== map) {
+        t9 = ({
+            "MapProvider[resetView]": ()=>{
+                if (!map) {
+                    return;
+                }
+                map.flyTo(DEFAULT_CENTER, DEFAULT_ZOOM, {
+                    duration: 0.8
+                });
+            }
+        })["MapProvider[resetView]"];
+        $[10] = map;
+        $[11] = t9;
+    } else {
+        t9 = $[11];
+    }
+    const resetView = t9;
+    let t10;
+    if ($[12] !== filters || $[13] !== isPinMode || $[14] !== layers || $[15] !== map || $[16] !== pinLocation || $[17] !== resetView || $[18] !== selectedClusterId || $[19] !== selectedIssueId || $[20] !== setCenter) {
+        t10 = {
+            map,
+            filters,
+            layers,
+            selectedClusterId,
+            selectedIssueId,
+            isPinMode,
+            pinLocation,
+            setMap,
+            setCenter,
+            selectCluster,
+            selectIssue,
+            clearSelection,
+            setPinMode,
+            setPinLocation,
+            updateFilters,
+            toggleLayer,
+            resetView
+        };
+        $[12] = filters;
+        $[13] = isPinMode;
+        $[14] = layers;
+        $[15] = map;
+        $[16] = pinLocation;
+        $[17] = resetView;
+        $[18] = selectedClusterId;
+        $[19] = selectedIssueId;
+        $[20] = setCenter;
+        $[21] = t10;
+    } else {
+        t10 = $[21];
+    }
+    const value = t10;
+    let t11;
+    if ($[22] !== children || $[23] !== value) {
+        t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CivicMapContext.Provider, {
+            value: value,
+            children: children
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx",
+            lineNumber: 280,
+            columnNumber: 11
+        }, this);
+        $[22] = children;
+        $[23] = value;
+        $[24] = t11;
+    } else {
+        t11 = $[24];
+    }
+    return t11;
+}
+_s(MapProvider, "fn9KnkjwyZSB6d3LQJnqCyrAlqU=");
+_c = MapProvider;
+function useCivicMap() {
+    _s1();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(1);
+    if ($[0] !== "37e39536944c517245be775a84625ed9b93f4abb16a02a5855f4d0ac37aea91f") {
+        for(let $i = 0; $i < 1; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "37e39536944c517245be775a84625ed9b93f4abb16a02a5855f4d0ac37aea91f";
+    }
+    const context = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useContext"])(CivicMapContext);
+    if (!context) {
+        throw new Error("useCivicMap must be used inside a MapProvider.");
+    }
+    return context;
+}
+_s1(useCivicMap, "b9L3QQ+jgeyIrH0NfHrJ8nn7VMU=");
+var _c;
+__turbopack_context__.k.register(_c, "MapProvider");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>LayerSelector
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chart$2d$column$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BarChart3$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/chart-column.mjs [app-client] (ecmascript) <export default as BarChart3>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$construction$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Construction$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/construction.mjs [app-client] (ecmascript) <export default as Construction>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layers$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Layers$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/layers.mjs [app-client] (ecmascript) <export default as Layers>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pinned$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPinned$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/map-pinned.mjs [app-client] (ecmascript) <export default as MapPinned>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$message$2d$square$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MessageSquare$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/message-square.mjs [app-client] (ecmascript) <export default as MessageSquare>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/shield.mjs [app-client] (ecmascript) <export default as Shield>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+const LAYER_OPTIONS = [
+    {
+        key: "showHotspots",
+        label: "Hotspots",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pinned$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPinned$3e$__["MapPinned"]
+    },
+    {
+        key: "showIssues",
+        label: "Individual issues",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$message$2d$square$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MessageSquare$3e$__["MessageSquare"]
+    },
+    {
+        key: "showDemographics",
+        label: "Demographics",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chart$2d$column$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__BarChart3$3e$__["BarChart3"]
+    },
+    {
+        key: "showInfrastructure",
+        label: "Infrastructure",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$construction$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Construction$3e$__["Construction"]
+    },
+    {
+        key: "showBoundaries",
+        label: "Boundaries",
+        icon: __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Shield$3e$__["Shield"]
+    }
+];
+function LayerSelector() {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(7);
+    if ($[0] !== "676d22dc197b1db4da405be0956673fc770772b4d487eb50eda1a77f57ef81d9") {
+        for(let $i = 0; $i < 7; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "676d22dc197b1db4da405be0956673fc770772b4d487eb50eda1a77f57ef81d9";
+    }
+    const { layers, toggleLayer } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    let t0;
+    if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
+        t0 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mb-3 flex items-center gap-2",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$layers$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Layers$3e$__["Layers"], {
+                    className: "h-4 w-4"
+                }, void 0, false, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                    lineNumber: 46,
+                    columnNumber: 56
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                    className: "text-sm font-semibold",
+                    children: "Map layers"
+                }, void 0, false, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                    lineNumber: 46,
+                    columnNumber: 86
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+            lineNumber: 46,
+            columnNumber: 10
+        }, this);
+        $[1] = t0;
+    } else {
+        t0 = $[1];
+    }
+    let t1;
+    if ($[2] !== layers || $[3] !== toggleLayer) {
+        t1 = LAYER_OPTIONS.map({
+            "LayerSelector[LAYER_OPTIONS.map()]": (option)=>{
+                const Icon = option.icon;
+                const enabled = layers[option.key];
+                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                    type: "button",
+                    onClick: {
+                        "LayerSelector[LAYER_OPTIONS.map() > <button>.onClick]": ()=>toggleLayer(option.key)
+                    }["LayerSelector[LAYER_OPTIONS.map() > <button>.onClick]"],
+                    "aria-pressed": enabled,
+                    className: `flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${enabled ? "bg-muted font-medium" : "hover:bg-muted/60"}`,
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Icon, {
+                            className: "h-4 w-4 shrink-0"
+                        }, void 0, false, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                            lineNumber: 59,
+                            columnNumber: 252
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "flex-1",
+                            children: option.label
+                        }, void 0, false, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                            lineNumber: 59,
+                            columnNumber: 289
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: `h-2.5 w-2.5 rounded-full ${enabled ? "bg-primary" : "bg-muted-foreground/30"}`,
+                            "aria-hidden": "true"
+                        }, void 0, false, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                            lineNumber: 59,
+                            columnNumber: 335
+                        }, this)
+                    ]
+                }, option.key, true, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                    lineNumber: 57,
+                    columnNumber: 16
+                }, this);
+            }
+        }["LayerSelector[LAYER_OPTIONS.map()]"]);
+        $[2] = layers;
+        $[3] = toggleLayer;
+        $[4] = t1;
+    } else {
+        t1 = $[4];
+    }
+    let t2;
+    if ($[5] !== t1) {
+        t2 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "absolute left-4 top-4 z-[1000] w-auto max-w-[calc(100vw-2rem)] sm:w-56 rounded-xl border bg-background/95 p-3 shadow-lg backdrop-blur-sm",
+            children: [
+                t0,
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "space-y-1",
+                    children: t1
+                }, void 0, false, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+                    lineNumber: 70,
+                    columnNumber: 168
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/LayerSelector.tsx",
+            lineNumber: 70,
+            columnNumber: 10
+        }, this);
+        $[5] = t1;
+        $[6] = t2;
+    } else {
+        t2 = $[6];
+    }
+    return t2;
+}
+_s(LayerSelector, "3fzJ9KIxPcGHTN/VxVo+XJZoTaU=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = LayerSelector;
+var _c;
+__turbopack_context__.k.register(_c, "LayerSelector");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>MapControls
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$locate$2d$fixed$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LocateFixed$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/locate-fixed.mjs [app-client] (ecmascript) <export default as LocateFixed>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/map-pin.mjs [app-client] (ecmascript) <export default as MapPin>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/rotate-ccw.mjs [app-client] (ecmascript) <export default as RotateCcw>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+function MapControls() {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(21);
+    if ($[0] !== "57652e3e719ce42c7033f376d5e6b90ed386989f6dc472906c92c9b93b78d5bd") {
+        for(let $i = 0; $i < 21; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "57652e3e719ce42c7033f376d5e6b90ed386989f6dc472906c92c9b93b78d5bd";
+    }
+    const { setCenter, setPinMode, isPinMode, resetView } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    let t0;
+    if ($[1] !== setCenter) {
+        t0 = ({
+            "MapControls[handleLocate]": ()=>{
+                if (!navigator.geolocation) {
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition({
+                    "MapControls[handleLocate > navigator.geolocation.getCurrentPosition(arg0)]": (position)=>{
+                        setCenter(position.coords.latitude, position.coords.longitude, 15);
+                    }
+                }["MapControls[handleLocate > navigator.geolocation.getCurrentPosition(arg0)]"], _MapControlsHandleLocateNavigatorGeolocationGetCurrentPositionArg);
+            }
+        })["MapControls[handleLocate]"];
+        $[1] = setCenter;
+        $[2] = t0;
+    } else {
+        t0 = $[2];
+    }
+    const handleLocate = t0;
+    let t1;
+    if ($[3] !== isPinMode || $[4] !== setPinMode) {
+        t1 = ({
+            "MapControls[handleReport]": ()=>{
+                setPinMode(!isPinMode);
+            }
+        })["MapControls[handleReport]"];
+        $[3] = isPinMode;
+        $[4] = setPinMode;
+        $[5] = t1;
+    } else {
+        t1 = $[5];
+    }
+    const handleReport = t1;
+    const t2 = `flex h-10 w-10 items-center justify-center rounded-lg border bg-background shadow-md transition-colors ${isPinMode ? "border-primary bg-primary text-primary-foreground" : "hover:bg-muted"}`;
+    let t3;
+    if ($[6] === Symbol.for("react.memo_cache_sentinel")) {
+        t3 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__["MapPin"], {
+            className: "h-5 w-5"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 57,
+            columnNumber: 10
+        }, this);
+        $[6] = t3;
+    } else {
+        t3 = $[6];
+    }
+    let t4;
+    if ($[7] !== handleReport || $[8] !== isPinMode || $[9] !== t2) {
+        t4 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: handleReport,
+            "aria-label": "Report an issue",
+            "aria-pressed": isPinMode,
+            className: t2,
+            children: t3
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 64,
+            columnNumber: 10
+        }, this);
+        $[7] = handleReport;
+        $[8] = isPinMode;
+        $[9] = t2;
+        $[10] = t4;
+    } else {
+        t4 = $[10];
+    }
+    let t5;
+    if ($[11] === Symbol.for("react.memo_cache_sentinel")) {
+        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$locate$2d$fixed$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LocateFixed$3e$__["LocateFixed"], {
+            className: "h-5 w-5"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 74,
+            columnNumber: 10
+        }, this);
+        $[11] = t5;
+    } else {
+        t5 = $[11];
+    }
+    let t6;
+    if ($[12] !== handleLocate) {
+        t6 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: handleLocate,
+            "aria-label": "Locate me",
+            className: "flex h-10 w-10 items-center justify-center rounded-lg border bg-background shadow-md transition-colors hover:bg-muted",
+            children: t5
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 81,
+            columnNumber: 10
+        }, this);
+        $[12] = handleLocate;
+        $[13] = t6;
+    } else {
+        t6 = $[13];
+    }
+    let t7;
+    if ($[14] === Symbol.for("react.memo_cache_sentinel")) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__["RotateCcw"], {
+            className: "h-5 w-5"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 89,
+            columnNumber: 10
+        }, this);
+        $[14] = t7;
+    } else {
+        t7 = $[14];
+    }
+    let t8;
+    if ($[15] !== resetView) {
+        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: resetView,
+            "aria-label": "Reset map view",
+            className: "flex h-10 w-10 items-center justify-center rounded-lg border bg-background shadow-md transition-colors hover:bg-muted",
+            children: t7
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 96,
+            columnNumber: 10
+        }, this);
+        $[15] = resetView;
+        $[16] = t8;
+    } else {
+        t8 = $[16];
+    }
+    let t9;
+    if ($[17] !== t4 || $[18] !== t6 || $[19] !== t8) {
+        t9 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "absolute right-4 top-4 z-[1000] flex flex-col gap-2",
+            children: [
+                t4,
+                t6,
+                t8
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/MapControls.tsx",
+            lineNumber: 104,
+            columnNumber: 10
+        }, this);
+        $[17] = t4;
+        $[18] = t6;
+        $[19] = t8;
+        $[20] = t9;
+    } else {
+        t9 = $[20];
+    }
+    return t9;
+}
+_s(MapControls, "Ycic0juVlO5gYAHxInBm0ltSxTg=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = MapControls;
+function _MapControlsHandleLocateNavigatorGeolocationGetCurrentPositionArg() {}
+var _c;
+__turbopack_context__.k.register(_c, "MapControls");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>WardIssueDirectory
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/chevron-down.mjs [app-client] (ecmascript) <export default as ChevronDown>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$up$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronUp$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/chevron-up.mjs [app-client] (ecmascript) <export default as ChevronUp>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$crosshair$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Crosshair$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/crosshair.mjs [app-client] (ecmascript) <export default as Crosshair>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$list$2d$filter$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ListFilter$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/list-filter.mjs [app-client] (ecmascript) <export default as ListFilter>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/map-pin.mjs [app-client] (ecmascript) <export default as MapPin>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$search$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Search$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/search.mjs [app-client] (ecmascript) <export default as Search>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/x.mjs [app-client] (ecmascript) <export default as X>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const WARD_SECTORS = [
+    {
+        ward: "Ward 5",
+        sectorName: "Saheed Nagar Sector",
+        issues: [
+            {
+                id: "dir-1",
+                title: "Janpath Main Road Pothole Crater",
+                ward: "Ward 5",
+                category: "road_repair",
+                status: "open",
+                lat: 20.2874,
+                lng: 85.8378,
+                reportCount: 48
+            },
+            {
+                id: "dir-2",
+                title: "Residential Drinking Water Pipe Rupture",
+                ward: "Ward 5",
+                category: "water_supply",
+                status: "in_progress",
+                lat: 20.2890,
+                lng: 85.8395,
+                reportCount: 32
+            },
+            {
+                id: "dir-3",
+                title: "High-Voltage Transformer Sparking",
+                ward: "Ward 5",
+                category: "electricity",
+                status: "open",
+                lat: 20.2855,
+                lng: 85.8360,
+                reportCount: 19
+            },
+            {
+                id: "dir-4",
+                title: "Stormwater Drain Overflow near Market",
+                ward: "Ward 5",
+                category: "sanitation",
+                status: "open",
+                lat: 20.2882,
+                lng: 85.8410,
+                reportCount: 26
+            }
+        ]
+    },
+    {
+        ward: "Ward 3",
+        sectorName: "Jaydev Vihar Sector",
+        issues: [
+            {
+                id: "dir-5",
+                title: "Flyover Approach Road Cavity",
+                ward: "Ward 3",
+                category: "road_repair",
+                status: "open",
+                lat: 20.3021,
+                lng: 85.8241,
+                reportCount: 36
+            },
+            {
+                id: "dir-6",
+                title: "Primary School Boundary Wall Deficit",
+                ward: "Ward 3",
+                category: "school_infrastructure",
+                status: "open",
+                lat: 20.3045,
+                lng: 85.8265,
+                reportCount: 24
+            },
+            {
+                id: "dir-7",
+                title: "Feeder Line Power Outage",
+                ward: "Ward 3",
+                category: "electricity",
+                status: "in_progress",
+                lat: 20.3005,
+                lng: 85.8220,
+                reportCount: 15
+            }
+        ]
+    },
+    {
+        ward: "Ward 8",
+        sectorName: "Bhauma Nagar Sector",
+        issues: [
+            {
+                id: "dir-8",
+                title: "Community Health Center (CHC) Bed Deficit",
+                ward: "Ward 8",
+                category: "health_clinic",
+                status: "open",
+                lat: 20.2798,
+                lng: 85.8189,
+                reportCount: 39
+            },
+            {
+                id: "dir-9",
+                title: "Municipal Water Pump Motor Failure",
+                ward: "Ward 8",
+                category: "water_supply",
+                status: "open",
+                lat: 20.2775,
+                lng: 85.8165,
+                reportCount: 28
+            },
+            {
+                id: "dir-10",
+                title: "Market Yard Open Garbage Dump",
+                ward: "Ward 8",
+                category: "sanitation",
+                status: "in_progress",
+                lat: 20.2810,
+                lng: 85.8210,
+                reportCount: 21
+            }
+        ]
+    },
+    {
+        ward: "Ward 1",
+        sectorName: "Chandrasekharpur Sector",
+        issues: [
+            {
+                id: "dir-11",
+                title: "Government High School Roof Waterproofing",
+                ward: "Ward 1",
+                category: "school_infrastructure",
+                status: "open",
+                lat: 20.3250,
+                lng: 85.8150,
+                reportCount: 32
+            },
+            {
+                id: "dir-12",
+                title: "District Avenue Kutcha Paving Need",
+                ward: "Ward 1",
+                category: "road_repair",
+                status: "open",
+                lat: 20.3275,
+                lng: 85.8180,
+                reportCount: 22
+            },
+            {
+                id: "dir-13",
+                title: "Public Standpost Water Leakage",
+                ward: "Ward 1",
+                category: "water_supply",
+                status: "resolved",
+                lat: 20.3225,
+                lng: 85.8120,
+                reportCount: 18
+            }
+        ]
+    },
+    {
+        ward: "Ward 2",
+        sectorName: "Patia KIIT Sector",
+        issues: [
+            {
+                id: "dir-14",
+                title: "Main Drainage Blockage near Square",
+                ward: "Ward 2",
+                category: "sanitation",
+                status: "open",
+                lat: 20.3520,
+                lng: 85.8180,
+                reportCount: 27
+            },
+            {
+                id: "dir-15",
+                title: "University Road Pothole Stretch",
+                ward: "Ward 2",
+                category: "road_repair",
+                status: "in_progress",
+                lat: 20.3550,
+                lng: 85.8210,
+                reportCount: 41
+            },
+            {
+                id: "dir-16",
+                title: "Streetlight Dark Zone Outage",
+                ward: "Ward 2",
+                category: "electricity",
+                status: "open",
+                lat: 20.3490,
+                lng: 85.8150,
+                reportCount: 17
+            }
+        ]
+    },
+    {
+        ward: "Khordha Town",
+        sectorName: "Khordha Municipal HQ",
+        issues: [
+            {
+                id: "dir-17",
+                title: "Sub-Divisional Hospital (SDH) Ward Upgrade",
+                ward: "Khordha Town",
+                category: "health_clinic",
+                status: "open",
+                lat: 20.1874,
+                lng: 85.6178,
+                reportCount: 76
+            },
+            {
+                id: "dir-18",
+                title: "Collectorate Main Road Resurfacing",
+                ward: "Khordha Town",
+                category: "road_repair",
+                status: "open",
+                lat: 20.1895,
+                lng: 85.6205,
+                reportCount: 52
+            },
+            {
+                id: "dir-19",
+                title: "Main Bazaar Drinking Water Pipeline Repair",
+                ward: "Khordha Town",
+                category: "water_supply",
+                status: "in_progress",
+                lat: 20.1850,
+                lng: 85.6150,
+                reportCount: 38
+            },
+            {
+                id: "dir-20",
+                title: "Town Model Primary School Classroom Deficit",
+                ward: "Khordha Town",
+                category: "school_infrastructure",
+                status: "open",
+                lat: 20.1910,
+                lng: 85.6230,
+                reportCount: 29
+            }
+        ]
+    },
+    {
+        ward: "Jatni Block",
+        sectorName: "Jatni Railway Sector",
+        issues: [
+            {
+                id: "dir-21",
+                title: "Railway Overbridge Approach Road Craters",
+                ward: "Jatni Block",
+                category: "road_repair",
+                status: "open",
+                lat: 20.1520,
+                lng: 85.7050,
+                reportCount: 41
+            },
+            {
+                id: "dir-22",
+                title: "Loco Colony Borewell Motor Failure",
+                ward: "Jatni Block",
+                category: "water_supply",
+                status: "open",
+                lat: 20.1545,
+                lng: 85.7080,
+                reportCount: 31
+            },
+            {
+                id: "dir-23",
+                title: "Station Market Public Toilet Sanitation",
+                ward: "Jatni Block",
+                category: "sanitation",
+                status: "open",
+                lat: 20.1570,
+                lng: 85.7110,
+                reportCount: 23
+            }
+        ]
+    },
+    {
+        ward: "Barunei Area",
+        sectorName: "Barunei Sanctuary Sector",
+        issues: [
+            {
+                id: "dir-24",
+                title: "Eco-Tourism Access Path Road Repair",
+                ward: "Barunei Area",
+                category: "road_repair",
+                status: "open",
+                lat: 20.1650,
+                lng: 85.6320,
+                reportCount: 25
+            },
+            {
+                id: "dir-25",
+                title: "Mountain Stream Water Filter Plant Setup",
+                ward: "Barunei Area",
+                category: "water_supply",
+                status: "open",
+                lat: 20.1620,
+                lng: 85.6290,
+                reportCount: 19
+            }
+        ]
+    }
+];
+const CATEGORY_ICONS = {
+    road_repair: {
+        symbol: "🛠️",
+        bgStyle: "bg-red-100 text-red-800 border-red-300"
+    },
+    water_supply: {
+        symbol: "💧",
+        bgStyle: "bg-blue-100 text-blue-800 border-blue-300"
+    },
+    health_clinic: {
+        symbol: "🏥",
+        bgStyle: "bg-emerald-100 text-emerald-800 border-emerald-300"
+    },
+    school_infrastructure: {
+        symbol: "🏫",
+        bgStyle: "bg-purple-100 text-purple-800 border-purple-300"
+    },
+    electricity: {
+        symbol: "⚡",
+        bgStyle: "bg-amber-100 text-amber-800 border-amber-300"
+    },
+    sanitation: {
+        symbol: "🧹",
+        bgStyle: "bg-orange-100 text-orange-800 border-orange-300"
+    }
+};
+function WardIssueDirectory() {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(27);
+    if ($[0] !== "922ff1680651cf002e5e5761ade71304a226475182de69268fa6598955766e82") {
+        for(let $i = 0; $i < 27; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "922ff1680651cf002e5e5761ade71304a226475182de69268fa6598955766e82";
+    }
+    const { setCenter, selectIssue } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    const [isOpen, setIsOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [searchQuery, setSearchQuery] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [activeWard, setActiveWard] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Ward 5");
+    let t0;
+    bb0: {
+        if (!searchQuery.trim()) {
+            t0 = WARD_SECTORS;
+            break bb0;
+        }
+        let t1;
+        if ($[1] !== searchQuery) {
+            const query = searchQuery.toLowerCase();
+            t1 = WARD_SECTORS.map({
+                "WardIssueDirectory[WARD_SECTORS.map()]": (sector)=>{
+                    const matchingIssues = sector.issues.filter({
+                        "WardIssueDirectory[WARD_SECTORS.map() > sector.issues.filter()]": (issue)=>issue.title.toLowerCase().includes(query) || issue.ward.toLowerCase().includes(query) || issue.category.toLowerCase().includes(query)
+                    }["WardIssueDirectory[WARD_SECTORS.map() > sector.issues.filter()]"]);
+                    return {
+                        ...sector,
+                        issues: matchingIssues
+                    };
+                }
+            }["WardIssueDirectory[WARD_SECTORS.map()]"]).filter({
+                "WardIssueDirectory[(anonymous)()]": (sector_0)=>sector_0.issues.length > 0 || sector_0.ward.toLowerCase().includes(query)
+            }["WardIssueDirectory[(anonymous)()]"]);
+            $[1] = searchQuery;
+            $[2] = t1;
+        } else {
+            t1 = $[2];
+        }
+        t0 = t1;
+    }
+    const filteredSectors = t0;
+    let t1;
+    if ($[3] !== selectIssue || $[4] !== setCenter) {
+        t1 = ({
+            "WardIssueDirectory[handleLocateIssue]": (issue_0)=>{
+                setCenter(issue_0.lat, issue_0.lng, 15);
+                selectIssue(issue_0.id);
+            }
+        })["WardIssueDirectory[handleLocateIssue]"];
+        $[3] = selectIssue;
+        $[4] = setCenter;
+        $[5] = t1;
+    } else {
+        t1 = $[5];
+    }
+    const handleLocateIssue = t1;
+    let t2;
+    if ($[6] !== setCenter) {
+        t2 = ({
+            "WardIssueDirectory[handleLocateWard]": (lat, lng)=>{
+                setCenter(lat, lng, 13);
+            }
+        })["WardIssueDirectory[handleLocateWard]"];
+        $[6] = setCenter;
+        $[7] = t2;
+    } else {
+        t2 = $[7];
+    }
+    const handleLocateWard = t2;
+    let t3;
+    if ($[8] !== isOpen) {
+        t3 = ({
+            "WardIssueDirectory[<button>.onClick]": ()=>setIsOpen(!isOpen)
+        })["WardIssueDirectory[<button>.onClick]"];
+        $[8] = isOpen;
+        $[9] = t3;
+    } else {
+        t3 = $[9];
+    }
+    let t4;
+    let t5;
+    if ($[10] === Symbol.for("react.memo_cache_sentinel")) {
+        t4 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$list$2d$filter$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ListFilter$3e$__["ListFilter"], {
+            className: "h-4 w-4 text-[#e25a45]"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 394,
+            columnNumber: 10
+        }, this);
+        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            children: "\uD83D\uDCCD Ward & Issue Directory"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 395,
+            columnNumber: 10
+        }, this);
+        $[10] = t4;
+        $[11] = t5;
+    } else {
+        t4 = $[10];
+        t5 = $[11];
+    }
+    let t6;
+    if ($[12] !== isOpen) {
+        t6 = isOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$up$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronUp$3e$__["ChevronUp"], {
+            className: "h-4 w-4 text-[#171817]/60 dark:text-white/60"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 404,
+            columnNumber: 19
+        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
+            className: "h-4 w-4 text-[#171817]/60 dark:text-white/60"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 404,
+            columnNumber: 92
+        }, this);
+        $[12] = isOpen;
+        $[13] = t6;
+    } else {
+        t6 = $[13];
+    }
+    let t7;
+    if ($[14] !== t3 || $[15] !== t6) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: t3,
+            className: "flex items-center gap-2.5 rounded-xl border border-[#171817]/20 bg-white dark:bg-[#171817] px-4 py-2.5 font-mono text-xs font-bold uppercase tracking-wider text-[#171817] dark:text-[#eeede9] shadow-xl backdrop-blur-md transition hover:bg-slate-50 dark:hover:bg-[#222522]",
+            children: [
+                t4,
+                t5,
+                t6
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 412,
+            columnNumber: 10
+        }, this);
+        $[14] = t3;
+        $[15] = t6;
+        $[16] = t7;
+    } else {
+        t7 = $[16];
+    }
+    let t8;
+    if ($[17] !== activeWard || $[18] !== filteredSectors || $[19] !== handleLocateIssue || $[20] !== handleLocateWard || $[21] !== isOpen || $[22] !== searchQuery) {
+        t8 = isOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mt-2 flex max-h-[calc(100vh-270px)] w-full flex-col rounded-2xl border border-[#171817]/20 bg-white text-[#171817] p-4 shadow-2xl backdrop-blur-md opacity-100",
+            style: {
+                backgroundColor: "#ffffff"
+            },
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex items-center justify-between border-b border-[#171817]/15 pb-3",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center gap-2.5",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex h-7 w-7 items-center justify-center rounded-lg bg-[#e25a45] text-white",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2d$pin$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__MapPin$3e$__["MapPin"], {
+                                        className: "h-4 w-4"
+                                    }, void 0, false, {
+                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                        lineNumber: 423,
+                                        columnNumber: 229
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                    lineNumber: 423,
+                                    columnNumber: 136
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            className: "font-mono text-xs font-bold uppercase tracking-wider text-[#171817]",
+                                            children: "Khordha Sectors & Issues"
+                                        }, void 0, false, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                            lineNumber: 423,
+                                            columnNumber: 270
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "text-[10px] text-[#171817]/60",
+                                            children: "Select issue to fly map & pinpoint affected radius"
+                                        }, void 0, false, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                            lineNumber: 423,
+                                            columnNumber: 387
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                    lineNumber: 423,
+                                    columnNumber: 265
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                            lineNumber: 423,
+                            columnNumber: 93
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            type: "button",
+                            onClick: {
+                                "WardIssueDirectory[<button>.onClick]": ()=>setIsOpen(false)
+                            }["WardIssueDirectory[<button>.onClick]"],
+                            "aria-label": "Close directory",
+                            className: "rounded-lg p-1.5 text-[#171817]/60 hover:bg-slate-100",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
+                                className: "h-4 w-4"
+                            }, void 0, false, {
+                                fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                lineNumber: 425,
+                                columnNumber: 147
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                            lineNumber: 423,
+                            columnNumber: 502
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                    lineNumber: 423,
+                    columnNumber: 8
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "relative my-3",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$search$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Search$3e$__["Search"], {
+                            className: "absolute left-3 top-2.5 h-4 w-4 text-[#171817]/40"
+                        }, void 0, false, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                            lineNumber: 425,
+                            columnNumber: 218
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                            type: "text",
+                            value: searchQuery,
+                            onChange: {
+                                "WardIssueDirectory[<input>.onChange]": (e)=>setSearchQuery(e.target.value)
+                            }["WardIssueDirectory[<input>.onChange]"],
+                            placeholder: "Search Ward, Sector or Issue Category...",
+                            className: "w-full rounded-xl border border-[#171817]/20 bg-[#f6f5f2] py-2 pl-9 pr-3 text-xs text-[#171817] focus:outline-none focus:ring-2 focus:ring-[#e25a45]"
+                        }, void 0, false, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                            lineNumber: 425,
+                            columnNumber: 290
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                    lineNumber: 425,
+                    columnNumber: 187
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex-1 overflow-y-auto space-y-3 pr-1 text-xs",
+                    children: filteredSectors.map({
+                        "WardIssueDirectory[filteredSectors.map()]": (sector_1)=>{
+                            const isExpanded = activeWard === sector_1.ward || searchQuery.trim().length > 0;
+                            const firstIssue = sector_1.issues[0];
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "rounded-xl border border-[#171817]/15 bg-[#f9f8f5] p-3 shadow-sm space-y-2.5",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-center justify-between",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                onClick: {
+                                                    "WardIssueDirectory[filteredSectors.map() > <div>.onClick]": ()=>setActiveWard(isExpanded ? null : sector_1.ward)
+                                                }["WardIssueDirectory[filteredSectors.map() > <div>.onClick]"],
+                                                className: "flex cursor-pointer items-center gap-2",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "rounded-lg bg-[#171817] px-2.5 py-1 font-mono text-[10px] font-bold text-white",
+                                                        children: sector_1.ward
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                        lineNumber: 433,
+                                                        columnNumber: 132
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "font-bold text-[#171817] text-xs",
+                                                        children: sector_1.sectorName
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                        lineNumber: 433,
+                                                        columnNumber: 251
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                lineNumber: 431,
+                                                columnNumber: 185
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                type: "button",
+                                                onClick: {
+                                                    "WardIssueDirectory[filteredSectors.map() > <button>.onClick]": ()=>firstIssue && handleLocateWard(firstIssue.lat, firstIssue.lng)
+                                                }["WardIssueDirectory[filteredSectors.map() > <button>.onClick]"],
+                                                className: "inline-flex items-center gap-1 rounded-lg bg-[#e25a45] px-2.5 py-1 font-mono text-[10px] font-bold text-white shadow hover:bg-[#d44833]",
+                                                title: "Fly map to ward center",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$crosshair$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Crosshair$3e$__["Crosshair"], {
+                                                        className: "h-3.5 w-3.5"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                        lineNumber: 435,
+                                                        columnNumber: 263
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        children: "Locate Sector"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                        lineNumber: 435,
+                                                        columnNumber: 300
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                lineNumber: 433,
+                                                columnNumber: 336
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                        lineNumber: 431,
+                                        columnNumber: 134
+                                    }, this),
+                                    isExpanded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "space-y-2 pt-1 border-t border-[#171817]/10",
+                                        children: sector_1.issues.map({
+                                            "WardIssueDirectory[filteredSectors.map() > sector_1.issues.map()]": (issue_1)=>{
+                                                const iconData = CATEGORY_ICONS[issue_1.category] || {
+                                                    symbol: "\uD83D\uDCCD",
+                                                    bgStyle: "bg-slate-100 text-slate-800"
+                                                };
+                                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    onClick: {
+                                                        "WardIssueDirectory[filteredSectors.map() > sector_1.issues.map() > <div>.onClick]": ()=>handleLocateIssue(issue_1)
+                                                    }["WardIssueDirectory[filteredSectors.map() > sector_1.issues.map() > <div>.onClick]"],
+                                                    className: "group flex items-center justify-between rounded-xl border border-[#171817]/10 bg-white p-2.5 transition hover:border-[#e25a45] hover:bg-red-50/40 cursor-pointer shadow-sm",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                            className: "flex items-start gap-2.5 pr-2",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    className: "text-base shrink-0 mt-0.5",
+                                                                    children: iconData.symbol
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                    lineNumber: 443,
+                                                                    columnNumber: 339
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                    className: "space-y-1",
+                                                                    children: [
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                            className: "font-semibold text-[#171817] text-xs leading-snug group-hover:text-[#e25a45]",
+                                                                            children: issue_1.title
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                            lineNumber: 443,
+                                                                            columnNumber: 434
+                                                                        }, this),
+                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                            className: "flex items-center gap-2",
+                                                                            children: [
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: `px-2 py-0.5 rounded border font-mono text-[9px] font-bold uppercase ${iconData.bgStyle}`,
+                                                                                    children: issue_1.category.replace("_", " ")
+                                                                                }, void 0, false, {
+                                                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                                    lineNumber: 443,
+                                                                                    columnNumber: 586
+                                                                                }, this),
+                                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                    className: "font-mono text-[10px] text-[#171817]/60 font-semibold",
+                                                                                    children: [
+                                                                                        issue_1.reportCount,
+                                                                                        " Complaints"
+                                                                                    ]
+                                                                                }, void 0, true, {
+                                                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                                    lineNumber: 443,
+                                                                                    columnNumber: 737
+                                                                                }, this)
+                                                                            ]
+                                                                        }, void 0, true, {
+                                                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                            lineNumber: 443,
+                                                                            columnNumber: 545
+                                                                        }, this)
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                    lineNumber: 443,
+                                                                    columnNumber: 407
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                            lineNumber: 443,
+                                                            columnNumber: 292
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            type: "button",
+                                                            className: "shrink-0 rounded-xl bg-[#171817] p-2 text-white opacity-85 group-hover:opacity-100 group-hover:bg-[#e25a45] transition",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$crosshair$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Crosshair$3e$__["Crosshair"], {
+                                                                className: "h-4 w-4"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                                lineNumber: 443,
+                                                                columnNumber: 1019
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                            lineNumber: 443,
+                                                            columnNumber: 866
+                                                        }, this)
+                                                    ]
+                                                }, issue_1.id, true, {
+                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                                    lineNumber: 441,
+                                                    columnNumber: 28
+                                                }, this);
+                                            }
+                                        }["WardIssueDirectory[filteredSectors.map() > sector_1.issues.map()]"])
+                                    }, void 0, false, {
+                                        fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                        lineNumber: 435,
+                                        columnNumber: 356
+                                    }, this)
+                                ]
+                            }, sector_1.ward, true, {
+                                fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                                lineNumber: 431,
+                                columnNumber: 20
+                            }, this);
+                        }
+                    }["WardIssueDirectory[filteredSectors.map()]"])
+                }, void 0, false, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+                    lineNumber: 427,
+                    columnNumber: 276
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 421,
+            columnNumber: 20
+        }, this);
+        $[17] = activeWard;
+        $[18] = filteredSectors;
+        $[19] = handleLocateIssue;
+        $[20] = handleLocateWard;
+        $[21] = isOpen;
+        $[22] = searchQuery;
+        $[23] = t8;
+    } else {
+        t8 = $[23];
+    }
+    let t9;
+    if ($[24] !== t7 || $[25] !== t8) {
+        t9 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "absolute left-4 top-[220px] z-[1000] w-auto max-w-[calc(100vw-2rem)] sm:w-[420px]",
+            children: [
+                t7,
+                t8
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/controls/WardIssueDirectory.tsx",
+            lineNumber: 460,
+            columnNumber: 10
+        }, this);
+        $[24] = t7;
+        $[25] = t8;
+        $[26] = t9;
+    } else {
+        t9 = $[26];
+    }
+    return t9;
+}
+_s(WardIssueDirectory, "Rcu/wnltgSUiO5VKzdfu/VfLze4=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = WardIssueDirectory;
+var _c;
+__turbopack_context__.k.register(_c, "WardIssueDirectory");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>BasemapSelector
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$TileLayer$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/TileLayer.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Map$3e$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/lucide-react/dist/esm/icons/map.mjs [app-client] (ecmascript) <export default as Map>");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const BASEMAPS = [
+    {
+        id: "osm",
+        label: "OpenStreetMap",
+        url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attribution: "&copy; OpenStreetMap contributors"
+    },
+    {
+        id: "light",
+        label: "Light",
+        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+    },
+    {
+        id: "dark",
+        label: "Dark",
+        url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+    }
+];
+function BasemapSelector() {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(23);
+    if ($[0] !== "fe060da1adc0318dd5468ff3a17e22e0f6dc82c2aa47aa8ef728838a1bfc0d51") {
+        for(let $i = 0; $i < 23; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "fe060da1adc0318dd5468ff3a17e22e0f6dc82c2aa47aa8ef728838a1bfc0d51";
+    }
+    const [activeBasemap, setActiveBasemap] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("osm");
+    const [open, setOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    let t0;
+    if ($[1] !== activeBasemap) {
+        t0 = BASEMAPS.find({
+            "BasemapSelector[BASEMAPS.find()]": (basemap)=>basemap.id === activeBasemap
+        }["BasemapSelector[BASEMAPS.find()]"]) ?? BASEMAPS[0];
+        $[1] = activeBasemap;
+        $[2] = t0;
+    } else {
+        t0 = $[2];
+    }
+    const active = t0;
+    let t1;
+    if ($[3] !== active.attribution || $[4] !== active.id || $[5] !== active.url) {
+        t1 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$TileLayer$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TileLayer"], {
+            attribution: active.attribution,
+            url: active.url
+        }, active.id, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 53,
+            columnNumber: 10
+        }, this);
+        $[3] = active.attribution;
+        $[4] = active.id;
+        $[5] = active.url;
+        $[6] = t1;
+    } else {
+        t1 = $[6];
+    }
+    let t2;
+    if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
+        t2 = ({
+            "BasemapSelector[<button>.onClick]": ()=>setOpen(_BasemapSelectorButtonOnClickSetOpen)
+        })["BasemapSelector[<button>.onClick]"];
+        $[7] = t2;
+    } else {
+        t2 = $[7];
+    }
+    let t3;
+    if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
+        t3 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$map$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Map$3e$__["Map"], {
+            className: "h-4 w-4"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 72,
+            columnNumber: 10
+        }, this);
+        $[8] = t3;
+    } else {
+        t3 = $[8];
+    }
+    let t4;
+    if ($[9] !== active.label) {
+        t4 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            className: "hidden sm:inline",
+            children: active.label
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 79,
+            columnNumber: 10
+        }, this);
+        $[9] = active.label;
+        $[10] = t4;
+    } else {
+        t4 = $[10];
+    }
+    let t5;
+    if ($[11] !== open || $[12] !== t4) {
+        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: t2,
+            "aria-label": "Change map style",
+            "aria-expanded": open,
+            className: "flex h-10 items-center gap-2 rounded-lg border bg-background/95 px-3 text-sm font-medium shadow-md backdrop-blur transition hover:bg-background",
+            children: [
+                t3,
+                t4
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 87,
+            columnNumber: 10
+        }, this);
+        $[11] = open;
+        $[12] = t4;
+        $[13] = t5;
+    } else {
+        t5 = $[13];
+    }
+    let t6;
+    if ($[14] !== activeBasemap || $[15] !== open) {
+        t6 = open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "mt-2 w-44 rounded-lg border bg-background/95 p-1 shadow-lg backdrop-blur",
+            children: BASEMAPS.map({
+                "BasemapSelector[BASEMAPS.map()]": (basemap_0)=>{
+                    const isActive = basemap_0.id === activeBasemap;
+                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        type: "button",
+                        onClick: {
+                            "BasemapSelector[BASEMAPS.map() > <button>.onClick]": ()=>{
+                                setActiveBasemap(basemap_0.id);
+                                setOpen(false);
+                            }
+                        }["BasemapSelector[BASEMAPS.map() > <button>.onClick]"],
+                        className: `flex w-full items-center rounded-md px-3 py-2 text-left text-sm transition ${isActive ? "bg-muted font-medium" : "hover:bg-muted/70"}`,
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                children: basemap_0.label
+                            }, void 0, false, {
+                                fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+                                lineNumber: 104,
+                                columnNumber: 216
+                            }, this),
+                            isActive && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "ml-auto text-xs text-muted-foreground",
+                                children: "Active"
+                            }, void 0, false, {
+                                fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+                                lineNumber: 104,
+                                columnNumber: 259
+                            }, this)
+                        ]
+                    }, basemap_0.id, true, {
+                        fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+                        lineNumber: 99,
+                        columnNumber: 18
+                    }, this);
+                }
+            }["BasemapSelector[BASEMAPS.map()]"])
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 96,
+            columnNumber: 18
+        }, this);
+        $[14] = activeBasemap;
+        $[15] = open;
+        $[16] = t6;
+    } else {
+        t6 = $[16];
+    }
+    let t7;
+    if ($[17] !== t5 || $[18] !== t6) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "absolute right-4 top-4 z-[1000]",
+            children: [
+                t5,
+                t6
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 115,
+            columnNumber: 10
+        }, this);
+        $[17] = t5;
+        $[18] = t6;
+        $[19] = t7;
+    } else {
+        t7 = $[19];
+    }
+    let t8;
+    if ($[20] !== t1 || $[21] !== t7) {
+        t8 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            children: [
+                t1,
+                t7
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/BaseMapSelector.tsx",
+            lineNumber: 124,
+            columnNumber: 10
+        }, this);
+        $[20] = t1;
+        $[21] = t7;
+        $[22] = t8;
+    } else {
+        t8 = $[22];
+    }
+    return t8;
+}
+_s(BasemapSelector, "UTi4AKnYeyoawF+k0PW0xar9/8g=");
+_c = BasemapSelector;
+function _BasemapSelectorButtonOnClickSetOpen(current) {
+    return !current;
+}
+var _c;
+__turbopack_context__.k.register(_c, "BasemapSelector");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/layers/ContextLayers.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>ContextLayers
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$GeoJSON$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/GeoJSON.js [app-client] (ecmascript)");
+"use client";
+;
+;
+;
+const EMPTY_FEATURE_COLLECTION = {
+    type: "FeatureCollection",
+    features: []
+};
+const DEFAULT_DATA = {
+    demographics: EMPTY_FEATURE_COLLECTION,
+    infrastructure: EMPTY_FEATURE_COLLECTION,
+    boundaries: EMPTY_FEATURE_COLLECTION
+};
+function getStyle(layer) {
+    switch(layer){
+        case "demographics":
+            return {
+                color: "#2563eb",
+                weight: 1,
+                fillOpacity: 0.18
+            };
+        case "infrastructure":
+            return {
+                color: "#16a34a",
+                weight: 1.5,
+                fillOpacity: 0.12
+            };
+        case "boundaries":
+            return {
+                color: "#111827",
+                weight: 2,
+                fillOpacity: 0,
+                dashArray: "6 5"
+            };
+        default:
+            return {};
+    }
+}
+function normalizeGeoJSON(data) {
+    return data ?? EMPTY_FEATURE_COLLECTION;
+}
+function ContextLayers(t0) {
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(24);
+    if ($[0] !== "109ac51139ae2c302c7c903f203430399f78df720a050c71567f1ecd48693654") {
+        for(let $i = 0; $i < 24; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "109ac51139ae2c302c7c903f203430399f78df720a050c71567f1ecd48693654";
+    }
+    const { showDemographics: t1, showInfrastructure: t2, showBoundaries: t3, data: t4 } = t0;
+    const showDemographics = t1 === undefined ? false : t1;
+    const showInfrastructure = t2 === undefined ? false : t2;
+    const showBoundaries = t3 === undefined ? true : t3;
+    const data = t4 === undefined ? DEFAULT_DATA : t4;
+    let t5;
+    if ($[1] !== data.demographics) {
+        t5 = normalizeGeoJSON(data.demographics);
+        $[1] = data.demographics;
+        $[2] = t5;
+    } else {
+        t5 = $[2];
+    }
+    let t6;
+    if ($[3] !== data.infrastructure) {
+        t6 = normalizeGeoJSON(data.infrastructure);
+        $[3] = data.infrastructure;
+        $[4] = t6;
+    } else {
+        t6 = $[4];
+    }
+    let t7;
+    if ($[5] !== data.boundaries) {
+        t7 = normalizeGeoJSON(data.boundaries);
+        $[5] = data.boundaries;
+        $[6] = t7;
+    } else {
+        t7 = $[6];
+    }
+    let t8;
+    if ($[7] !== t5 || $[8] !== t6 || $[9] !== t7) {
+        t8 = {
+            demographics: t5,
+            infrastructure: t6,
+            boundaries: t7
+        };
+        $[7] = t5;
+        $[8] = t6;
+        $[9] = t7;
+        $[10] = t8;
+    } else {
+        t8 = $[10];
+    }
+    const layers = t8;
+    let t9;
+    if ($[11] !== layers || $[12] !== showDemographics) {
+        t9 = showDemographics && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$GeoJSON$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GeoJSON"], {
+            data: layers.demographics,
+            style: _ContextLayersGeoJSONStyle
+        }, "demographics", false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/ContextLayers.tsx",
+            lineNumber: 115,
+            columnNumber: 30
+        }, this);
+        $[11] = layers;
+        $[12] = showDemographics;
+        $[13] = t9;
+    } else {
+        t9 = $[13];
+    }
+    let t10;
+    if ($[14] !== layers || $[15] !== showInfrastructure) {
+        t10 = showInfrastructure && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$GeoJSON$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GeoJSON"], {
+            data: layers.infrastructure,
+            style: _ContextLayersGeoJSONStyle2
+        }, "infrastructure", false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/ContextLayers.tsx",
+            lineNumber: 124,
+            columnNumber: 33
+        }, this);
+        $[14] = layers;
+        $[15] = showInfrastructure;
+        $[16] = t10;
+    } else {
+        t10 = $[16];
+    }
+    let t11;
+    if ($[17] !== layers || $[18] !== showBoundaries) {
+        t11 = showBoundaries && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$GeoJSON$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["GeoJSON"], {
+            data: layers.boundaries,
+            style: _ContextLayersGeoJSONStyle3
+        }, "boundaries", false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/ContextLayers.tsx",
+            lineNumber: 133,
+            columnNumber: 29
+        }, this);
+        $[17] = layers;
+        $[18] = showBoundaries;
+        $[19] = t11;
+    } else {
+        t11 = $[19];
+    }
+    let t12;
+    if ($[20] !== t10 || $[21] !== t11 || $[22] !== t9) {
+        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            children: [
+                t9,
+                t10,
+                t11
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/ContextLayers.tsx",
+            lineNumber: 142,
+            columnNumber: 11
+        }, this);
+        $[20] = t10;
+        $[21] = t11;
+        $[22] = t9;
+        $[23] = t12;
+    } else {
+        t12 = $[23];
+    }
+    return t12;
+}
+_c = ContextLayers;
+function _ContextLayersGeoJSONStyle3() {
+    return getStyle("boundaries");
+}
+function _ContextLayersGeoJSONStyle2() {
+    return getStyle("infrastructure");
+}
+function _ContextLayersGeoJSONStyle() {
+    return getStyle("demographics");
+}
+var _c;
+__turbopack_context__.k.register(_c, "ContextLayers");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>HotspotLayer
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Circle.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$LayerGroup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/LayerGroup.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Marker$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Marker.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Popup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Popup.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Tooltip.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$leaflet$2f$dist$2f$leaflet$2d$src$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/leaflet/dist/leaflet-src.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const CATEGORY_CONFIG = {
+    road_repair: {
+        symbol: "🛠️",
+        bg: "#dc2626",
+        name: "Road Repair"
+    },
+    roads: {
+        symbol: "🛣️",
+        bg: "#dc2626",
+        name: "Roads & Mobility"
+    },
+    water_supply: {
+        symbol: "💧",
+        bg: "#2563eb",
+        name: "Water Supply"
+    },
+    water: {
+        symbol: "🚰",
+        bg: "#2563eb",
+        name: "Drinking Water"
+    },
+    health_clinic: {
+        symbol: "🏥",
+        bg: "#16a34a",
+        name: "Health Clinic"
+    },
+    health: {
+        symbol: "🚑",
+        bg: "#16a34a",
+        name: "Healthcare"
+    },
+    school_infrastructure: {
+        symbol: "🏫",
+        bg: "#7e22ce",
+        name: "School Infrastructure"
+    },
+    education: {
+        symbol: "🎓",
+        bg: "#7e22ce",
+        name: "Education"
+    },
+    electricity: {
+        symbol: "⚡",
+        bg: "#d97706",
+        name: "Electricity Grid"
+    },
+    sanitation: {
+        symbol: "🧹",
+        bg: "#ea580c",
+        name: "Sanitation"
+    }
+};
+function createHotspotIcon(theme = "roads", count) {
+    const config = CATEGORY_CONFIG[theme.toLowerCase()] || {
+        symbol: "📍",
+        bg: "#e25a45",
+        name: "Demand Cluster"
+    };
+    const size = count >= 50 ? 44 : count >= 20 ? 38 : 34;
+    return __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$leaflet$2f$dist$2f$leaflet$2d$src$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].divIcon({
+        className: "custom-hotspot-pin",
+        html: `
+      <div style="
+        background: ${config.bg};
+        border: 3px solid #ffffff;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: ${size >= 40 ? "20px" : "16px"};
+        color: white;
+        cursor: pointer;
+        position: relative;
+      ">
+        ${config.symbol}
+        <span style="
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          background: #171817;
+          border: 1px solid #ffffff;
+          border-radius: 50%;
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: 900;
+          font-family: monospace;
+          padding: 1px 5px;
+        ">
+          ${count}
+        </span>
+      </div>
+    `,
+        iconSize: [
+            size,
+            size
+        ],
+        iconAnchor: [
+            size / 2,
+            size / 2
+        ]
+    });
+}
+function HotspotLayer(t0) {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(6);
+    if ($[0] !== "3647d13f989b65f223e90683bedbf2f683fe09a330248d0d3ec1a22d7724f912") {
+        for(let $i = 0; $i < 6; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "3647d13f989b65f223e90683bedbf2f683fe09a330248d0d3ec1a22d7724f912";
+    }
+    const { hotspots: t1 } = t0;
+    const hotspots = t1 === undefined ? [] : t1;
+    const { layers, filters } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    if (!layers.showHotspots) {
+        return null;
+    }
+    let t2;
+    if ($[1] !== filters) {
+        t2 = ({
+            "HotspotLayer[hotspots.filter()]": (hotspot)=>{
+                if (filters.themeFilter === "all") {
+                    return true;
+                }
+                return hotspot.dominantTheme?.toLowerCase() === filters.themeFilter.toLowerCase();
+            }
+        })["HotspotLayer[hotspots.filter()]"];
+        $[1] = filters;
+        $[2] = t2;
+    } else {
+        t2 = $[2];
+    }
+    const visibleHotspots = hotspots.filter(t2);
+    const T0 = __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$LayerGroup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["LayerGroup"];
+    const t3 = visibleHotspots.map(_HotspotLayerVisibleHotspotsMap);
+    let t4;
+    if ($[3] !== T0 || $[4] !== t3) {
+        t4 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(T0, {
+            children: t3
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+            lineNumber: 162,
+            columnNumber: 10
+        }, this);
+        $[3] = T0;
+        $[4] = t3;
+        $[5] = t4;
+    } else {
+        t4 = $[5];
+    }
+    return t4;
+}
+_s(HotspotLayer, "nilnjqK462OhDrfyyrpe6wofdgc=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = HotspotLayer;
+function _HotspotLayerVisibleHotspotsMap(hotspot_0) {
+    const themeKey = (hotspot_0.dominantTheme || "roads").toLowerCase();
+    const config = CATEGORY_CONFIG[themeKey] || {
+        symbol: "\uD83D\uDCCD",
+        bg: "#e25a45",
+        name: "Demand Cluster"
+    };
+    const customIcon = createHotspotIcon(hotspot_0.dominantTheme, hotspot_0.count);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$LayerGroup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["LayerGroup"], {
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Circle"], {
+                center: [
+                    hotspot_0.latitude,
+                    hotspot_0.longitude
+                ],
+                radius: 500,
+                pathOptions: {
+                    color: config.bg,
+                    fillColor: config.bg,
+                    fillOpacity: 0.12,
+                    weight: 2,
+                    dashArray: "6,6"
+                }
+            }, void 0, false, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                lineNumber: 179,
+                columnNumber: 41
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Marker$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Marker"], {
+                position: [
+                    hotspot_0.latitude,
+                    hotspot_0.longitude
+                ],
+                icon: customIcon,
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Tooltip"], {
+                        direction: "top",
+                        offset: [
+                            0,
+                            -20
+                        ],
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "space-y-0.5 text-xs font-sans",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-bold text-[#171817]",
+                                    children: hotspot_0.label ?? "Civic Hotspot"
+                                }, void 0, false, {
+                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                    lineNumber: 185,
+                                    columnNumber: 179
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "text-[10px] text-muted-foreground",
+                                    children: [
+                                        "Theme: ",
+                                        config.name,
+                                        " (",
+                                        hotspot_0.count,
+                                        " reports)"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                    lineNumber: 185,
+                                    columnNumber: 259
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                            lineNumber: 185,
+                            columnNumber: 132
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                        lineNumber: 185,
+                        columnNumber: 89
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Popup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Popup"], {
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "min-w-[200px] space-y-2.5 font-sans",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-2",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "text-2xl",
+                                            children: config.symbol
+                                        }, void 0, false, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                            lineNumber: 185,
+                                            columnNumber: 477
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    className: "font-bold text-sm text-[#171817] line-clamp-1",
+                                                    children: hotspot_0.label ?? "Civic Hotspot"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                                    lineNumber: 185,
+                                                    columnNumber: 531
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[10px] uppercase font-bold text-[#e25a45]",
+                                                    children: [
+                                                        config.name,
+                                                        " Cluster"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                                    lineNumber: 185,
+                                                    columnNumber: 634
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                            lineNumber: 185,
+                                            columnNumber: 526
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                    lineNumber: 185,
+                                    columnNumber: 436
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "text-xs space-y-1 border-t pt-2 text-slate-700",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                    children: "Location:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                                    lineNumber: 185,
+                                                    columnNumber: 816
+                                                }, this),
+                                                " ",
+                                                hotspot_0.latitude.toFixed(4),
+                                                "° N, ",
+                                                hotspot_0.longitude.toFixed(4),
+                                                "° E"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                            lineNumber: 185,
+                                            columnNumber: 813
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                    children: "Reports Volume:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                                    lineNumber: 185,
+                                                    columnNumber: 921
+                                                }, this),
+                                                " ",
+                                                hotspot_0.count,
+                                                " submissions"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                            lineNumber: 185,
+                                            columnNumber: 918
+                                        }, this),
+                                        typeof hotspot_0.score === "number" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                    children: "Priority Score:"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                                    lineNumber: 185,
+                                                    columnNumber: 1030
+                                                }, this),
+                                                " ",
+                                                Math.round(hotspot_0.score * 100),
+                                                "%"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                            lineNumber: 185,
+                                            columnNumber: 1027
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                                    lineNumber: 185,
+                                    columnNumber: 749
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                            lineNumber: 185,
+                            columnNumber: 383
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                        lineNumber: 185,
+                        columnNumber: 376
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+                lineNumber: 185,
+                columnNumber: 10
+            }, this)
+        ]
+    }, hotspot_0.id, true, {
+        fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/HotspotLayer.tsx",
+        lineNumber: 179,
+        columnNumber: 10
+    }, this);
+}
+var _c;
+__turbopack_context__.k.register(_c, "HotspotLayer");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/layers/IssueLayer.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>IssueLayer
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$markers$2f$IssueMarker$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+const DEFAULT_ISSUES = [
+    {
+        id: "issue-001",
+        latitude: 20.298,
+        longitude: 85.826,
+        title: "Damaged road near residential area",
+        description: "Residents reported potholes and unsafe road conditions.",
+        theme: "roads",
+        source: "citizen",
+        createdAt: "2026-08-02T09:30:00Z",
+        status: "open"
+    },
+    {
+        id: "issue-002",
+        latitude: 20.291,
+        longitude: 85.818,
+        title: "Irregular water supply",
+        description: "Households reported inconsistent water availability.",
+        theme: "water",
+        source: "grievance",
+        createdAt: "2026-07-28T11:15:00Z",
+        status: "in_progress"
+    },
+    {
+        id: "issue-003",
+        latitude: 20.306,
+        longitude: 85.811,
+        title: "School infrastructure concern",
+        description: "Local residents highlighted infrastructure requirements.",
+        theme: "education",
+        source: "citizen",
+        createdAt: "2026-07-22T14:20:00Z",
+        status: "open"
+    }
+];
+function isWithinTimeRange(createdAt, timeRange) {
+    if (timeRange === "custom") {
+        return true;
+    }
+    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+    const issueDate = new Date(createdAt).getTime();
+    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+    return issueDate >= cutoff;
+}
+function IssueLayer(t0) {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(15);
+    if ($[0] !== "50a3cec650f78dee27338f7fffb3df7b8bdda49926fbd26ef2a4c858a663c31b") {
+        for(let $i = 0; $i < 15; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "50a3cec650f78dee27338f7fffb3df7b8bdda49926fbd26ef2a4c858a663c31b";
+    }
+    const { issues: t1 } = t0;
+    const issues = t1 === undefined ? DEFAULT_ISSUES : t1;
+    const { filters: t2, layers } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    const { themeFilter, timeRange, sourceFilter } = t2;
+    let t3;
+    bb0: {
+        if (!layers.showIssues) {
+            let t4;
+            if ($[1] === Symbol.for("react.memo_cache_sentinel")) {
+                t4 = [];
+                $[1] = t4;
+            } else {
+                t4 = $[1];
+            }
+            t3 = t4;
+            break bb0;
+        }
+        let t4;
+        if ($[2] !== issues || $[3] !== sourceFilter || $[4] !== themeFilter || $[5] !== timeRange) {
+            let t5;
+            if ($[7] !== sourceFilter || $[8] !== themeFilter || $[9] !== timeRange) {
+                t5 = ({
+                    "IssueLayer[issues.filter()]": (issue)=>{
+                        const matchesTheme = themeFilter === "all" || issue.theme === themeFilter;
+                        const matchesSource = sourceFilter === "all" || issue.source === sourceFilter;
+                        const matchesTime = isWithinTimeRange(issue.createdAt, timeRange);
+                        return matchesTheme && matchesSource && matchesTime;
+                    }
+                })["IssueLayer[issues.filter()]"];
+                $[7] = sourceFilter;
+                $[8] = themeFilter;
+                $[9] = timeRange;
+                $[10] = t5;
+            } else {
+                t5 = $[10];
+            }
+            t4 = issues.filter(t5);
+            $[2] = issues;
+            $[3] = sourceFilter;
+            $[4] = themeFilter;
+            $[5] = timeRange;
+            $[6] = t4;
+        } else {
+            t4 = $[6];
+        }
+        t3 = t4;
+    }
+    const visibleIssues = t3;
+    let t4;
+    if ($[11] !== visibleIssues) {
+        t4 = visibleIssues.map(_IssueLayerVisibleIssuesMap);
+        $[11] = visibleIssues;
+        $[12] = t4;
+    } else {
+        t4 = $[12];
+    }
+    let t5;
+    if ($[13] !== t4) {
+        t5 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            children: t4
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/IssueLayer.tsx",
+            lineNumber: 137,
+            columnNumber: 10
+        }, this);
+        $[13] = t4;
+        $[14] = t5;
+    } else {
+        t5 = $[14];
+    }
+    return t5;
+}
+_s(IssueLayer, "Krzv9KWXUHKTP1vEmzmBOupa3J8=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = IssueLayer;
+function _IssueLayerVisibleIssuesMap(issue_0) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$markers$2f$IssueMarker$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["IssueMarker"], {
+        issue: issue_0
+    }, issue_0.id, false, {
+        fileName: "[project]/civic-priority-platform/frontend/components/maps/layers/IssueLayer.tsx",
+        lineNumber: 146,
+        columnNumber: 10
+    }, this);
+}
+var _c;
+__turbopack_context__.k.register(_c, "IssueLayer");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "IssueMarker",
+    ()=>IssueMarker,
+    "default",
+    ()=>__TURBOPACK__default__export__
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Circle.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Marker$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Marker.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Popup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Popup.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/Tooltip.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$leaflet$2f$dist$2f$leaflet$2d$src$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/leaflet/dist/leaflet-src.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+;
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+const CATEGORY_CONFIG = {
+    road_repair: {
+        symbol: "🛠️",
+        bg: "#ef4444",
+        name: "Road Repair"
+    },
+    roads: {
+        symbol: "🛣️",
+        bg: "#ef4444",
+        name: "Roads & Mobility"
+    },
+    water_supply: {
+        symbol: "💧",
+        bg: "#3b82f6",
+        name: "Water Supply"
+    },
+    water: {
+        symbol: "🚰",
+        bg: "#3b82f6",
+        name: "Drinking Water"
+    },
+    health_clinic: {
+        symbol: "🏥",
+        bg: "#10b981",
+        name: "Health Clinic"
+    },
+    health: {
+        symbol: "🚑",
+        bg: "#10b981",
+        name: "Healthcare"
+    },
+    school_infrastructure: {
+        symbol: "🏫",
+        bg: "#a855f7",
+        name: "School Infrastructure"
+    },
+    education: {
+        symbol: "🎓",
+        bg: "#a855f7",
+        name: "Education"
+    },
+    electricity: {
+        symbol: "⚡",
+        bg: "#f59e0b",
+        name: "Electricity Grid"
+    },
+    sanitation: {
+        symbol: "🧹",
+        bg: "#f97316",
+        name: "Sanitation"
+    }
+};
+function createCategoryIcon(theme = "roads") {
+    const config = CATEGORY_CONFIG[theme.toLowerCase()] || {
+        symbol: "📍",
+        bg: "#e25a45",
+        name: "Civic Issue"
+    };
+    return __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$leaflet$2f$dist$2f$leaflet$2d$src$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].divIcon({
+        className: "custom-category-pin",
+        html: `
+      <div style="
+        background: ${config.bg};
+        border: 2px solid #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      ">
+        ${config.symbol}
+      </div>
+    `,
+        iconSize: [
+            34,
+            34
+        ],
+        iconAnchor: [
+            17,
+            17
+        ]
+    });
+}
+function IssueMarker(t0) {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(68);
+    if ($[0] !== "81dacc46d7abf321043f475fe175ad9f318f700ff9f67c9d1cd507775285f07f") {
+        for(let $i = 0; $i < 68; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "81dacc46d7abf321043f475fe175ad9f318f700ff9f67c9d1cd507775285f07f";
+    }
+    const { issue } = t0;
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    const t1 = issue.theme || "roads";
+    let t2;
+    if ($[1] !== t1) {
+        t2 = t1.toLowerCase();
+        $[1] = t1;
+        $[2] = t2;
+    } else {
+        t2 = $[2];
+    }
+    const themeKey = t2;
+    let t3;
+    if ($[3] !== themeKey) {
+        t3 = CATEGORY_CONFIG[themeKey] || {
+            symbol: "\uD83D\uDCCD",
+            bg: "#e25a45",
+            name: "Civic Issue"
+        };
+        $[3] = themeKey;
+        $[4] = t3;
+    } else {
+        t3 = $[4];
+    }
+    const config = t3;
+    let t4;
+    if ($[5] !== issue.theme) {
+        t4 = createCategoryIcon(issue.theme);
+        $[5] = issue.theme;
+        $[6] = t4;
+    } else {
+        t4 = $[6];
+    }
+    const customIcon = t4;
+    let t5;
+    if ($[7] !== issue.latitude || $[8] !== issue.longitude) {
+        t5 = [
+            issue.latitude,
+            issue.longitude
+        ];
+        $[7] = issue.latitude;
+        $[8] = issue.longitude;
+        $[9] = t5;
+    } else {
+        t5 = $[9];
+    }
+    let t6;
+    if ($[10] !== config.bg) {
+        t6 = {
+            color: config.bg,
+            fillColor: config.bg,
+            fillOpacity: 0.15,
+            weight: 1.5,
+            dashArray: "5,5"
+        };
+        $[10] = config.bg;
+        $[11] = t6;
+    } else {
+        t6 = $[11];
+    }
+    let t7;
+    if ($[12] !== t5 || $[13] !== t6) {
+        t7 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Circle$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Circle"], {
+            center: t5,
+            radius: 350,
+            pathOptions: t6
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 177,
+            columnNumber: 10
+        }, this);
+        $[12] = t5;
+        $[13] = t6;
+        $[14] = t7;
+    } else {
+        t7 = $[14];
+    }
+    let t8;
+    if ($[15] !== issue.latitude || $[16] !== issue.longitude) {
+        t8 = [
+            issue.latitude,
+            issue.longitude
+        ];
+        $[15] = issue.latitude;
+        $[16] = issue.longitude;
+        $[17] = t8;
+    } else {
+        t8 = $[17];
+    }
+    let t9;
+    if ($[18] === Symbol.for("react.memo_cache_sentinel")) {
+        t9 = [
+            0,
+            -18
+        ];
+        $[18] = t9;
+    } else {
+        t9 = $[18];
+    }
+    const t10 = issue.title ?? "Civic Issue";
+    let t11;
+    if ($[19] !== t10) {
+        t11 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            className: "font-bold text-[#171817]",
+            children: t10
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 203,
+            columnNumber: 11
+        }, this);
+        $[19] = t10;
+        $[20] = t11;
+    } else {
+        t11 = $[20];
+    }
+    let t12;
+    if ($[21] !== config.name) {
+        t12 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            className: "text-[10px] text-muted-foreground",
+            children: [
+                "Category: ",
+                config.name
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 211,
+            columnNumber: 11
+        }, this);
+        $[21] = config.name;
+        $[22] = t12;
+    } else {
+        t12 = $[22];
+    }
+    let t13;
+    if ($[23] !== t11 || $[24] !== t12) {
+        t13 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Tooltip"], {
+            direction: "top",
+            offset: t9,
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "space-y-0.5 text-xs font-sans",
+                children: [
+                    t11,
+                    t12
+                ]
+            }, void 0, true, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+                lineNumber: 219,
+                columnNumber: 48
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 219,
+            columnNumber: 11
+        }, this);
+        $[23] = t11;
+        $[24] = t12;
+        $[25] = t13;
+    } else {
+        t13 = $[25];
+    }
+    let t14;
+    if ($[26] !== config.symbol) {
+        t14 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            className: "text-xl",
+            children: config.symbol
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 228,
+            columnNumber: 11
+        }, this);
+        $[26] = config.symbol;
+        $[27] = t14;
+    } else {
+        t14 = $[27];
+    }
+    const t15 = issue.title ?? "Civic Issue";
+    let t16;
+    if ($[28] !== t15) {
+        t16 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+            className: "font-bold text-sm text-[#171817] line-clamp-1",
+            children: t15
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 237,
+            columnNumber: 11
+        }, this);
+        $[28] = t15;
+        $[29] = t16;
+    } else {
+        t16 = $[29];
+    }
+    let t17;
+    if ($[30] !== config.name) {
+        t17 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+            className: "font-mono text-[10px] uppercase font-bold text-[#e25a45]",
+            children: config.name
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 245,
+            columnNumber: 11
+        }, this);
+        $[30] = config.name;
+        $[31] = t17;
+    } else {
+        t17 = $[31];
+    }
+    let t18;
+    if ($[32] !== t16 || $[33] !== t17) {
+        t18 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            children: [
+                t16,
+                t17
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 253,
+            columnNumber: 11
+        }, this);
+        $[32] = t16;
+        $[33] = t17;
+        $[34] = t18;
+    } else {
+        t18 = $[34];
+    }
+    let t19;
+    if ($[35] !== t14 || $[36] !== t18) {
+        t19 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "flex items-center gap-2",
+            children: [
+                t14,
+                t18
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 262,
+            columnNumber: 11
+        }, this);
+        $[35] = t14;
+        $[36] = t18;
+        $[37] = t19;
+    } else {
+        t19 = $[37];
+    }
+    let t20;
+    if ($[38] !== issue.description) {
+        t20 = issue.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            className: "text-xs text-slate-600 bg-slate-50 p-2 rounded border",
+            children: issue.description
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 271,
+            columnNumber: 32
+        }, this);
+        $[38] = issue.description;
+        $[39] = t20;
+    } else {
+        t20 = $[39];
+    }
+    let t21;
+    if ($[40] === Symbol.for("react.memo_cache_sentinel")) {
+        t21 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+            children: "Location:"
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 279,
+            columnNumber: 11
+        }, this);
+        $[40] = t21;
+    } else {
+        t21 = $[40];
+    }
+    let t22;
+    if ($[41] !== issue.latitude) {
+        t22 = issue.latitude.toFixed(4);
+        $[41] = issue.latitude;
+        $[42] = t22;
+    } else {
+        t22 = $[42];
+    }
+    let t23;
+    if ($[43] !== issue.longitude) {
+        t23 = issue.longitude.toFixed(4);
+        $[43] = issue.longitude;
+        $[44] = t23;
+    } else {
+        t23 = $[44];
+    }
+    let t24;
+    if ($[45] !== t22 || $[46] !== t23) {
+        t24 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            children: [
+                t21,
+                " ",
+                t22,
+                "° N, ",
+                t23,
+                "° E"
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 302,
+            columnNumber: 11
+        }, this);
+        $[45] = t22;
+        $[46] = t23;
+        $[47] = t24;
+    } else {
+        t24 = $[47];
+    }
+    let t25;
+    if ($[48] !== issue.source) {
+        t25 = issue.source && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            className: "capitalize text-[11px]",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                    children: "Source:"
+                }, void 0, false, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+                    lineNumber: 311,
+                    columnNumber: 65
+                }, this),
+                " ",
+                issue.source
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 311,
+            columnNumber: 27
+        }, this);
+        $[48] = issue.source;
+        $[49] = t25;
+    } else {
+        t25 = $[49];
+    }
+    let t26;
+    if ($[50] !== issue.timestamp) {
+        t26 = issue.timestamp && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            className: "text-[11px]",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                    children: "Reported:"
+                }, void 0, false, {
+                    fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+                    lineNumber: 319,
+                    columnNumber: 57
+                }, this),
+                " ",
+                issue.timestamp
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 319,
+            columnNumber: 30
+        }, this);
+        $[50] = issue.timestamp;
+        $[51] = t26;
+    } else {
+        t26 = $[51];
+    }
+    let t27;
+    if ($[52] !== t24 || $[53] !== t25 || $[54] !== t26) {
+        t27 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "space-y-1 text-xs border-t pt-2 text-slate-700",
+            children: [
+                t24,
+                t25,
+                t26
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 327,
+            columnNumber: 11
+        }, this);
+        $[52] = t24;
+        $[53] = t25;
+        $[54] = t26;
+        $[55] = t27;
+    } else {
+        t27 = $[55];
+    }
+    let t28;
+    if ($[56] !== t19 || $[57] !== t20 || $[58] !== t27) {
+        t28 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Popup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Popup"], {
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "min-w-[220px] space-y-2.5 font-sans",
+                children: [
+                    t19,
+                    t20,
+                    t27
+                ]
+            }, void 0, true, {
+                fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+                lineNumber: 337,
+                columnNumber: 18
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 337,
+            columnNumber: 11
+        }, this);
+        $[56] = t19;
+        $[57] = t20;
+        $[58] = t27;
+        $[59] = t28;
+    } else {
+        t28 = $[59];
+    }
+    let t29;
+    if ($[60] !== customIcon || $[61] !== t13 || $[62] !== t28 || $[63] !== t8) {
+        t29 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$Marker$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Marker"], {
+            position: t8,
+            icon: customIcon,
+            children: [
+                t13,
+                t28
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 347,
+            columnNumber: 11
+        }, this);
+        $[60] = customIcon;
+        $[61] = t13;
+        $[62] = t28;
+        $[63] = t8;
+        $[64] = t29;
+    } else {
+        t29 = $[64];
+    }
+    let t30;
+    if ($[65] !== t29 || $[66] !== t7) {
+        t30 = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            children: [
+                t7,
+                t29
+            ]
+        }, void 0, true, {
+            fileName: "[project]/civic-priority-platform/frontend/components/maps/markers/IssueMarker.tsx",
+            lineNumber: 358,
+            columnNumber: 11
+        }, this);
+        $[65] = t29;
+        $[66] = t7;
+        $[67] = t30;
+    } else {
+        t30 = $[67];
+    }
+    return t30;
+}
+_s(IssueMarker, "NDfh+rrJX7oVevlK+OmCcBrcGQk=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"]
+    ];
+});
+_c = IssueMarker;
+const __TURBOPACK__default__export__ = IssueMarker;
+var _c;
+__turbopack_context__.k.register(_c, "IssueMarker");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/components/maps/utils/useMapEvents.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "useMapEvents",
+    ()=>useMapEvents
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/compiler-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/react-leaflet/lib/hooks.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/civic-priority-platform/frontend/components/maps/MapProvider.tsx [app-client] (ecmascript)");
+var _s = __turbopack_context__.k.signature();
+"use client";
+;
+;
+;
+;
+function useMapEvents() {
+    _s();
+    const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(19);
+    if ($[0] !== "895a252417c6f85cae13df6a1244554b57b2fcfaa96269278c73eb5160cdecdc") {
+        for(let $i = 0; $i < 19; $i += 1){
+            $[$i] = Symbol.for("react.memo_cache_sentinel");
+        }
+        $[0] = "895a252417c6f85cae13df6a1244554b57b2fcfaa96269278c73eb5160cdecdc";
+    }
+    const map = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMap"])();
+    const { isPinMode, setPinLocation, clearSelection } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"])();
+    let t0;
+    if ($[1] !== clearSelection || $[2] !== isPinMode || $[3] !== setPinLocation) {
+        t0 = ({
+            "useMapEvents[handleMapClick]": (event)=>{
+                clearSelection();
+                if (!isPinMode) {
+                    return;
+                }
+                setPinLocation({
+                    lat: event.latlng.lat,
+                    lng: event.latlng.lng
+                });
+            }
+        })["useMapEvents[handleMapClick]"];
+        $[1] = clearSelection;
+        $[2] = isPinMode;
+        $[3] = setPinLocation;
+        $[4] = t0;
+    } else {
+        t0 = $[4];
+    }
+    const handleMapClick = t0;
+    let t1;
+    if ($[5] !== handleMapClick) {
+        t1 = {
+            click: handleMapClick
+        };
+        $[5] = handleMapClick;
+        $[6] = t1;
+    } else {
+        t1 = $[6];
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMapEvents"])(t1);
+    let t2;
+    let t3;
+    if ($[7] !== map) {
+        t2 = ({
+            "useMapEvents[useEffect()]": ()=>{
+                const handleMoveEnd = _useMapEventsUseEffectHandleMoveEnd;
+                const handleZoomEnd = _useMapEventsUseEffectHandleZoomEnd;
+                map.on("moveend", handleMoveEnd);
+                map.on("zoomend", handleZoomEnd);
+                return ()=>{
+                    map.off("moveend", handleMoveEnd);
+                    map.off("zoomend", handleZoomEnd);
+                };
+            }
+        })["useMapEvents[useEffect()]"];
+        t3 = [
+            map
+        ];
+        $[7] = map;
+        $[8] = t2;
+        $[9] = t3;
+    } else {
+        t2 = $[8];
+        t3 = $[9];
+    }
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])(t2, t3);
+    let t4;
+    if ($[10] !== map) {
+        t4 = ({
+            "useMapEvents[flyToLocation]": (lat, lng, t5)=>{
+                const zoom = t5 === undefined ? 15 : t5;
+                map.flyTo([
+                    lat,
+                    lng
+                ], zoom, {
+                    duration: 0.8
+                });
+            }
+        })["useMapEvents[flyToLocation]"];
+        $[10] = map;
+        $[11] = t4;
+    } else {
+        t4 = $[11];
+    }
+    const flyToLocation = t4;
+    let t5;
+    if ($[12] !== clearSelection || $[13] !== map) {
+        t5 = ({
+            "useMapEvents[resetMap]": (center, zoom_0)=>{
+                clearSelection();
+                map.flyTo(center, zoom_0, {
+                    duration: 0.8
+                });
+            }
+        })["useMapEvents[resetMap]"];
+        $[12] = clearSelection;
+        $[13] = map;
+        $[14] = t5;
+    } else {
+        t5 = $[14];
+    }
+    const resetMap = t5;
+    let t6;
+    if ($[15] !== flyToLocation || $[16] !== map || $[17] !== resetMap) {
+        t6 = {
+            map,
+            flyToLocation,
+            resetMap
+        };
+        $[15] = flyToLocation;
+        $[16] = map;
+        $[17] = resetMap;
+        $[18] = t6;
+    } else {
+        t6 = $[18];
+    }
+    return t6;
+}
+_s(useMapEvents, "3DES4CFWKA9yMUfXqZ2EiW/S+HI=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMap"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$components$2f$maps$2f$MapProvider$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCivicMap"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$react$2d$leaflet$2f$lib$2f$hooks$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMapEvents"]
+    ];
+});
+function _useMapEventsUseEffectHandleZoomEnd() {}
+function _useMapEventsUseEffectHandleMoveEnd() {}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/civic-priority-platform/frontend/lib/api.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "createPortfolio",
+    ()=>createPortfolio,
+    "createSubmission",
+    ()=>createSubmission,
+    "generateHotspots",
+    ()=>generateHotspots,
+    "generateRanking",
+    ()=>generateRanking,
+    "getDashboard",
+    ()=>getDashboard,
+    "getMapHotspots",
+    ()=>getMapHotspots,
+    "getMapIssues",
+    ()=>getMapIssues,
+    "getSubmission",
+    ()=>getSubmission,
+    "getWardsContext",
+    ()=>getWardsContext
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$civic$2d$priority$2d$platform$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/civic-priority-platform/frontend/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
+const API_BASE = ("TURBOPACK compile-time value", "http://localhost:8000") || "http://localhost:8000";
+const API_PREFIX = `${API_BASE}/api/v1`;
+async function fetchJson(url, options) {
+    const res = await fetch(url, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...options?.headers || {}
+        }
+    });
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`API call failed: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+    return res.json();
+}
+async function createSubmission(payload) {
+    return fetchJson(`${API_PREFIX}/submissions`, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+async function getSubmission(submissionId) {
+    return fetchJson(`${API_PREFIX}/submissions/${submissionId}`);
+}
+async function getDashboard(constituency = "khordha") {
+    try {
+        return await fetchJson(`${API_PREFIX}/dashboard?constituency=${encodeURIComponent(constituency)}`);
+    } catch (err) {
+        console.warn("Backend unavailable, returning fallback dashboard data:", err);
+        return getFallbackDashboard(constituency);
+    }
+}
+async function generateHotspots(payload = {}) {
+    try {
+        return await fetchJson(`${API_PREFIX}/hotspots`, {
+            method: "POST",
+            body: JSON.stringify({
+                constituency: "khordha",
+                ...payload
+            })
+        });
+    } catch (err) {
+        console.warn("Backend unavailable, returning fallback hotspots:", err);
+        return {
+            constituency: payload.constituency || "khordha",
+            hotspots: getFallbackHotspots()
+        };
+    }
+}
+async function generateRanking(payload = {}) {
+    try {
+        return await fetchJson(`${API_PREFIX}/ranking`, {
+            method: "POST",
+            body: JSON.stringify({
+                constituency: "khordha",
+                ...payload
+            })
+        });
+    } catch (err) {
+        console.warn("Backend unavailable, returning fallback ranking:", err);
+        return {
+            constituency: payload.constituency || "khordha",
+            projects: getFallbackProjects(),
+            scoring_weights: {
+                population_impact: 0.4,
+                urgency: 0.3,
+                cost_effectiveness: 0.2,
+                alignment_with_plans: 0.1
+            }
+        };
+    }
+}
+async function createPortfolio(payload) {
+    try {
+        return await fetchJson(`${API_PREFIX}/portfolios`, {
+            method: "POST",
+            headers: {
+                "Idempotency-Key": `port_${Date.now()}`
+            },
+            body: JSON.stringify({
+                constituency: "khordha",
+                ...payload
+            })
+        });
+    } catch (err) {
+        console.warn("Backend unavailable, returning fallback portfolio:", err);
+        const projects = getFallbackProjects().slice(0, 3);
+        return {
+            portfolio_id: `fallback-${Date.now()}`,
+            constituency: payload.constituency || "khordha",
+            budget: payload.budget,
+            selected_projects: projects,
+            total_benefit: projects.reduce((acc, p)=>acc + p.score, 0),
+            constraints: payload.constraints || {
+                geographical: [
+                    "Max 3 projects per ward"
+                ],
+                timeline: [
+                    "Roads before building construction"
+                ],
+                administrative: [
+                    "Capacity cap active"
+                ]
+            },
+            status: "optimized"
+        };
+    }
+}
+async function getMapIssues() {
+    try {
+        return await fetchJson(`${API_PREFIX}/maps/issues`);
+    } catch (err) {
+        return {
+            type: "FeatureCollection",
+            features: []
+        };
+    }
+}
+async function getMapHotspots() {
+    try {
+        return await fetchJson(`${API_PREFIX}/maps/hotspots`);
+    } catch (err) {
+        return {
+            type: "FeatureCollection",
+            features: []
+        };
+    }
+}
+async function getWardsContext() {
+    try {
+        return await fetchJson(`${API_PREFIX}/context/wards`);
+    } catch (err) {
+        return [
+            {
+                ward_id: "Ward 1",
+                ward_name: "Chandrasekharpur",
+                city_name: "Khordha",
+                zone_name: "North",
+                area_sq_km: 4.2,
+                population_thousands: 8.2,
+                male_population_thousands: 4.2,
+                female_population_thousands: 4.0,
+                children_population_thousands: 1.1,
+                youth_population_thousands: 2.3
+            },
+            {
+                ward_id: "Ward 2",
+                ward_name: "Patia",
+                city_name: "Khordha",
+                zone_name: "North",
+                area_sq_km: 3.8,
+                population_thousands: 7.4,
+                male_population_thousands: 3.8,
+                female_population_thousands: 3.6,
+                children_population_thousands: 0.9,
+                youth_population_thousands: 2.1
+            },
+            {
+                ward_id: "Ward 3",
+                ward_name: "Jaydev Vihar",
+                city_name: "Khordha",
+                zone_name: "Central",
+                area_sq_km: 5.1,
+                population_thousands: 9.1,
+                male_population_thousands: 4.6,
+                female_population_thousands: 4.5,
+                children_population_thousands: 1.3,
+                youth_population_thousands: 2.8
+            },
+            {
+                ward_id: "Ward 4",
+                ward_name: "Acharya Vihar",
+                city_name: "Khordha",
+                zone_name: "Central",
+                area_sq_km: 2.9,
+                population_thousands: 6.8,
+                male_population_thousands: 3.5,
+                female_population_thousands: 3.3,
+                children_population_thousands: 0.8,
+                youth_population_thousands: 1.9
+            },
+            {
+                ward_id: "Ward 5",
+                ward_name: "Saheed Nagar",
+                city_name: "Khordha",
+                zone_name: "Central",
+                area_sq_km: 6.0,
+                population_thousands: 11.2,
+                male_population_thousands: 5.8,
+                female_population_thousands: 5.4,
+                children_population_thousands: 1.6,
+                youth_population_thousands: 3.4
+            },
+            {
+                ward_id: "Ward 8",
+                ward_name: "Bhauma Nagar",
+                city_name: "Khordha",
+                zone_name: "South",
+                area_sq_km: 4.5,
+                population_thousands: 7.6,
+                male_population_thousands: 3.9,
+                female_population_thousands: 3.7,
+                children_population_thousands: 1.0,
+                youth_population_thousands: 2.2
+            }
+        ];
+    }
+}
+// ---------------------------------------------------------------------------
+// Fallbacks for client resilience during local dev / build
+// ---------------------------------------------------------------------------
+function getFallbackHotspots() {
+    return [
+        {
+            ward: "Ward 5",
+            theme: "road_repair",
+            submission_count: 42,
+            latitude: 20.1874,
+            longitude: 85.6178,
+            radius: 500
+        },
+        {
+            ward: "Ward 3",
+            theme: "school_infrastructure",
+            submission_count: 28,
+            latitude: 20.1921,
+            longitude: 85.6241,
+            radius: 500
+        },
+        {
+            ward: "Ward 8",
+            theme: "health_clinic",
+            submission_count: 19,
+            latitude: 20.1798,
+            longitude: 85.6089,
+            radius: 500
+        }
+    ];
+}
+function getFallbackProjects() {
+    return [
+        {
+            project_id: "proj_001",
+            theme: "road_repair",
+            ward: "Ward 5",
+            score: 87.5,
+            population_impact_score: 90,
+            urgency_score: 85,
+            cost_effectiveness_score: 80,
+            alignment_score: 75,
+            social_impact: "Saves 12,000 commute hours/day for 11,200 residents in Ward 5",
+            economic_impact: "ROI: 2.5x — generates 50 local jobs, reduces transport cost 30%",
+            estimated_cost: 12000000
+        },
+        {
+            project_id: "proj_002",
+            theme: "school_infrastructure",
+            ward: "Ward 3",
+            score: 81.2,
+            population_impact_score: 85,
+            urgency_score: 78,
+            cost_effectiveness_score: 82,
+            alignment_score: 70,
+            social_impact: "Improves learning outcomes for 9,100 students in Ward 3",
+            economic_impact: "ROI: 3.1x — boosts enrolment 15%, reduces dropout 20%",
+            estimated_cost: 8000000
+        },
+        {
+            project_id: "proj_003",
+            theme: "health_clinic",
+            ward: "Ward 8",
+            score: 76.8,
+            population_impact_score: 75,
+            urgency_score: 80,
+            cost_effectiveness_score: 70,
+            alignment_score: 80,
+            social_impact: "Reduces OOP medical expenditure for 7,600 residents in Ward 8",
+            economic_impact: "ROI: 1.8x — reduces disease burden, generates 20 healthcare jobs",
+            estimated_cost: 15000000
+        }
+    ];
+}
+function getFallbackDashboard(constituency) {
+    return {
+        constituency,
+        total_submissions: 145,
+        hotspots: getFallbackHotspots(),
+        top_projects: getFallbackProjects(),
+        user_submissions: [
+            {
+                submission_id: "sub_001",
+                status: "processed",
+                theme: "road_repair",
+                confidence: 0.92,
+                message: "Submission processed."
+            }
+        ]
+    };
+}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+]);
+
+//# sourceMappingURL=civic-priority-platform_frontend_0_f3ad3._.js.map
