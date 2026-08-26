@@ -62,6 +62,10 @@ out/
 # Local/raw imported datasets
 civic-priority-platform/backend/data/import/
 
+civic-priority-platform\backend\data\import
+
+C:\Users\USER\Desktop\CIVICO\civic-priority-platform\backend\data\import
+
 # Local delivery and temporary files
 civico_context_tools/
 delivery/
