@@ -39,3 +39,36 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# Local editor files
+.vscode/
+
+# Local/raw imported datasets
+civic-priority-platform/backend/data/import/
+
+# Local delivery and temporary files
+civico_context_tools/
+delivery/
+workspace/
+*.zip
+
+# Logs and local databases
+*.log
+*.sqlite
+
