@@ -19,3 +19,11 @@ frontend/out/
 backend/data/import/
 backend/data/source_manifest.json
 *.log
+
+# Nested CIVICO project paths
+civic-priority-platform/backend/.venv/
+civic-priority-platform/backend/data/import/
+civic-priority-platform/backend/data/source_manifest.json
+civic-priority-platform/frontend/.next/
+civic-priority-platform/frontend/node_modules/
+civic-priority-platform/frontend/out/
