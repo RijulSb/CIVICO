@@ -16,6 +16,7 @@ import {
   type AddressSuggestion,
   type IntakeLanguage,
 } from "@/lib/api/geocoding";
+import { getReportCopy } from "@/lib/reportI18n";
 
 export interface ConfirmedLocation {
   lat: number;
@@ -24,6 +25,8 @@ export interface ConfirmedLocation {
   accuracyMeters?: number;
   source: "gps" | "address" | "photo";
   precision: "address" | "street" | "place" | "area" | "gps" | "photo";
+  customText?: string;
+  capturedAt?: string;
 }
 
 export interface SpatialLocationPickerProps {
@@ -51,6 +54,7 @@ export function SpatialLocationPicker({
   onLocationConfirmed,
   disabled = false,
 }: SpatialLocationPickerProps) {
+  const ui = getReportCopy(language);
   const initialLocation = React.useMemo(
     () =>
       exifGeotag ??
@@ -197,7 +201,7 @@ export function SpatialLocationPicker({
   const handleGetCurrentLocation = () => {
     if (!("geolocation" in navigator)) {
       setLocationError(
-        "Device location is not available. Search for an address instead.",
+        ui.location.gpsUnavailable,
       );
       return;
     }
@@ -220,23 +224,41 @@ export function SpatialLocationPicker({
         setIsConfirmed(false);
         setIsLocating(false);
       },
-      () => {
-        setLocationError(
-          "We could not access your location. Search for an address instead.",
-        );
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          setLocationError(
+            ui.location.gpsDenied,
+          );
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setLocationError(
+            ui.location.gpsUnavailable,
+          );
+        } else {
+          setLocationError(
+            ui.location.gpsFailed,
+          );
+        }
         setIsLocating(false);
       },
+
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 },
     );
   };
 
   const handleConfirm = () => {
+    const customText = selectedAddress || addressQuery.trim();
+    if (!customText) {
+      setLocationError("Add a nearby landmark, road, ward, or address before confirming.");
+      return;
+    }
     setIsConfirmed(true);
     onLocationConfirmed({
       lat: currentCoords.lat,
       lng: currentCoords.lng,
-      address: selectedAddress || addressQuery.trim() || undefined,
+      address: customText,
+      customText,
       accuracyMeters,
+      capturedAt: new Date().toISOString(),
       source: locationSource,
       precision,
     });
@@ -244,12 +266,12 @@ export function SpatialLocationPicker({
 
   const accuracyLabel =
     locationSource === "gps" && accuracyMeters != null
-      ? `GPS accuracy ±${Math.round(accuracyMeters)} m`
+      ? `${ui.location.accuracy} ±${Math.round(accuracyMeters)} m`
       : locationSource === "address"
-        ? `${precision === "address" ? "Address" : "Place"} match — confirm pin`
+        ? ui.location.addressMatch
         : locationSource === "photo"
-          ? "Photo geotag — confirm pin"
-          : "Approximate area — confirm pin";
+          ? ui.location.photoGeotag
+          : ui.location.approximate;
 
   return (
     <div className="flex min-w-0 flex-col gap-3 rounded-xl border border-[#171817]/20 bg-[#f4f3ef] p-3 font-sans sm:p-4">
@@ -260,23 +282,23 @@ export function SpatialLocationPicker({
           </div>
           <div className="min-w-0">
             <h4 className="text-sm font-semibold text-[#171817]">
-              Where is this happening?
+              {ui.location.title}
             </h4>
             <p className="font-mono text-[10px] uppercase tracking-wide text-[#777872]">
-              Address, GPS, or photo location
+              {ui.location.subtitle}
             </p>
           </div>
         </div>
         {isConfirmed && (
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 font-mono text-[10px] font-medium text-emerald-800">
-            <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> Verified
+            <CheckCircle2 className="h-3 w-3" aria-hidden="true" /> {ui.location.confirmed}
           </span>
         )}
       </div>
 
       <div className="relative">
         <label htmlFor="civico-address-search" className="sr-only">
-          Search address or landmark
+          {ui.location.searchLabel}
         </label>
         <Search
           className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-[#777872]"
@@ -291,7 +313,7 @@ export function SpatialLocationPicker({
             setSelectedAddress("");
             setIsConfirmed(false);
           }}
-          placeholder="Type a road, school, landmark, or address"
+          placeholder={ui.location.placeholder}
           autoComplete="street-address"
           disabled={disabled}
           className="h-11 w-full rounded-lg border border-[#171817]/20 bg-white pl-9 pr-10 text-sm text-[#171817] outline-none transition focus:border-[#e25a45] focus:ring-2 focus:ring-[#e25a45]/30 disabled:cursor-not-allowed disabled:opacity-60"
@@ -302,7 +324,7 @@ export function SpatialLocationPicker({
         {isSearching && (
           <Loader2
             className="absolute right-3 top-3 h-4 w-4 animate-spin text-[#e25a45]"
-            aria-label="Searching"
+            aria-label={ui.location.searchLabel}
           />
         )}
 
@@ -323,7 +345,7 @@ export function SpatialLocationPicker({
                     {suggestion.display_name}
                   </span>
                   <span className="mt-0.5 block font-mono text-[10px] uppercase text-[#777872]">
-                    {suggestion.precision} match
+                    {ui.location.addressMatch}
                   </span>
                 </button>
               </li>
@@ -335,8 +357,7 @@ export function SpatialLocationPicker({
         id="civico-address-help"
         className="text-[11px] leading-4 text-[#777872]"
       >
-        Choose a suggestion to place the pin, then confirm it below. Intake
-        language: {languageLabels[language]}.
+        {ui.location.help} {languageLabels[language]}.
       </p>
 
       {gpsSuggestion && !isConfirmed && locationSource !== "gps" && (
@@ -349,12 +370,12 @@ export function SpatialLocationPicker({
           <Navigation className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <span>
             <span className="block font-semibold">
-              Use your detected location?
+              {ui.location.detected}
             </span>
             <span className="block opacity-80">
               {gpsSuggestion.accuracyMeters != null
-                ? `Estimated GPS accuracy ±${Math.round(gpsSuggestion.accuracyMeters)} m.`
-                : "A device location was found; confirm it before submitting."}
+                ? `${ui.location.accuracy} ±${Math.round(gpsSuggestion.accuracyMeters)} m.`
+                : ui.location.detectedHint}
             </span>
           </span>
         </button>
@@ -424,13 +445,13 @@ export function SpatialLocationPicker({
       >
         <Crosshair className="h-5 w-5 shrink-0" aria-hidden="true" />
         <span>
-          {isConfirmed ? "Location Confirmed ✓" : "Confirm Suggested Location"}
+                        {isConfirmed ? `${ui.location.confirmed} ✓` : ui.location.confirm}
+
         </span>
       </button>
 
       <p className="text-center text-[10px] leading-4 text-[#777872]">
-        Address results use OpenStreetMap data via Photon. Confirm the pin
-        before sending your report.
+        {ui.location.attribution}
       </p>
     </div>
   );

@@ -5,7 +5,9 @@ import io
 from datetime import datetime, timezone
 from typing import Literal
 
-from fastapi import APIRouter, File, HTTPException, Query, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
+
+from app.core.security import verify_api_key
 
 from app.api.v1.optimization import (
     OPTIMIZATION_RUNS,
@@ -17,6 +19,16 @@ from app.schemas.reports import ReportCreate, ReportJobResponse, ReportResponse
 router = APIRouter()
 
 REPORTS: dict[str, dict] = {}
+
+REPORT_LABELS = {
+    "en": {"constituency": "Khordha", "status": "Draft recommendation - requires authority review", "validated": "Validated citizen submissions: 2,845", "channels": "Input channels: text, voice, photo", "languages": "Languages processed: Odia, Hindi, English", "demographic": "Demographic data: constituency and ward dataset", "infrastructure": "Infrastructure dataset: facilities, road and service-gap records", "method": "Optimization method: weighted scoring + constraint-aware portfolio selection"},
+    "hi": {"constituency": "खोरधा", "status": "प्रारूप अनुशंसा - प्राधिकरण की समीक्षा आवश्यक", "validated": "सत्यापित नागरिक प्रस्तुतियाँ: 2,845", "channels": "इनपुट माध्यम: टेक्स्ट, वॉइस, फोटो", "languages": "प्रसंस्कृत भाषाएँ: उड़िया, हिंदी, अंग्रेज़ी", "demographic": "जनसांख्यिकीय डेटा: निर्वाचन क्षेत्र और वार्ड डेटा सेट", "infrastructure": "बुनियादी ढाँचा डेटा: सुविधाएँ, सड़क और सेवा-अंतर रिकॉर्ड", "method": "अनुकूलन विधि: भारित स्कोरिंग और बाधा-सचेत पोर्टफोलियो चयन"},
+    "or": {"constituency": "ଖୋର୍ଦ୍ଧା", "status": "ଖସଡ଼ା ସୁପାରିଶ - କର୍ତ୍ତୃପକ୍ଷଙ୍କ ସମୀକ୍ଷା ଆବଶ୍ୟକ", "validated": "ଯାଞ୍ଚ ହୋଇଥିବା ନାଗରିକ ଦାଖଲ: ୨,୮୪୫", "channels": "ଇନପୁଟ ମାଧ୍ୟମ: ଟେକ୍ସଟ, ଭଏସ, ଫଟୋ", "languages": "ପ୍ରକ୍ରିୟାକରଣ ଭାଷା: ଓଡ଼ିଆ, ହିନ୍ଦୀ, ଇଂରାଜୀ", "demographic": "ଜନସାଂଖ୍ୟିକ ତଥ୍ୟ: ନିର୍ବାଚନମଣ୍ଡଳୀ ଏବଂ ୱାର୍ଡ ଡାଟାସେଟ", "infrastructure": "ଭିତ୍ତିଭୂମି ତଥ୍ୟ: ସୁବିଧା, ରାସ୍ତା ଏବଂ ସେବା ଅଭାବ ରେକର୍ଡ", "method": "ଅପ୍ଟିମାଇଜେସନ ପଦ୍ଧତି: ଭାରିତ ସ୍କୋରିଂ ଏବଂ ସୀମା-ସଚେତନ ପୋର୍ଟଫୋଲିଓ ଚୟନ"},
+}
+
+
+def _labels(language: str) -> dict[str, str]:
+    return REPORT_LABELS.get(language, REPORT_LABELS["en"])
 
 
 async def _latest_or_seed_run() -> dict:
@@ -64,7 +76,8 @@ def _number(value: str | int | float | None, default: float = 0) -> float:
         return default
 
 
-def _report_payload(run: dict) -> dict:
+def _report_payload(run: dict, language: str = "en") -> dict:
+    labels = _labels(language)
     summary = run.get("summary", {})
     selected = run.get("selectedProjects", [])
     constraints = run.get("constraintsStatus", [])
@@ -72,8 +85,9 @@ def _report_payload(run: dict) -> dict:
 
     return {
         "runId": run["runId"],
-        "constituency": "Khordha",
-        "status": "Draft recommendation - requires authority review",
+        "constituency": labels["constituency"],
+        "status": labels["status"],
+        "language": language if language in REPORT_LABELS else "en",
         "summary": {
             "budget": 450000000,
             "totalAllocated": summary.get("totalCostRaw", 0),
@@ -119,12 +133,12 @@ def _report_payload(run: dict) -> dict:
             for item in constraints
         ],
         "provenance": [
-            "Validated citizen submissions: 2,845",
-            "Input channels: text, voice, photo",
-            "Languages processed: Odia, Hindi, English",
-            "Demographic data: constituency and ward dataset",
-            "Infrastructure dataset: facilities, road and service-gap records",
-            "Optimization method: weighted scoring + constraint-aware portfolio selection",
+            labels["validated"],
+            labels["channels"],
+            labels["languages"],
+            labels["demographic"],
+            labels["infrastructure"],
+            labels["method"],
         ],
     }
 
@@ -379,9 +393,12 @@ async def upload_source_csv(file: UploadFile = File(...)) -> dict:
 
 
 @router.get("/preview")
-async def preview_report(runId: str = Query(...)) -> dict:
+async def preview_report(
+    runId: str = Query(...),
+    language: str = Query(default="en", pattern="^(en|hi|or)$"),
+) -> dict:
     run = await _get_run(runId)
-    return _report_payload(run)
+    return _report_payload(run, language)
 
 
 @router.get("", response_model=list[ReportResponse])
@@ -395,6 +412,7 @@ async def list_reports(constituency: str = Query(default="khordha")) -> list[Rep
             status=report["status"],
             format=report["format"],
             downloadUrl=f"/api/v1/reports/{report['reportId']}/download",
+            language=report.get("language", "en"),
         )
         for report in sorted(
             REPORTS.values(), key=lambda item: item["createdAt"], reverse=True
@@ -404,9 +422,13 @@ async def list_reports(constituency: str = Query(default="khordha")) -> list[Rep
 
 
 @router.post("", response_model=ReportJobResponse, status_code=status.HTTP_201_CREATED)
-async def create_report(payload: ReportCreate) -> ReportJobResponse:
+async def create_report(
+    payload: ReportCreate,
+    _api_key: str = Depends(verify_api_key),
+) -> ReportJobResponse:
+
     run = await _get_run(payload.runId)
-    report_payload = _report_payload(run)
+    report_payload = _report_payload(run, payload.language)
     report_id = f"RPT-{datetime.now(timezone.utc).year}-{len(REPORTS) + 24:05d}"
     created_at = datetime.now(timezone.utc)
     REPORTS[report_id] = {
@@ -418,6 +440,7 @@ async def create_report(payload: ReportCreate) -> ReportJobResponse:
         "createdAt": created_at,
         "constituency": "khordha",
         "includeRejectedProjects": payload.includeRejectedProjects,
+        "language": payload.language,
         "payload": report_payload,
     }
     return ReportJobResponse(
@@ -427,6 +450,7 @@ async def create_report(payload: ReportCreate) -> ReportJobResponse:
         createdAt=created_at,
         downloadUrl=f"/api/v1/reports/{report_id}/download",
         previewUrl=f"/api/v1/reports/{report_id}",
+        language=payload.language,
     )
 
 

@@ -1,30 +1,41 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import Lenis from "lenis";
 
 export default function LenisProvider({ children }: { children: ReactNode }) {
-  const lenisRef = useRef<Lenis | null>(null);
+  const lenisRef = useRef<any>(null);
 
   useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.08,
-      smoothWheel: true,
-    });
-    lenisRef.current = lenis;
-    document.documentElement.classList.add("lenis");
-
+    let isMounted = true;
     let raf = 0;
-    const loop = (time: number) => {
-      lenis.raf(time);
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+
+    import("lenis")
+      .then(({ default: Lenis }) => {
+        if (!isMounted) return;
+        const lenis = new Lenis({
+          lerp: 0.08,
+          smoothWheel: true,
+        });
+        lenisRef.current = lenis;
+        document.documentElement.classList.add("lenis");
+
+        const loop = (time: number) => {
+          lenis.raf(time);
+          raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+      })
+      .catch((err) => {
+        console.warn("Lenis smooth scroll initialization skipped:", err);
+      });
 
     return () => {
-      cancelAnimationFrame(raf);
-      lenis.destroy();
-      document.documentElement.classList.remove("lenis");
+      isMounted = false;
+      if (raf) cancelAnimationFrame(raf);
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        document.documentElement.classList.remove("lenis");
+      }
     };
   }, []);
 

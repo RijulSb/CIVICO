@@ -1,4 +1,5 @@
 import type {
+  AuthTokenResponse,
   DashboardResponse,
   HotspotListResponse,
   HotspotRequest,
@@ -7,18 +8,36 @@ import type {
   PortfolioResponse,
   RankingRequest,
   RankingResponse,
+  SignInPayload,
+  SignUpPayload,
   SubmissionRequest,
   SubmissionResponse,
+  UserProfile,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_PREFIX = `${API_BASE}/api/v1`;
 
+function getStoredToken(): string | null {
+  if (typeof window !== "undefined") {
+    try {
+      return localStorage.getItem("civico_token");
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const isFormData =
+    typeof FormData !== "undefined" && options?.body instanceof FormData;
+  const token = getStoredToken();
   const res = await fetch(url, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options?.headers || {}),
     },
   });
@@ -32,20 +51,105 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 // ---------------------------------------------------------------------------
-// API Methods
+// Authentication API Methods
 // ---------------------------------------------------------------------------
 
-export async function createSubmission(
-  payload: SubmissionRequest
-): Promise<SubmissionResponse> {
-  return fetchJson<SubmissionResponse>(`${API_PREFIX}/submissions`, {
+export async function apiSignUp(payload: SignUpPayload): Promise<AuthTokenResponse> {
+  return fetchJson<AuthTokenResponse>(`${API_PREFIX}/auth/signup`, {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
+export async function apiSignIn(payload: SignInPayload): Promise<AuthTokenResponse> {
+  return fetchJson<AuthTokenResponse>(`${API_PREFIX}/auth/signin`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function apiGetMe(token?: string): Promise<UserProfile> {
+  return fetchJson<UserProfile>(`${API_PREFIX}/auth/me`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+}
+
+export async function apiVerifyAdminKey(
+  adminKey: string,
+  token?: string
+): Promise<AuthTokenResponse> {
+  return fetchJson<AuthTokenResponse>(`${API_PREFIX}/auth/verify-admin-key`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: JSON.stringify({ admin_key: adminKey }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Intake & Domain API Methods
+// ---------------------------------------------------------------------------
+
+export async function createSubmission(
+  payload: SubmissionRequest
+): Promise<SubmissionResponse> {
+  if (payload.audio_file || payload.video_file || payload.photo_file) {
+    const formData = new FormData();
+    formData.append("constituency", payload.constituency || "khordha");
+    formData.append("language", payload.language);
+    formData.append("submission_type", payload.submission_type);
+    if (payload.full_name) formData.append("full_name", payload.full_name);
+    if (payload.email) formData.append("email", payload.email);
+    if (payload.phone) formData.append("phone", payload.phone);
+    if (payload.consent != null) formData.append("consent", String(payload.consent));
+    formData.append("content", payload.content);
+    formData.append("ward", payload.location.ward);
+    formData.append("block", payload.location.block);
+    if (payload.location.latitude != null) formData.append("latitude", String(payload.location.latitude));
+    if (payload.location.longitude != null) formData.append("longitude", String(payload.location.longitude));
+    if (payload.custom_location_text) formData.append("custom_location_text", payload.custom_location_text);
+    if (payload.gps_accuracy_m != null) formData.append("gps_accuracy_m", String(payload.gps_accuracy_m));
+    if (payload.gps_timestamp) formData.append("gps_timestamp", payload.gps_timestamp);
+    if (payload.consent != null) formData.append("consent", String(payload.consent));
+    if (payload.audio_url) formData.append("audio_url", payload.audio_url);
+    if (payload.photo_url) formData.append("photo_url", payload.photo_url);
+    if (payload.category) formData.append("category", payload.category);
+    if (payload.citizen_id) formData.append("citizen_id", payload.citizen_id);
+    if (payload.audio_file) formData.append("audio", payload.audio_file, "civico-voice.webm");
+    if (payload.video_file) formData.append("video", payload.video_file, "civico-video.webm");
+    if (payload.photo_file) formData.append("photo", payload.photo_file, "civico-photo.jpg");
+
+    return fetchJson<SubmissionResponse>(`${API_PREFIX}/submissions`, {
+      method: "POST",
+      body: formData,
+    });
+  }
+
+  const jsonPayload: SubmissionRequest = { ...payload };
+  delete jsonPayload.audio_file;
+  delete jsonPayload.video_file;
+  delete jsonPayload.photo_file;
+  return fetchJson<SubmissionResponse>(`${API_PREFIX}/submissions`, {
+    method: "POST",
+    body: JSON.stringify(jsonPayload),
+  });
+}
+
 export async function getSubmission(submissionId: string): Promise<SubmissionResponse> {
   return fetchJson<SubmissionResponse>(`${API_PREFIX}/submissions/${submissionId}`);
+}
+
+export async function getSubmissions(
+  constituency: string = "khordha",
+  limit: number = 50
+): Promise<SubmissionResponse[]> {
+  try {
+    return await fetchJson<SubmissionResponse[]>(
+      `${API_PREFIX}/submissions?constituency=${encodeURIComponent(constituency)}&limit=${limit}`
+    );
+  } catch (err) {
+    console.warn("Backend submissions list failed, falling back to empty:", err);
+    return [];
+  }
 }
 
 export async function getDashboard(
@@ -115,18 +219,24 @@ export async function createPortfolio(
   } catch (err) {
     console.warn("Backend unavailable, returning fallback portfolio:", err);
     const projects = getFallbackProjects().slice(0, 3);
+    const budget = payload.budget;
+    const reservePct = payload.constraints?.reserve_percent ?? 5;
+    const netBudget = Math.floor(budget * (1 - reservePct / 100));
+    const reserveAmount = budget - netBudget;
+    const spend = projects.reduce((acc, p) => acc + p.estimated_cost, 0);
     return {
       portfolio_id: `fallback-${Date.now()}`,
       constituency: payload.constituency || "khordha",
-      budget: payload.budget,
+      budget,
+      net_budget: netBudget,
+      reserve_amount: reserveAmount,
+      spend,
       selected_projects: projects,
       total_benefit: projects.reduce((acc, p) => acc + p.score, 0),
-      constraints: payload.constraints || {
-        geographical: ["Max 3 projects per ward"],
-        timeline: ["Roads before building construction"],
-        administrative: ["Capacity cap active"],
-      },
-      status: "optimized",
+      constraints: payload.constraints ?? { reserve_percent: reservePct },
+      status: "heuristic_fallback",
+      solver_status: "heuristic_fallback",
+      fallback_reason: "Backend is unavailable. Results are from a greedy heuristic.",
     };
   }
 }

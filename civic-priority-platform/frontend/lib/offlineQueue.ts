@@ -16,6 +16,11 @@ export interface QueuedSubmission {
   longitude: number | null;
   audioBlob?: Blob | null;
   photoBlob?: Blob | null;
+  videoBlob?: Blob | null;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  customLocationText?: string;
   status: "pending" | "syncing" | "failed";
 }
 
@@ -149,13 +154,19 @@ export async function autoSyncQueue(): Promise<number> {
       await createSubmission({
         constituency: "khordha",
         language: langMap[item.language] || "odia",
-        submission_type: item.audioBlob ? "voice" : item.photoBlob ? "photo" : "text",
-        content: item.text || (item.audioBlob ? "[Voice Recording Attached]" : "[Photo Evidence Attached]"),
+        submission_type: item.audioBlob ? "voice" : item.videoBlob ? "video" : item.photoBlob ? "photo" : "text",
+        content: item.text || (item.photoBlob ? "[Photo Evidence Attached]" : ""),
+        audio_file: item.audioBlob || undefined,
+        video_file: item.videoBlob || undefined,
+        full_name: item.fullName,
+        email: item.email,
+        phone: item.phone,
         location: {
           ward: item.wardId || "Ward 5",
           block: "Khordha Block",
-          latitude: item.latitude ?? 20.1874,
-          longitude: item.longitude ?? 85.6178,
+          latitude: item.latitude ?? undefined,
+          longitude: item.longitude ?? undefined,
+          custom_text: item.customLocationText || item.text,
         },
       });
       await removeQueuedSubmission(item.id);

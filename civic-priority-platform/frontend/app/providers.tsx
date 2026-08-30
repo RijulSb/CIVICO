@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { FeedbackHubProvider } from "@/components/feedback/FeedbackHub";
+import { AuthProvider } from "@/lib/authContext";
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -46,7 +47,9 @@ const queryClient = new QueryClient({
 export default function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <FeedbackHubProvider>{children}</FeedbackHubProvider>
+      <AuthProvider>
+        <FeedbackHubProvider>{children}</FeedbackHubProvider>
+      </AuthProvider>
 
       {process.env.NODE_ENV === "development" && (
         <ReactQueryDevtools

@@ -6,7 +6,7 @@ import type { FeatureCollection } from "geojson";
 
 import "leaflet/dist/leaflet.css";
 
-import { MapProvider, useCivicMap } from "./MapProvider";
+import { MapProvider, useCivicMap, type MapTheme } from "./MapProvider";
 
 import BasemapSelector from "@/components/maps/layers/BaseMapSelector";
 import HotspotLayer, { type Hotspot } from "@/components/maps/layers/HotspotLayer";
@@ -97,19 +97,25 @@ function MapContent() {
         // 2. Fetch GeoJSON Submissions
         const issuesGeoJson = await getMapIssues();
         if (isMounted && issuesGeoJson.features) {
-          const mappedIssues: CivicIssue[] = issuesGeoJson.features.map((f, i) => {
-            const props = f.properties || {};
-            const coords = f.geometry?.coordinates || [85.8245, 20.2961];
+          const mappedIssues: CivicIssue[] = issuesGeoJson.features.map((feature, index) => {
+            const props = feature.properties ?? {};
+            const stringProp = (key: string, fallback: string) => {
+              const value = props[key];
+              return typeof value === "string" && value.length > 0 ? value : fallback;
+            };
+            const coords = feature.geometry?.coordinates ?? [85.8245, 20.2961];
+            const category = stringProp("category", "roads");
+            const status = stringProp("status", "open");
             return {
-              id: props.id || `issue-${i + 1}`,
+              id: stringProp("id", `issue-${index + 1}`),
               latitude: coords[1],
               longitude: coords[0],
-              title: `${(props.category || "civic").replace("_", " ").toUpperCase()} in ${props.ward || "Khordha"}`,
-              description: `Reported issue status: ${props.status || "open"}. Type: ${props.submission_type || "text"}.`,
-              theme: (props.category || "roads") as any,
-              source: "citizen",
-              createdAt: props.created_at || new Date().toISOString(),
-              status: (props.status || "open") as any,
+              title: `${category.replace("_", " ").toUpperCase()} in ${stringProp("ward", "Khordha")}`,
+              description: `Reported issue status: ${status}. Type: ${stringProp("submission_type", "text")}.`,
+              theme: category as MapTheme,
+              source: "citizen" as const,
+              createdAt: stringProp("created_at", new Date().toISOString()),
+              status: status as CivicIssue["status"],
             };
           });
           setIssues(mappedIssues);

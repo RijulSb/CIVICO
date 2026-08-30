@@ -8,6 +8,7 @@ from app.models.portfolio import Portfolio
 from app.models.priority import Priority
 from app.models.project import Project
 from app.models.submission import Submission, Theme
+from app.models.user import User
 from app.models.ward import CivicPortfolio, Hotspot, RankedProject
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     "RankedProject",
     "Submission",
     "Theme",
+    "User",
 ]

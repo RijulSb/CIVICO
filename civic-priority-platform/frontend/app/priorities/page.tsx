@@ -3,6 +3,8 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
+import LockedOverlay from "@/components/auth/LockedOverlay";
+import { useAuth } from "@/lib/authContext";
 import { useFeedback } from "@/components/feedback/FeedbackHub";
 import {
   AlertCircle,
@@ -24,10 +26,12 @@ import {
   RefreshCw,
   Sliders,
   Sparkles,
+  Trash2,
   UserCheck,
   Users,
   X,
 } from "lucide-react";
+
 
 // Dynamic import for Leaflet Ward Coverage Map
 const WardCoverageMap = dynamic(
@@ -107,6 +111,7 @@ const DEFAULT_PROJECTS: Project[] = [
 
 export default function PrioritiesLinearWorkspace() {
   const { showSuccess, showError } = useFeedback();
+  const { isAdmin } = useAuth();
 
   // 5 Visible Workspace Stages
   const [currentStep, setCurrentStep] = React.useState<1 | 2 | 3 | 4 | 5>(1);
@@ -213,6 +218,21 @@ export default function PrioritiesLinearWorkspace() {
     setNewInfraGap("");
   };
 
+  const handleDeleteWard = (wardId: string) => {
+    const wardToDelete = wards.find((w) => w.id === wardId);
+    if (!wardToDelete) return;
+
+    setWards((prev) => prev.filter((w) => w.id !== wardId));
+    setProjects((prev) => prev.filter((p) => p.wardId !== wardId && p.wardName !== wardToDelete.name));
+
+    if (expandedWardId === wardId) {
+      setExpandedWardId(null);
+    }
+
+    showSuccess("Ward Removed ✓", `Deleted ${wardToDelete.name} and removed its associated candidate projects.`);
+  };
+
+
   // ---------------------------------------------------------------------------
   // Fetch real ward population data on mount from backend context API
   // ---------------------------------------------------------------------------
@@ -274,7 +294,10 @@ export default function PrioritiesLinearWorkspace() {
 
       const res = await fetch(`${API_BASE}/api/v1/optimization/run`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": process.env.NEXT_PUBLIC_CIVICO_API_KEY || "civ_dev_secret_key_8f39a01c89e24b5d",
+        },
         signal: controller.signal,
         body: JSON.stringify({
           constituency: "khordha",
@@ -282,6 +305,7 @@ export default function PrioritiesLinearWorkspace() {
           constraints: constraints,
         }),
       });
+
 
       clearTimeout(timeout);
       clearInterval(stepInterval);
@@ -415,6 +439,10 @@ export default function PrioritiesLinearWorkspace() {
     <div className="min-h-screen bg-[#f6f5f2] text-[#171817] font-sans">
       <Header />
 
+      <LockedOverlay
+        pageTitle="Constituency Priorities Workspace"
+        pageDescription="Multi-objective decision matrix that balances citizen urgency, population impact, and cost effectiveness."
+      >
       <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10 space-y-8">
         {/* ------------------------------------------------------------------- */}
         {/* Page Header & Linear Progress Bar Stage Indicator */}
@@ -507,10 +535,10 @@ export default function PrioritiesLinearWorkspace() {
                   Stage 01 • Ward Needs Directory
                 </span>
                 <h2 className="text-xl font-black text-[#171817] mt-1">
-                  Review & Add Constituency Wards ({wards.length})
+                  Constituency Wards Directory ({wards.length})
                 </h2>
                 <p className="text-xs text-[#171817]/65 mt-1">
-                  Input ward details, citizen demand counts, population, and dominant infrastructure gaps.
+                  Add, edit, or delete wards to customize your constituency profile and generate candidate proposals.
                 </p>
               </div>
 
@@ -546,7 +574,7 @@ export default function PrioritiesLinearWorkspace() {
                       <th className="py-3.5 px-4">Dominant Need</th>
                       <th className="py-3.5 px-4">Demand</th>
                       <th className="py-3.5 px-4">Population</th>
-                      <th className="py-3.5 px-4 text-right">Action</th>
+                      <th className="py-3.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#171817]/10">
@@ -577,13 +605,24 @@ export default function PrioritiesLinearWorkspace() {
                               {w.population.toLocaleString()} residents
                             </td>
                             <td className="py-3.5 px-4 text-right">
-                              <button
-                                type="button"
-                                onClick={() => setExpandedWardId(isExpanded ? null : w.id)}
-                                className="font-mono text-[11px] font-bold text-[#e25a45] hover:underline cursor-pointer"
-                              >
-                                {isExpanded ? "Close Data ▲" : "Edit Data ▼"}
-                              </button>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedWardId(isExpanded ? null : w.id)}
+                                  className="font-mono text-[11px] font-bold text-[#e25a45] hover:underline cursor-pointer"
+                                >
+                                  {isExpanded ? "Close ▲" : "View ▼"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteWard(w.id)}
+                                  title={`Delete ${w.name}`}
+                                  className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 font-mono text-[10px] font-bold text-red-700 hover:bg-red-100 transition cursor-pointer"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                  <span>Delete</span>
+                                </button>
+                              </div>
                             </td>
                           </tr>
 
@@ -591,7 +630,7 @@ export default function PrioritiesLinearWorkspace() {
                           {isExpanded && (
                             <tr>
                               <td colSpan={6} className="bg-[#f9f8f5] p-4 border-b border-[#171817]/10">
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+                                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 font-mono text-xs items-center">
                                   <div>
                                     <span className="text-[#171817]/60 text-[10px] block">Geographic Coordinates</span>
                                     <span className="font-bold">{w.latitude.toFixed(4)}° N, {w.longitude.toFixed(4)}° E</span>
@@ -606,10 +645,21 @@ export default function PrioritiesLinearWorkspace() {
                                       {projects.filter((p) => p.wardId === w.id || p.wardName === w.name).length} Proposals Active
                                     </span>
                                   </div>
+                                  <div className="text-right">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteWard(w.id)}
+                                      className="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow hover:bg-red-700 transition cursor-pointer"
+                                    >
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                      <span>Delete Ward</span>
+                                    </button>
+                                  </div>
                                 </div>
                               </td>
                             </tr>
                           )}
+
                         </React.Fragment>
                       );
                     })}
@@ -1247,6 +1297,7 @@ export default function PrioritiesLinearWorkspace() {
           </div>
         </div>
       )}
+      </LockedOverlay>
     </div>
   );
 }

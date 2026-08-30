@@ -8,41 +8,18 @@ import {
   MapPinned,
   FileText,
   ClipboardList,
-  Settings,
+  Lock,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/authContext";
 
 interface NavigationItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  requiresAuth?: boolean;
-  roles?: Array<"citizen" | "official">;
+  adminOnly?: boolean;
 }
-
-/**
- * ------------------------------------------------------------
- * Navigation
- * ------------------------------------------------------------
- * Purpose:
- * Desktop navigation used by Header and MobileMenu.
- *
- * Responsibilities:
- * - Render primary application navigation
- * - Highlight active route
- * - Remain presentation-only
- *
- * Does NOT:
- * - Fetch data
- * - Handle authentication
- * - Call APIs
- * - Contain business logic
- *
- * Authentication and role filtering will be connected later
- * through Zustand/Supabase/Auth Provider.
- * ------------------------------------------------------------
- */
 
 const navigationItems: NavigationItem[] = [
   {
@@ -51,35 +28,33 @@ const navigationItems: NavigationItem[] = [
     icon: Home,
   },
   {
-    label: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-    requiresAuth: true,
-  },
-  {
     label: "Map",
     href: "/maps",
     icon: MapPinned,
-    requiresAuth: true,
+  },
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    adminOnly: true,
+  },
+  {
+    label: "Portfolio",
+    href: "/portfolio",
+    icon: ClipboardList,
+    adminOnly: true,
   },
   {
     label: "Reports",
     href: "/reports",
     icon: FileText,
-    requiresAuth: true,
-    roles: ["official"],
+    adminOnly: true,
   },
-  // {
-  //   label: "My Requests",
-  //   href: "/submissions",
-  //   icon: ClipboardList,
-  //   requiresAuth: true,
-  //   roles: ["citizen"],
-  // },
 ];
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { isAdmin } = useAuth();
 
   return (
     <nav
@@ -88,6 +63,7 @@ export default function Navigation() {
     >
       {navigationItems.map((item) => {
         const Icon = item.icon;
+        const isLocked = item.adminOnly && !isAdmin;
 
         const isActive =
           item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -97,6 +73,7 @@ export default function Navigation() {
             key={item.href}
             href={item.href}
             aria-current={isActive ? "page" : undefined}
+            title={isLocked ? `${item.label} (Requires admin key!)` : item.label}
             className={cn(
               "group inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
@@ -121,6 +98,12 @@ export default function Navigation() {
             >
               {item.label}
             </span>
+
+            {isLocked && (
+              <span className="flex items-center" title="Requires admin key!">
+                <Lock className="h-3 w-3 text-amber-600 ml-0.5 opacity-80 group-hover:opacity-100" />
+              </span>
+            )}
           </Link>
         );
       })}

@@ -29,7 +29,10 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
+
 import Header from "@/components/layout/Header";
+import LockedOverlay from "@/components/auth/LockedOverlay";
+import { useAuth } from "@/lib/authContext";
 
 type PriorityLevel = "high" | "medium" | "emerging";
 type ThemeKey =
@@ -64,7 +67,7 @@ export type DashboardHotspot = {
   intensity: "high" | "medium" | "low";
   submissionCount: number;
   affectedPopulation: number;
-  evidenceCounts: { text: number; voice: number; photo: number };
+  evidenceCounts: { text: number; voice: number; photo: number; video?: number };
   candidateProjectId: string | null;
   infrastructureContext: Record<string, string | number | boolean>;
   suggestedProject: {
@@ -84,7 +87,7 @@ type RecentSubmission = {
   ward: string;
   theme: IssueTheme;
   language: string;
-  channel: "text" | "voice" | "photo";
+  channel: "text" | "voice" | "photo" | "video";
   preview: string;
   translatedPreview: string;
   submittedMinsAgo: number;
@@ -585,15 +588,29 @@ function WardProposalList({
   );
 }
 
+const EMPTY_DASHBOARD: DashboardData = {
+  constituency: "khordha",
+  constituencyLabel: "Khordha",
+  state: "Odisha",
+  period: "30d",
+  lastUpdatedAt: new Date(0).toISOString(),
+  languageBreakdown: { odia: 0, hindi: 0, english: 0 },
+  summary: { totalSubmissions: 0, recurringThemes: 0, activeHotspots: 0, candidateProjects: 0 },
+  priorityPulse: [],
+  hotspots: [],
+  recentSubmissions: [],
+};
+
 export default function DashboardPage() {
   const router = useRouter();
-  const [data, setData] = useState<DashboardData>(FALLBACK);
+  const { isAdmin } = useAuth();
+  const [data, setData] = useState<DashboardData>(EMPTY_DASHBOARD);
   const [constituency, setConstituency] = useState("khordha");
   const [period, setPeriod] = useState("30d");
   const [theme, setTheme] = useState<ThemeKey>("all");
   const [wardQuery, setWardQuery] = useState("");
   const [selectedHotspot, setSelectedHotspot] =
-    useState<DashboardHotspot | null>(FALLBACK.hotspots[0]);
+    useState<DashboardHotspot | null>(null);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -606,7 +623,13 @@ export default function DashboardPage() {
   }, []);
 
   const fetchData = useCallback(async () => {
+    if (!isAdmin) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
+    const fallbackData = CONSTITUENCY_FALLBACKS[constituency] || CONSTITUENCY_FALLBACKS.khordha;
+
     try {
       const response = await fetch(
         `${API_BASE}/api/v1/dashboard?constituency=${constituency}&period=${period}&theme=${theme}&ward=all`,
@@ -614,23 +637,28 @@ export default function DashboardPage() {
       );
       if (!response.ok) throw new Error("Dashboard API failed");
       const nextData = (await response.json()) as DashboardData;
+
+      // Always use the live database API response when connected to the backend
       setData(nextData);
       const firstHotspot = nextData.hotspots[0] ?? null;
       setSelectedHotspot(firstHotspot);
 
-      // Smoothly pan map to new constituency location
-      const center = CONSTITUENCY_CENTERS[constituency] || (firstHotspot ? { lat: firstHotspot.latitude, lng: firstHotspot.longitude, zoom: 12 } : null);
+      const center = CONSTITUENCY_CENTERS[constituency] || null;
       if (center) {
         mapRef.current?.flyTo(center.lat, center.lng, center.zoom);
       }
     } catch {
-      // Fallback to seeded data matching the selected constituency
-      const fallbackData = CONSTITUENCY_FALLBACKS[constituency] || CONSTITUENCY_FALLBACKS.khordha;
-      setData(fallbackData);
-      const firstHotspot = fallbackData.hotspots[0] ?? null;
+      // Fall back to robust constituency baseline dataset
+      const populatedFallback = {
+        ...fallbackData,
+        period,
+        lastUpdatedAt: new Date().toISOString(),
+      };
+      setData(populatedFallback);
+      const firstHotspot = populatedFallback.hotspots[0] ?? null;
       setSelectedHotspot(firstHotspot);
 
-      const center = CONSTITUENCY_CENTERS[constituency] || (firstHotspot ? { lat: firstHotspot.latitude, lng: firstHotspot.longitude, zoom: 12 } : null);
+      const center = CONSTITUENCY_CENTERS[constituency] || null;
       if (center) {
         mapRef.current?.flyTo(center.lat, center.lng, center.zoom);
       }
@@ -638,6 +666,7 @@ export default function DashboardPage() {
       setLoading(false);
     }
   }, [period, theme, constituency]);
+
 
 
 
@@ -697,10 +726,14 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <section className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#171817]/15 bg-white px-3 py-1 font-mono text-xs uppercase tracking-wider text-[#171817]/60 shadow-sm">
+      <LockedOverlay
+        pageTitle="Constituency Development Dashboard"
+        pageDescription="Official civic intelligence, demand cluster analytics, and infrastructure gap signals for municipal planners."
+      >
+        <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+          <section className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#171817]/15 bg-white px-3 py-1 font-mono text-xs uppercase tracking-wider text-[#171817]/60 shadow-sm">
               <Activity className="h-3.5 w-3.5 text-[#e25a45]" />
               {data.constituencyLabel ?? constituency.charAt(0).toUpperCase() + constituency.slice(1)} Constituency Decision Overview
             </div>
@@ -1012,6 +1045,7 @@ export default function DashboardPage() {
           </div>
         </section>
       </main>
+      </LockedOverlay>
     </div>
   );
 }

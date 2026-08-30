@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { getReportCopy, type ReportUILanguage } from "@/lib/reportI18n";
 import {
   Mic,
   Square,
@@ -12,7 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 
-export type IntakeLanguage = "odia" | "hindi" | "english";
+export type IntakeLanguage = ReportUILanguage;
 
 export interface VoiceRecorderProps {
   onRecordingComplete: (file: File) => void;
@@ -45,6 +46,7 @@ export function VoiceRecorder({
   className = "",
 }: VoiceRecorderProps) {
   const [state, setState] = React.useState<RecorderState>("idle");
+  const ui = getReportCopy(language);
   const [elapsed, setElapsed] = React.useState(0);
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
@@ -235,12 +237,12 @@ export function VoiceRecorder({
             aria-hidden="true"
           />
           <span className="truncate font-semibold uppercase tracking-wider">
-            Audio Studio
+            {ui.voice.title}
           </span>
         </div>
         <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#1c2d1c] px-2.5 py-1 font-mono text-[10px] text-[#eeede9]">
           <Sparkles className="h-3 w-3 text-[#e25a45]" aria-hidden="true" />
-          <span>Intake: {languageLabels[language]}</span>
+          <span>{ui.voice.intake}: {languageLabels[language]}</span>
         </div>
       </div>
 
@@ -270,7 +272,7 @@ export function VoiceRecorder({
           </div>
         ) : (
           <p className="font-mono text-xs text-[#777872]">
-            Tap below to record your report in {languageLabels[language]}.
+            {ui.voice.idle} {languageLabels[language]}.
           </p>
         )}
       </div>
@@ -283,7 +285,8 @@ export function VoiceRecorder({
           className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] px-3 text-base font-semibold text-white shadow-md transition hover:bg-[#d44833] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Mic className="h-6 w-6 shrink-0" aria-hidden="true" />
-          <span>Record Voice Note</span>
+                      <span>{ui.voice.record}</span>
+
         </button>
       )}
 
@@ -294,7 +297,7 @@ export function VoiceRecorder({
           className="flex min-h-14 w-full items-center justify-center gap-3 rounded-xl bg-[#e25a45] px-3 text-base font-semibold text-white opacity-70"
         >
           <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
-          <span>Requesting microphone…</span>
+          <span>{ui.voice.requesting}</span>
         </button>
       )}
 
@@ -308,7 +311,7 @@ export function VoiceRecorder({
             className="h-6 w-6 fill-current text-[#e25a45]"
             aria-hidden="true"
           />
-          <span>Stop Recording ({formatTime(elapsed)})</span>
+          <span>{ui.voice.stop} ({formatTime(elapsed)})</span>
         </button>
       )}
 
@@ -332,15 +335,15 @@ export function VoiceRecorder({
                 <Play className="h-5 w-5" />
               )}
               <span className="truncate">
-                {isPlaying ? "Pause Playback" : "Listen to Recording"}
+                {isPlaying ? ui.voice.pause : ui.voice.listen}
               </span>
             </button>
             <button
               type="button"
               onClick={clear}
               className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-600 transition hover:bg-red-100"
-              title="Delete recording"
-              aria-label="Delete recording"
+              title={ui.voice.delete}
+              aria-label={ui.voice.delete}
             >
               <Trash2 className="h-5 w-5" />
             </button>
@@ -353,8 +356,7 @@ export function VoiceRecorder({
           role="alert"
           className="rounded-lg bg-red-50 p-3 text-xs text-red-600"
         >
-          Microphone access is unavailable. You can continue with typed text or
-          a photo.
+          {ui.voice.denied}
         </div>
       )}
     </div>

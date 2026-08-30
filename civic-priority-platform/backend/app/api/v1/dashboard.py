@@ -3,7 +3,11 @@
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.session import get_db
+from app.services.analytics_service import get_analytics_service
 
 router = APIRouter()
 
@@ -147,8 +151,16 @@ async def get_dashboard(
     period: str = Query(default="30d"),
     theme: str = Query(default="all"),
     ward: str = Query(default="all"),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
-    """Return constituency decision overview: summary, priority pulse, hotspots, recent signals."""
+    """Return live constituency analytics derived from persisted submissions."""
+    return await get_analytics_service(db).build_dashboard(
+        constituency=constituency,
+        period=period,
+        theme=theme,
+        ward=ward,
+    )
+
     c_key = constituency.lower().strip()
     cd = CONSTITUENCY_DATA.get(c_key, CONSTITUENCY_DATA["khordha"])
 

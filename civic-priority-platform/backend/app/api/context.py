@@ -8,7 +8,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import sanitize_text_input
 from app.db.session import get_db
+
 
 router = APIRouter(prefix="/context", tags=["context"])
 
@@ -94,14 +96,18 @@ async def list_ward_context(
     predicates: list[str] = []
     params: dict[str, Any] = {"limit": limit, "offset": offset}
     if city_name:
+        sanitized_city = sanitize_text_input(city_name, max_length=100)
         predicates.append("city_name = :city_name")
-        params["city_name"] = city_name
+        params["city_name"] = sanitized_city
     if zone_name:
+        sanitized_zone = sanitize_text_input(zone_name, max_length=100)
         predicates.append("zone_name = :zone_name")
-        params["zone_name"] = zone_name
+        params["zone_name"] = sanitized_zone
     if ward_id:
+        sanitized_ward = sanitize_text_input(ward_id, max_length=100)
         predicates.append("ward_id = :ward_id")
-        params["ward_id"] = ward_id
+        params["ward_id"] = sanitized_ward
+
 
     where_clause = f"WHERE {' AND '.join(predicates)}" if predicates else ""
     query = text(
@@ -162,13 +168,14 @@ async def list_sanitation_context(
     params: dict[str, Any] = {"limit": limit, "offset": offset}
     if district_name:
         predicates.append("district_name = :district_name")
-        params["district_name"] = district_name
+        params["district_name"] = sanitize_text_input(district_name, max_length=100)
     if block_name:
         predicates.append("block_name = :block_name")
-        params["block_name"] = block_name
+        params["block_name"] = sanitize_text_input(block_name, max_length=100)
     if quality_flag:
         predicates.append("source_quality_flag = :quality_flag")
-        params["quality_flag"] = quality_flag
+        params["quality_flag"] = sanitize_text_input(quality_flag, max_length=50)
+
 
     where_clause = f"WHERE {' AND '.join(predicates)}" if predicates else ""
     query = text(

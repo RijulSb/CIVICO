@@ -4,6 +4,7 @@ from app.api.geocoding import router as geocoding_router
 
 from app.api.context import router as context_router
 from app.api.v1 import (
+    auth,
     dashboard,
     feedback,
     hotspots,
@@ -18,6 +19,8 @@ from app.api.v1 import (
 )
 
 api_router = APIRouter()
+
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 
 api_router.include_router(geocoding_router)
 

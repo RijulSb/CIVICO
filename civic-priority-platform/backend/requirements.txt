@@ -1,9 +1,10 @@
-alembic==1.19.1
+﻿alembic==1.19.1
 amqp==5.3.1
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.14.2
 asyncpg==0.31.0
+bcrypt==5.0.0
 billiard==4.2.4
 celery==5.6.3
 certifi==2026.7.22
@@ -62,10 +63,12 @@ portalocker==3.2.0
 prompt_toolkit==3.0.53
 protobuf==7.35.1
 psycopg2-binary==2.9.12
+pulp==2.9.0
 pydantic==2.13.4
 pydantic-settings==2.15.0
 pydantic_core==2.46.4
 Pygments==2.21.0
+pyjwt==2.13.0
 pyogrio==0.13.0
 pyproj==3.7.2
 python-dateutil==2.9.0.post0

@@ -24,12 +24,12 @@ export default function CitizenPwaPage() {
   return (
     <LenisProvider>
       <AdaptiveFontScale />
-      <div className="relative flex min-h-screen flex-col overflow-x-hidden text-[#F2F2F2]">
+      <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-white text-[#171817]">
         <GrainOverlay />
         <Header />
 
         <main className="relative z-10 flex-1 px-3 py-8 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-10 lg:py-12">
-          <div className="mx-auto w-full max-w-lg space-y-6 sm:space-y-8">
+          <div className="mx-auto w-full max-w-3xl space-y-8 sm:space-y-10">
             <div className="text-center">
               <Inview
                 delayIn={0}
@@ -57,7 +57,7 @@ export default function CitizenPwaPage() {
                   baseDelay={350}
                   duration={900}
                   ready={ready}
-                  className="mx-auto text-[0.7rem] uppercase tracking-[0.15em] text-[--ink-soft]"
+                  className="mx-auto text-[0.7rem] uppercase tracking-[0.15em] text-[#5f6368]"
                 />
               </div>
 
@@ -67,11 +67,11 @@ export default function CitizenPwaPage() {
                 config={{ tension: 200, friction: 26 }}
                 className="mt-5 flex flex-wrap items-center justify-center gap-2 text-[0.7rem] uppercase tracking-[0.1em]"
               >
-                <Eyebrow tone="light">
+                <Eyebrow tone="dark">
                   <Sparkles className="h-3 w-3 text-[--brand-light]" /> AI Voice
                   Analysis
                 </Eyebrow>
-                <Eyebrow tone="light">
+                <Eyebrow tone="dark">
                   <ShieldCheck className="h-3 w-3 text-emerald-400" /> Offline
                   Auto-Sync
                 </Eyebrow>

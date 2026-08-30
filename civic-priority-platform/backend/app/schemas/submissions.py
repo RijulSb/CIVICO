@@ -1,5 +1,6 @@
 """Submission schemas — matches PRD §3.1 / §4.1 API contract exactly."""
 
+from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
@@ -19,6 +20,7 @@ class SubmissionType(StrEnum):
     VOICE = "voice"
     TEXT = "text"
     PHOTO = "photo"
+    VIDEO = "video"
 
 
 class SubmissionStatus(StrEnum):
@@ -30,8 +32,11 @@ class SubmissionStatus(StrEnum):
 class SubmissionLocation(APIModel):
     ward: str = Field(max_length=100)
     block: str = Field(max_length=100)
-    latitude: float = Field(ge=-90, le=90)
-    longitude: float = Field(ge=-180, le=180)
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
+    accuracy_m: float | None = Field(default=None, ge=0, le=100_000)
+    timestamp: datetime | None = None
+    custom_text: str | None = Field(default=None, max_length=500)
 
 
 class SubmissionRequest(APIModel):
@@ -42,6 +47,14 @@ class SubmissionRequest(APIModel):
     audio_url: str | None = Field(default=None, max_length=500)
     photo_url: str | None = Field(default=None, max_length=500)
     location: SubmissionLocation
+    custom_location_text: str | None = Field(default=None, max_length=500)
+    gps_accuracy_m: float | None = Field(default=None, ge=0, le=100_000)
+    gps_timestamp: datetime | None = None
+    consent: bool = True
+    full_name: str | None = Field(default=None, max_length=120)
+    email: str | None = Field(default=None, max_length=254)
+    phone: str | None = Field(default=None, max_length=20)
+    video_url: str | None = Field(default=None, max_length=500)
     category: str | None = Field(default=None, max_length=100)
     citizen_id: UUID | None = None
 
@@ -52,3 +65,6 @@ class SubmissionResponse(APIModel):
     theme: str | None = None
     confidence: float | None = Field(default=None, ge=0, le=1)
     message: str
+    formatted_text: dict[str, str | None] | None = None
+    transcript: str | None = None
+    extracted: dict[str, object] | None = None

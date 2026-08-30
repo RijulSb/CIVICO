@@ -4,13 +4,16 @@ import csv
 import io
 from datetime import datetime
 from uuid import uuid4
-from fastapi import APIRouter, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel
+
+from app.core.security import verify_api_key
 
 router = APIRouter()
 
 # In-memory store for optimization runs during session
 OPTIMIZATION_RUNS: dict[str, dict] = {}
+
 
 class ConstraintPayload(BaseModel):
     budget: float = 450000000.0  # ₹45 Cr
@@ -170,7 +173,11 @@ SEED_PROJECTS = [
 ]
 
 @router.post("/run", status_code=status.HTTP_200_OK)
-async def run_optimization(payload: RunOptimizationRequest):
+async def run_optimization(
+    payload: RunOptimizationRequest,
+    _api_key: str = Depends(verify_api_key),
+):
+
     """Run 0/1 Knapsack ILP optimization pipeline according to PRD constraints."""
     run_id = f"run_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:6]}"
 

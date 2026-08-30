@@ -11,6 +11,7 @@ router = APIRouter()
 
 
 @router.post("", response_model=RankingResponse, status_code=status.HTTP_200_OK)
+@router.post("/generate", response_model=RankingResponse, status_code=status.HTTP_200_OK)
 async def generate_ranking(
     payload: RankingRequest,
     db: AsyncSession = Depends(get_db),

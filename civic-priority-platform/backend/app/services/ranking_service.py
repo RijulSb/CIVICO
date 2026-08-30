@@ -116,6 +116,18 @@ class RankingService:
         hotspots = list(result.scalars().all())
 
         if not hotspots:
+            from app.schemas.hotspots import HotspotRequest
+            from app.services.hotspot_service import HotspotService
+            hotspot_service = HotspotService(self._db)
+            await hotspot_service.generate_hotspots(HotspotRequest(constituency=request.constituency))
+            result = await self._db.execute(
+                select(Hotspot)
+                .where(Hotspot.constituency == request.constituency)
+                .order_by(Hotspot.submission_count.desc())
+            )
+            hotspots = list(result.scalars().all())
+
+        if not hotspots:
             return RankingResponse(
                 projects=[], scoring_weights=WEIGHTS, constituency=request.constituency
             )

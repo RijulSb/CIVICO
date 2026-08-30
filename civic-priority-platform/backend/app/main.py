@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from app.api.router import api_router
 from app.core.config import settings
@@ -33,33 +35,44 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
+media_dir = Path(__file__).resolve().parents[1] / "data" / "uploads"
+media_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=media_dir), name="media")
 
 
 if settings.cors_origin_list:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
+        allow_origin_regex=settings.cors_origin_regex,
+
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-        )
-    #     allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-    #     allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "X-Request-ID"],
-    # )
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "X-Request-ID", "X-API-Key"],
+    )
 
 
 @app.middleware("http")
-async def request_context_middleware(request: Request, call_next):
+async def security_and_context_middleware(request: Request, call_next):
+    # Enforce request payload size limit (reject payloads > 10MB to prevent DoS)
+    content_length = request.headers.get("Content-Length")
+    if content_length and int(content_length) > settings.max_content_length_bytes:
+        return JSONResponse(
+            status_code=413,
+            content={"error": {"code": "PAYLOAD_TOO_LARGE", "message": "Request body exceeds maximum size limit (10MB)."}},
+        )
+
     request_id = set_request_id(request.headers.get("X-Request-ID"))
     request.state.request_id = request_id
     try:
         response = await call_next(request)
     finally:
-        # ContextVar reset is intentionally omitted here because the request
-        # context is isolated by the ASGI task and remains available to logs.
         pass
     response.headers["X-Request-ID"] = request_id
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
     return response
+
 
 
 @app.exception_handler(CivicoException)
@@ -115,6 +128,3 @@ async def process_readiness() -> dict[str, object]:
             "qdrant": "not_configured",
         },
     }
-
-
-#app.include_router(api_router, prefix=settings.api_v1_prefix)

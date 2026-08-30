@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Literal
 
+ReportLanguage = Literal["en", "hi", "or"]
+
 from pydantic import BaseModel, Field
 
 
@@ -15,6 +17,7 @@ class ReportCreate(BaseModel):
     includeHotspotMap: bool = True
     includeRejectedProjects: bool = False
     includeCitizenEvidence: bool = True
+    language: ReportLanguage = "en"
 
 
 class ReportJobResponse(BaseModel):
@@ -24,6 +27,7 @@ class ReportJobResponse(BaseModel):
     createdAt: datetime
     downloadUrl: str
     previewUrl: str
+    language: ReportLanguage = "en"
 
 
 class ReportResponse(BaseModel):
@@ -34,3 +38,4 @@ class ReportResponse(BaseModel):
     status: str
     format: Literal["pdf", "csv"]
     downloadUrl: str
+    language: ReportLanguage = "en"

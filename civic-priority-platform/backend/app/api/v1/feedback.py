@@ -9,10 +9,13 @@ from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
+from app.core.security import check_rate_limit, detect_prompt_injection, sanitize_text_input
+
 router = APIRouter()
+
 
 PRIMARY_CLIENT_EMAIL = "rsekharbarik@gmail.com"
 
@@ -150,14 +153,27 @@ def send_real_email(subject: str, html_body: str, to_emails: list[str], raw_mess
     return True
 
 
-@router.post("", response_model=FeedbackResponse, status_code=status.HTTP_200_OK)
+@router.post("", response_model=FeedbackResponse, status_code=status.HTTP_200_OK, dependencies=[Depends(check_rate_limit)])
 async def submit_feedback(payload: FeedbackPayload) -> FeedbackResponse:
     """Process and send feedback email message to rsekharbarik@gmail.com and client email."""
-    if not payload.message.strip():
+    raw_msg = payload.message.strip()
+    if not raw_msg:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Feedback message cannot be empty.",
         )
+
+    # Prompt Injection Check
+    is_injection, reason = detect_prompt_injection(raw_msg)
+    if is_injection:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Feedback rejected: {reason}",
+        )
+
+    sanitized_msg = sanitize_text_input(raw_msg, max_length=2500)
+    sanitized_contact = sanitize_text_input(payload.contact or "", max_length=150)
+
 
     recipients = [PRIMARY_CLIENT_EMAIL]
     if payload.contact and "@" in payload.contact and payload.contact.strip().lower() != PRIMARY_CLIENT_EMAIL:
@@ -207,10 +223,11 @@ async def submit_feedback(payload: FeedbackPayload) -> FeedbackResponse:
         subject,
         html_body,
         recipients,
-        payload.message.strip(),
-        payload.contact or "Anonymous Citizen",
+        sanitized_msg,
+        sanitized_contact or "Anonymous Citizen",
         payload.type
     )
+
     delivered_str = ", ".join(recipients)
 
     return FeedbackResponse(

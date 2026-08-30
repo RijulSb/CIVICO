@@ -3,6 +3,7 @@
 from uuid import UUID
 
 from sqlalchemy import Double, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -20,6 +21,13 @@ class Submission(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     content: Mapped[str | None] = mapped_column(Text, nullable=True)
     audio_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    video_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    full_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(254), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    transcript: Mapped[str | None] = mapped_column(Text, nullable=True)
+    formatted_text: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    extracted: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     ward: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
     block: Mapped[str | None] = mapped_column(String(100), nullable=True)
     latitude: Mapped[float | None] = mapped_column(Double, nullable=True)

@@ -10,6 +10,7 @@
 import * as React from "react";
 import { Paperclip, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { extractGeoFromImageFile } from "@/lib/utils/exifLocation";
 
 export interface FileUploaderProps {
   /** e.g. "image/*", "audio/*" */
@@ -17,9 +18,14 @@ export interface FileUploaderProps {
   maxSizeMB: number;
   file: File | null;
   onFileSelect: (file: File | null) => void;
+  onExifExtracted?: (coords: { lat: number; lng: number } | null) => void;
   label: string;
-  hint?: string;
+    hint?: string;
+  emptyLabel?: string;
+  removeLabel?: string;
+  tooLargeLabel?: string;
   disabled?: boolean;
+
   className?: string;
 }
 
@@ -28,9 +34,14 @@ export function FileUploader({
   maxSizeMB,
   file,
   onFileSelect,
+  onExifExtracted,
   label,
-  hint,
+    hint,
+  emptyLabel = "Choose a file or drag it here",
+  removeLabel = "Remove file",
+  tooLargeLabel = "File is too large.",
   disabled = false,
+
   className = "",
 }: FileUploaderProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -38,19 +49,27 @@ export function FileUploader({
   const [error, setError] = React.useState<string | null>(null);
   const inputId = React.useId();
 
-  function validateAndSet(candidate: File | null) {
+  async function validateAndSet(candidate: File | null) {
     if (!candidate) {
       onFileSelect(null);
+      onExifExtracted?.(null);
       setError(null);
       return;
     }
     if (candidate.size > maxSizeMB * 1024 * 1024) {
-      setError(`File is larger than ${maxSizeMB}MB.`);
+            setError(`${tooLargeLabel} (${maxSizeMB}MB)`);
+
       return;
     }
     setError(null);
     onFileSelect(candidate);
+
+    if (candidate.type.startsWith("image/") && onExifExtracted) {
+      const coords = await extractGeoFromImageFile(candidate);
+      onExifExtracted(coords ? { lat: coords.latitude, lng: coords.longitude } : null);
+    }
   }
+
 
   function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
@@ -95,7 +114,8 @@ export function FileUploader({
         <span className="min-w-0 flex-1 truncate text-slate-600">
           {file
             ? file.name
-            : `Choose a file or drag it here — up to ${maxSizeMB}MB`}
+                        : `${emptyLabel} — up to ${maxSizeMB}MB`}
+
         </span>
         {file && (
           <Button
@@ -106,7 +126,8 @@ export function FileUploader({
               e.stopPropagation();
               validateAndSet(null);
             }}
-            aria-label="Remove file"
+                        aria-label={removeLabel}
+
             className="h-6 w-6 shrink-0 text-slate-400 hover:text-red-600"
           >
             <X className="h-3.5 w-3.5" />

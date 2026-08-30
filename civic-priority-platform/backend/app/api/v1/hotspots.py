@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import verify_api_key
 from app.db.session import get_db
 from app.schemas.hotspots import HotspotListResponse, HotspotRequest
 from app.services.hotspot_service import HotspotService, get_hotspot_service
@@ -16,10 +17,12 @@ router = APIRouter()
 async def generate_hotspots(
     payload: HotspotRequest,
     db: AsyncSession = Depends(get_db),
+    _api_key: str = Depends(verify_api_key),
 ) -> HotspotListResponse:
     """Run DBSCAN clustering on submissions and generate demand hotspots."""
     service = get_hotspot_service(db)
     return await service.generate_hotspots(payload)
+
 
 
 @router.get("", response_model=HotspotListResponse)

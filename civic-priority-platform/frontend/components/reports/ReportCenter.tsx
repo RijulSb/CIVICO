@@ -17,6 +17,13 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_PREFIX = `${API_BASE}/api/v1`;
 
 type OutputFormat = "pdf" | "csv";
+type ReportLanguage = "en" | "hi" | "or";
+
+const REPORT_LANGUAGES: Record<ReportLanguage, { label: string; title: string; status: string; generated: string; selector: string; preview: string }> = {
+  en: { label: "English", title: "Khordha Development Priority Decision Brief", status: "Draft recommendation - requires authority review", generated: "Generate Decision Brief", selector: "Report language", preview: "Report Preview" },
+  hi: { label: "हिंदी", title: "खोरधा विकास प्राथमिकता निर्णय संक्षेप", status: "प्रारूप अनुशंसा - प्राधिकरण की समीक्षा आवश्यक", generated: "निर्णय संक्षेप बनाएँ", selector: "रिपोर्ट भाषा", preview: "रिपोर्ट पूर्वावलोकन" },
+  or: { label: "ଓଡ଼ିଆ", title: "ଖୋର୍ଦ୍ଧା ବିକାଶ ପ୍ରାଥମିକତା ନିଷ୍ପତ୍ତି ସଂକ୍ଷିପ୍ତ", status: "ଖସଡ଼ା ସୁପାରିଶ - କର୍ତ୍ତୃପକ୍ଷଙ୍କ ସମୀକ୍ଷା ଆବଶ୍ୟକ", generated: "ନିଷ୍ପତ୍ତି ସଂକ୍ଷିପ୍ତ ପ୍ରସ୍ତୁତ କରନ୍ତୁ", selector: "ରିପୋର୍ଟ ଭାଷା", preview: "ରିପୋର୍ଟ ପୂର୍ବାବଲୋକନ" },
+};
 
 type SourceRun = {
   runId: string;
@@ -77,6 +84,7 @@ type ReportHistoryItem = {
   status: string;
   format: OutputFormat;
   downloadUrl: string;
+  language?: ReportLanguage;
 };
 
 type ReportSettings = {
@@ -86,6 +94,9 @@ type ReportSettings = {
   includeRejectedProjects: boolean;
   includeCitizenEvidence: boolean;
 };
+
+const API_KEY = process.env.NEXT_PUBLIC_CIVICO_API_KEY || (process.env.NODE_ENV === "development" ? "dev" : "");
+const REQUEST_TIMEOUT_MS = 15000;
 
 const DEFAULT_SETTINGS: ReportSettings = {
   title: "Khordha Development Priority Decision Brief",
@@ -110,15 +121,30 @@ function formatDate(value: string) {
 }
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers ?? {}),
-    },
-  });
-  if (!response.ok) throw new Error(await response.text());
-  return response.json() as Promise<T>;
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          ...(API_KEY ? { "X-API-Key": API_KEY } : {}),
+          ...(options?.headers ?? {}),
+        },
+      });
+      if (!response.ok) throw new Error(await response.text());
+      return (await response.json()) as T;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 2) await new Promise((resolve) => window.setTimeout(resolve, 300 * 2 ** attempt));
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Request failed");
 }
 
 function SummaryTile({ label, value }: { label: string; value: string | number }) {
@@ -157,6 +183,7 @@ function Toggle({
 export default function ReportCenter() {
   const [runs, setRuns] = useState<SourceRun[]>([]);
   const [selectedRunId, setSelectedRunId] = useState("");
+  const [language, setLanguage] = useState<ReportLanguage>("en");
   const [preview, setPreview] = useState<PreviewPayload | null>(null);
   const [history, setHistory] = useState<ReportHistoryItem[]>([]);
   const [settings, setSettings] = useState<ReportSettings>(DEFAULT_SETTINGS);
@@ -170,6 +197,8 @@ export default function ReportCenter() {
     null,
   );
 
+  const copy = REPORT_LANGUAGES[language];
+
   const selectedRun = useMemo(
     () => runs.find((run) => run.runId === selectedRunId) ?? null,
     [runs, selectedRunId],
@@ -182,9 +211,9 @@ export default function ReportCenter() {
     setHistory(reports);
   }, []);
 
-  const loadPreview = useCallback(async (runId: string) => {
+  const loadPreview = useCallback(async (runId: string, selectedLanguage: ReportLanguage) => {
     const payload = await fetchJson<PreviewPayload>(
-      `${API_PREFIX}/reports/preview?runId=${encodeURIComponent(runId)}`,
+      `${API_PREFIX}/reports/preview?runId=${encodeURIComponent(runId)}&language=${selectedLanguage}`,
     );
     setPreview(payload);
   }, []);
@@ -200,7 +229,7 @@ export default function ReportCenter() {
       const latestRun = source.runs[0];
       if (latestRun) {
         setSelectedRunId(latestRun.runId);
-        await loadPreview(latestRun.runId);
+        await loadPreview(latestRun.runId, language);
       }
       await loadHistory();
     } catch {
@@ -210,7 +239,7 @@ export default function ReportCenter() {
     } finally {
       setLoading(false);
     }
-  }, [loadHistory, loadPreview]);
+  }, [language, loadHistory, loadPreview]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -224,7 +253,7 @@ export default function ReportCenter() {
     setGeneratedReport(null);
     setError("");
     try {
-      await loadPreview(runId);
+      await loadPreview(runId, language);
     } catch {
       setError("The selected optimization run is incomplete or unavailable.");
     }
@@ -242,6 +271,7 @@ export default function ReportCenter() {
       formData.append("file", file);
       const response = await fetch(`${API_PREFIX}/reports/upload-source`, {
         method: "POST",
+        headers: API_KEY ? { "X-API-Key": API_KEY } : undefined,
         body: formData,
       });
       if (!response.ok) throw new Error(await response.text());
@@ -286,6 +316,7 @@ export default function ReportCenter() {
           includeHotspotMap: settings.includeHotspotMap,
           includeRejectedProjects: settings.includeRejectedProjects,
           includeCitizenEvidence: settings.includeCitizenEvidence,
+          language,
         }),
       });
       const item: ReportHistoryItem = {
@@ -321,8 +352,9 @@ export default function ReportCenter() {
           <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#e25a45]">
             Reports
           </p>
-          <h1 className="mt-2 text-3xl font-black text-[#171817]">
-            Development Priority Decision Brief
+                      <h1 className="mt-2 text-3xl font-black text-[#171817]">
+            {copy.title}
+
           </h1>
           <p className="mt-2 max-w-3xl text-sm text-[#171817]/60">
             Turn the latest recommended portfolio into a review-ready plan for
@@ -341,7 +373,7 @@ export default function ReportCenter() {
           ) : (
             <FileText className="h-4 w-4" />
           )}
-          Generate Decision Brief
+          {copy.generated}
         </button>
       </section>
 
@@ -375,6 +407,24 @@ export default function ReportCenter() {
             }}
             className="sr-only"
           />
+        </label>
+
+        <label className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#171817]/20 bg-white px-3 text-sm font-bold text-[#171817]">
+          <span>{copy.selector}</span>
+          <select
+            value={language}
+            onChange={(event) => {
+              const nextLanguage = event.target.value as ReportLanguage;
+              setLanguage(nextLanguage);
+              setSettings((current) => ({ ...current, title: REPORT_LANGUAGES[nextLanguage].title }));
+            }}
+            className="bg-transparent py-2 outline-none"
+            aria-label={copy.selector}
+          >
+            {(Object.keys(REPORT_LANGUAGES) as ReportLanguage[]).map((item) => (
+              <option key={item} value={item}>{REPORT_LANGUAGES[item].label}</option>
+            ))}
+          </select>
         </label>
 
         <select
@@ -532,7 +582,7 @@ export default function ReportCenter() {
               ) : (
                 <FileText className="h-4 w-4" />
               )}
-              Generate Decision Brief
+              {copy.generated}
             </button>
           </aside>
 
@@ -540,13 +590,13 @@ export default function ReportCenter() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-mono text-xs font-bold uppercase tracking-wider text-[#e25a45]">
-                  Report Preview
+                  {copy.preview}
                 </p>
                 <h2 className="mt-1 text-2xl font-black text-[#171817]">
-                  Khordha Constituency Development Decision Brief
+                  {copy.title}
                 </h2>
                 <p className="mt-1 text-sm font-semibold text-amber-700">
-                  Status: Draft recommendation - requires authority review
+                  {copy.status}
                 </p>
               </div>
               {generatedReport && (
