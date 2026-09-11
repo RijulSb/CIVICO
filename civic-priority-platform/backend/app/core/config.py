@@ -34,6 +34,20 @@ class Settings(BaseSettings):
             raise ValueError("RATE_LIMIT_PER_MINUTE must be at least 1")
         return value
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def normalize_async_database_url(cls, value: str) -> str:
+        """Render may provide a generic PostgreSQL URL; the app requires asyncpg."""
+        if not isinstance(value, str):
+            return value
+        if value.startswith("postgres://"):
+            return "postgresql+asyncpg://" + value[len("postgres://"):]
+        if value.startswith("postgresql+psycopg2://"):
+            return "postgresql+asyncpg://" + value[len("postgresql+psycopg2://"):]
+        if value.startswith("postgresql://"):
+            return "postgresql+asyncpg://" + value[len("postgresql://"):]
+        return value
+
     model_config = SettingsConfigDict(
         env_file=".env.local",
         env_file_encoding="utf-8",
