@@ -31,8 +31,6 @@ import {
 } from "lucide-react";
 
 import Header from "@/components/layout/Header";
-import LockedOverlay from "@/components/auth/LockedOverlay";
-import { useAuth } from "@/lib/authContext";
 
 type PriorityLevel = "high" | "medium" | "emerging";
 type ThemeKey =
@@ -603,7 +601,6 @@ const EMPTY_DASHBOARD: DashboardData = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isAdmin } = useAuth();
   const [data, setData] = useState<DashboardData>(EMPTY_DASHBOARD);
   const [constituency, setConstituency] = useState("khordha");
   const [period, setPeriod] = useState("30d");
@@ -623,10 +620,6 @@ export default function DashboardPage() {
   }, []);
 
   const fetchData = useCallback(async () => {
-    if (!isAdmin) {
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     const fallbackData = CONSTITUENCY_FALLBACKS[constituency] || CONSTITUENCY_FALLBACKS.khordha;
 
@@ -725,11 +718,6 @@ export default function DashboardPage() {
           {toast}
         </div>
       )}
-
-      <LockedOverlay
-        pageTitle="Constituency Development Dashboard"
-        pageDescription="Official civic intelligence, demand cluster analytics, and infrastructure gap signals for municipal planners."
-      >
         <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
           <section className="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -1045,7 +1033,6 @@ export default function DashboardPage() {
           </div>
         </section>
       </main>
-      </LockedOverlay>
     </div>
   );
 }

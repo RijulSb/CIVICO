@@ -62,7 +62,9 @@ export function CitizenSubmissionForm({
   const [confirmedLocation, setConfirmedLocation] =
     React.useState<ConfirmedLocation | null>(null);
 
-  const [isOnline, setIsOnline] = React.useState(() => typeof navigator !== "undefined" ? navigator.onLine : true);
+  // Keep the first render identical on the server and client. Browser network
+  // state is populated in the effect below after hydration completes.
+  const [isOnline, setIsOnline] = React.useState(true);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<
     "idle" | "processing" | "synced" | "queued"
@@ -74,6 +76,7 @@ export function CitizenSubmissionForm({
   const statusCopy = { english: { online: "PWA Online Mode", offline: "Offline Mode — Auto-Sync Active", queued: "queued" }, hindi: { online: "PWA ऑनलाइन मोड", offline: "ऑफलाइन मोड — ऑटो-सिंक सक्रिय", queued: "कतार में" }, odia: { online: "PWA ଅନଲାଇନ ମୋଡ", offline: "ଅଫଲାଇନ ମୋଡ — ଅଟୋ-ସିଙ୍କ ସକ୍ରିୟ", queued: "ଅପେକ୍ଷାରେ" } }[language];
 
   React.useEffect(() => {
+    setIsOnline(navigator.onLine);
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     window.addEventListener("online", handleOnline);
@@ -164,6 +167,7 @@ export function CitizenSubmissionForm({
           submission_type: voice ? "voice" : video ? "video" : photo ? "photo" : "text",
           content: text.trim() || (voice ? "[Voice Evidence Attached]" : video ? "[Video Evidence Attached]" : "[Photo Evidence Attached]"),
           audio_file: voice || undefined,
+          photo_file: photo || undefined,
           video_file: video || undefined,
           full_name: fullName.trim(),
           email: email.trim(),
@@ -426,7 +430,6 @@ export function CitizenSubmissionForm({
         type="submit"
         disabled={
           isSubmitting ||
-          (!(!confirmedLocation && !text.trim())) ||
           !consent ||
           (!text.trim() && !voice && !photo &&
           !video)

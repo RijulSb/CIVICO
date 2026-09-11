@@ -9,12 +9,10 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
-  KeyRound,
   Lock,
   Mail,
   Phone,
   RefreshCw,
-  ShieldCheck,
   Sparkles,
   User,
 } from "lucide-react";
@@ -27,7 +25,6 @@ export default function AuthPage() {
 
   const [mode, setMode] = React.useState<"signin" | "signup">("signin");
   const [showPassword, setShowPassword] = React.useState(false);
-  const [isOfficialExpanded, setIsOfficialExpanded] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [successMsg, setSuccessMsg] = React.useState<string | null>(null);
@@ -36,7 +33,6 @@ export default function AuthPage() {
   const [signInIdent, setSignInIdent] = React.useState("");
   const [signInPassword, setSignInPassword] = React.useState("");
   const [signInRemember, setSignInRemember] = React.useState(false);
-  const [signInAdminKey, setSignInAdminKey] = React.useState("");
 
   // Sign Up State
   const [signUpFullName, setSignUpFullName] = React.useState("");
@@ -46,7 +42,6 @@ export default function AuthPage() {
   const [signUpPassword, setSignUpPassword] = React.useState("");
   const [signUpConfirmPassword, setSignUpConfirmPassword] = React.useState("");
   const [signUpConsent, setSignUpConsent] = React.useState(true);
-  const [signUpAdminKey, setSignUpAdminKey] = React.useState("");
 
   // If already logged in, show status or redirect
   React.useEffect(() => {
@@ -70,7 +65,6 @@ export default function AuthPage() {
         email_or_phone: signInIdent.trim(),
         password: signInPassword,
         remember_me: signInRemember,
-        admin_key: signInAdminKey.trim() || undefined,
       });
 
       setSuccessMsg(`Welcome back, ${loggedUser.full_name || loggedUser.username}!`);
@@ -81,8 +75,6 @@ export default function AuthPage() {
       const msg = err instanceof Error ? err.message : "Sign in failed.";
       if (msg.includes("401") || msg.includes("Invalid credentials")) {
         setError("Invalid email/phone or password. Please verify your details.");
-      } else if (msg.includes("403") || msg.includes("whitelist")) {
-        setError("Admin access denied: This email is not on the authorized official whitelist.");
       } else {
         setError(msg);
       }
@@ -126,7 +118,6 @@ export default function AuthPage() {
         password: signUpPassword,
         confirm_password: signUpConfirmPassword,
         consent: signUpConsent,
-        admin_key: signUpAdminKey.trim() || undefined,
       });
 
       setSuccessMsg(`Account created successfully as ${newUser.role}! Redirecting...`);
@@ -137,8 +128,6 @@ export default function AuthPage() {
       const msg = err instanceof Error ? err.message : "Sign up failed.";
       if (msg.includes("409") || msg.includes("already")) {
         setError("An account with this email, username, or phone number already exists.");
-      } else if (msg.includes("403") || msg.includes("whitelist")) {
-        setError("Official elevation rejected: Only whitelisted administrative emails can register as Admin.");
       } else {
         setError(msg);
       }
@@ -274,38 +263,6 @@ export default function AuthPage() {
                   </label>
                 </div>
 
-                {/* Official / Admin Key Accordion */}
-                <div className="rounded-2xl border border-dashed border-slate-200 p-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsOfficialExpanded(!isOfficialExpanded)}
-                    className="flex w-full items-center justify-between text-xs font-bold text-slate-700"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <KeyRound className="h-3.5 w-3.5 text-violet-600" />
-                      Official Command Login (Admin Key)
-                    </span>
-                    <span className="text-[10px] text-slate-400 uppercase">
-                      {isOfficialExpanded ? "Hide" : "Expand"}
-                    </span>
-                  </button>
-
-                  {isOfficialExpanded && (
-                    <div className="mt-3 pt-3 border-t border-slate-100">
-                      <input
-                        type="password"
-                        value={signInAdminKey}
-                        onChange={(e) => setSignInAdminKey(e.target.value)}
-                        placeholder="Enter secret Admin Key (Optional)"
-                        className="w-full rounded-xl border border-violet-200 bg-violet-50/40 px-3 py-2 text-xs font-mono outline-none focus:border-violet-600"
-                      />
-                      <p className="mt-1.5 text-[10px] text-slate-500">
-                        Admin keys are strictly checked against the designated municipal whitelist.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
                 <button
                   type="submit"
                   disabled={isLoading}
@@ -429,35 +386,6 @@ export default function AuthPage() {
                     I agree to CIVICO storing and processing my civic submissions for transparent constituency planning.
                   </span>
                 </label>
-
-                {/* Optional Admin Key for Official Registration */}
-                <div className="rounded-2xl border border-dashed border-slate-200 p-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsOfficialExpanded(!isOfficialExpanded)}
-                    className="flex w-full items-center justify-between text-xs font-bold text-slate-700"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-violet-600" />
-                      Official Command Registration (Optional Admin Key)
-                    </span>
-                    <span className="text-[10px] text-slate-400 uppercase">
-                      {isOfficialExpanded ? "Hide" : "Expand"}
-                    </span>
-                  </button>
-
-                  {isOfficialExpanded && (
-                    <div className="mt-3 pt-3 border-t border-slate-100">
-                      <input
-                        type="password"
-                        value={signUpAdminKey}
-                        onChange={(e) => setSignUpAdminKey(e.target.value)}
-                        placeholder="Enter Admin Key (Authorized emails only)"
-                        className="w-full rounded-xl border border-violet-200 bg-violet-50/40 px-3 py-2 text-xs font-mono outline-none focus:border-violet-600"
-                      />
-                    </div>
-                  )}
-                </div>
 
                 <button
                   type="submit"

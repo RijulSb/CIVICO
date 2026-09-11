@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Lock, LogIn, LogOut, ShieldCheck } from "lucide-react";
+import { LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/authContext";
 
 const navigation = [
-  { label: "Explore", href: "/explore", adminOnly: false },
-  { label: "Priorities", href: "/priorities", adminOnly: true },
-  { label: "Dashboard", href: "/dashboard", adminOnly: true },
-  { label: "Portfolio", href: "/portfolio", adminOnly: true },
-  { label: "Reports", href: "/reports", adminOnly: true },
+  { label: "Explore", href: "/explore" },
+  { label: "Priorities", href: "/priorities" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Reports", href: "/reports" },
 ];
 
 export default function Navbar() {
@@ -35,16 +35,14 @@ export default function Navbar() {
         {/* Primary navigation */}
         <div className="hidden items-center gap-6 md:flex">
           {navigation.map((item) => {
-            const isLocked = item.adminOnly && !isAdmin;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                title={isLocked ? `${item.label} (Requires admin key!)` : item.label}
+                title={item.label}
                 className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 transition-colors hover:text-slate-950"
               >
                 <span>{item.label}</span>
-                {isLocked && <Lock className="h-3 w-3 text-amber-600 opacity-80" />}
               </Link>
             );
           })}

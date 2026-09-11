@@ -1,7 +1,7 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +11,7 @@ from app.api.router import api_router
 from app.core.config import settings
 from app.core.exceptions import CivicoException
 from app.core.logging import configure_logging, set_request_id
+from app.db.session import check_database, dispose_engine
 
 configure_logging(settings.log_level)
 logger = logging.getLogger(__name__)
@@ -19,10 +20,12 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     logger.info("Starting %s version=%s", settings.app_name, settings.app_version)
-    if settings.is_production and settings.jwt_secret_key == "development-only-change-me":
-        raise RuntimeError("JWT_SECRET_KEY must be configured in production.")
-    yield
-    logger.info("Stopping %s", settings.app_name)
+    settings.validate_production()
+    try:
+        yield
+    finally:
+        await dispose_engine()
+        logger.info("Stopping %s", settings.app_name)
 
 
 app = FastAPI(
@@ -119,12 +122,16 @@ async def process_liveness() -> dict[str, str]:
 
 
 @app.get("/health/ready", tags=["health"])
-async def process_readiness() -> dict[str, object]:
-    return {
-        "status": "ready",
-        "dependencies": {
-            "database": "not_configured",
-            "redis": "not_configured",
-            "qdrant": "not_configured",
-        },
-    }
+async def process_readiness() -> JSONResponse:
+    dependencies: dict[str, str] = {}
+    try:
+        await check_database()
+        dependencies["database"] = "ok"
+    except Exception:
+        logger.exception("Readiness database check failed")
+        dependencies["database"] = "unavailable"
+    ready = dependencies["database"] == "ok"
+    return JSONResponse(
+        status_code=status.HTTP_200_OK if ready else status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"status": "ready" if ready else "not_ready", "dependencies": dependencies},
+    )

@@ -192,7 +192,7 @@ async def get_current_user(
                 pass
 
     # 2. Check X-API-Key fallback for system integrations
-    if x_api_key and (x_api_key.strip() == settings.civico_api_key or x_api_key == "civ_dev_secret_key_8f39a01c89e24b5d"):
+    if x_api_key and x_api_key.strip() == settings.civico_api_key:
         # Synthetic admin user for verified key
         return User(
             id=UUID("00000000-0000-0000-0000-000000000001"),
@@ -252,10 +252,10 @@ async def verify_api_key(
 
     if authorization and authorization.startswith("Bearer "):
         token = authorization[7:].strip()
-        if token == settings.civico_api_key or token == settings.jwt_secret_key:
+        if token == settings.civico_api_key:
             return token
 
-    if not settings.is_production and (x_api_key == "civ_dev_secret_key_8f39a01c89e24b5d" or x_api_key == "dev"):
+    if not settings.is_production and x_api_key == "dev":
         return "dev-bypass"
 
     raise HTTPException(

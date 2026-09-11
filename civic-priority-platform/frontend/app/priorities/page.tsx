@@ -3,8 +3,6 @@
 import * as React from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
-import LockedOverlay from "@/components/auth/LockedOverlay";
-import { useAuth } from "@/lib/authContext";
 import { useFeedback } from "@/components/feedback/FeedbackHub";
 import {
   AlertCircle,
@@ -111,7 +109,6 @@ const DEFAULT_PROJECTS: Project[] = [
 
 export default function PrioritiesLinearWorkspace() {
   const { showSuccess, showError } = useFeedback();
-  const { isAdmin } = useAuth();
 
   // 5 Visible Workspace Stages
   const [currentStep, setCurrentStep] = React.useState<1 | 2 | 3 | 4 | 5>(1);
@@ -438,11 +435,6 @@ export default function PrioritiesLinearWorkspace() {
   return (
     <div className="min-h-screen bg-[#f6f5f2] text-[#171817] font-sans">
       <Header />
-
-      <LockedOverlay
-        pageTitle="Constituency Priorities Workspace"
-        pageDescription="Multi-objective decision matrix that balances citizen urgency, population impact, and cost effectiveness."
-      >
       <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10 space-y-8">
         {/* ------------------------------------------------------------------- */}
         {/* Page Header & Linear Progress Bar Stage Indicator */}
@@ -1297,7 +1289,6 @@ export default function PrioritiesLinearWorkspace() {
           </div>
         </div>
       )}
-      </LockedOverlay>
     </div>
   );
 }

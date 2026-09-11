@@ -274,13 +274,10 @@ export interface SignUpPayload {
   password: string;
   confirm_password: string;
   consent: boolean;
-  admin_key?: string;
 }
 
 export interface SignInPayload {
   email_or_phone: string;
   password: string;
   remember_me?: boolean;
-  admin_key?: string;
 }
-

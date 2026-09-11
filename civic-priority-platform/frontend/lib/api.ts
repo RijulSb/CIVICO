@@ -74,17 +74,6 @@ export async function apiGetMe(token?: string): Promise<UserProfile> {
   });
 }
 
-export async function apiVerifyAdminKey(
-  adminKey: string,
-  token?: string
-): Promise<AuthTokenResponse> {
-  return fetchJson<AuthTokenResponse>(`${API_PREFIX}/auth/verify-admin-key`, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: JSON.stringify({ admin_key: adminKey }),
-  });
-}
-
 // ---------------------------------------------------------------------------
 // Intake & Domain API Methods
 // ---------------------------------------------------------------------------

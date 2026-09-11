@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     cors_origin_regex: str = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
     log_level: str = "INFO"
     jwt_secret_key: str = "development-only-change-me"
-    civico_api_key: str = "civ_dev_secret_key_8f39a01c89e24b5d"
+    civico_api_key: str = "civ_dev_secret_key_change-me"
     opencage_api_key: str = ""
     mapbox_geocoding_key: str = ""
     groq_api_key: str = ""
@@ -25,6 +26,13 @@ class Settings(BaseSettings):
     database_pool_size: int = 5
     database_max_overflow: int = 10
     database_pool_timeout: float = 30.0
+
+    @field_validator("rate_limit_per_minute")
+    @classmethod
+    def validate_rate_limit(cls, value: int) -> int:
+        if value < 1:
+            raise ValueError("RATE_LIMIT_PER_MINUTE must be at least 1")
+        return value
 
     model_config = SettingsConfigDict(
         env_file=".env.local",
@@ -42,6 +50,16 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.environment.lower() == "production"
 
+    def validate_production(self) -> None:
+        if not self.is_production:
+            return
+        if self.jwt_secret_key == "development-only-change-me":
+            raise ValueError("JWT_SECRET_KEY must be configured in production")
+        if self.civico_api_key.startswith("civ_dev_"):
+            raise ValueError("CIVICO_API_KEY must be configured in production")
+        if "localhost" in self.database_url or "127.0.0.1" in self.database_url:
+            raise ValueError("DATABASE_URL must point to a managed production database")
+
 
 @lru_cache
 def get_settings() -> Settings:
@@ -49,4 +67,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-
