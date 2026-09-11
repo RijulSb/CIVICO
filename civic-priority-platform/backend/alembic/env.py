@@ -12,6 +12,7 @@ from app.db.base import Base
 config = context.config
 
 settings = get_settings()
+settings.validate_production()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
