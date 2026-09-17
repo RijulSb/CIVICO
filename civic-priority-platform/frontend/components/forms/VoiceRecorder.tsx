@@ -63,6 +63,11 @@ export function VoiceRecorder({
   // Track the current blob URL in a ref so we can revoke it only on unmount,
   // not every time the audioUrl state changes (which caused ERR_FILE_NOT_FOUND).
   const audioBlobUrlRef = React.useRef<string | null>(null);
+  const audioBlobRef = React.useRef<Blob | null>(null);
+  const webAudioSourceRef = React.useRef<{
+    ctx: AudioContext;
+    source: AudioBufferSourceNode;
+  } | null>(null);
 
   const stopTimer = () => {
     if (timerRef.current !== null) {
@@ -144,6 +149,7 @@ export function VoiceRecorder({
         const file = new File([blob], `civico-voice-${Date.now()}.webm`, {
           type: blob.type,
         });
+        audioBlobRef.current = blob;
         const url = URL.createObjectURL(blob);
         audioBlobUrlRef.current = url;
         setAudioUrl(url);

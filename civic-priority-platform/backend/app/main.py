@@ -22,6 +22,21 @@ async def lifespan(_: FastAPI):
     logger.info("Starting %s version=%s", settings.app_name, settings.app_version)
     settings.validate_production()
     try:
+        # Pre-warm the dashboard cache on startup so the first user request is fast
+        import asyncio
+        async def _warmup():
+            try:
+                await asyncio.sleep(2)  # let DB connections settle
+                from app.db.session import AsyncSessionFactory
+                from app.services.analytics_service import get_analytics_service
+                async with AsyncSessionFactory() as session:
+                    await get_analytics_service(session).build_dashboard(
+                        constituency="khordha", period="30d", theme="all", ward="all"
+                    )
+                logger.info("Dashboard cache pre-warmed successfully")
+            except Exception as exc:
+                logger.warning("Dashboard cache warm-up failed (non-fatal): %s", exc)
+        asyncio.ensure_future(_warmup())
         yield
     finally:
         await dispose_engine()
@@ -38,9 +53,32 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
+class CivicMediaFiles(StaticFiles):
+    def file_response(self, full_path, stat_result, scope, status_code=200):
+        resp = super().file_response(full_path, stat_result, scope, status_code)
+        path_str = str(full_path).lower()
+        if path_str.endswith(".webm"):
+            try:
+                with open(full_path, "rb") as f:
+                    sample = f.read(4096)
+                if b"A_OPUS" in sample and b"V_VP8" not in sample and b"V_VP9" not in sample and b"V_AV1" not in sample:
+                    resp.headers["Content-Type"] = "audio/webm"
+            except Exception:
+                pass
+        elif path_str.endswith(".mp3"):
+            resp.headers["Content-Type"] = "audio/mpeg"
+        elif path_str.endswith(".mp4"):
+            resp.headers["Content-Type"] = "video/mp4"
+        resp.headers["Accept-Ranges"] = "bytes"
+        resp.headers["Content-Disposition"] = "inline"
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
+        return resp
+
 media_dir = Path(__file__).resolve().parents[1] / "data" / "uploads"
 media_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/media", StaticFiles(directory=media_dir), name="media")
+app.mount("/media", CivicMediaFiles(directory=media_dir), name="media")
 
 
 if settings.cors_origin_list:

@@ -4,6 +4,7 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
 import { useFeedback } from "@/components/feedback/FeedbackHub";
+import { API_PREFIX } from "@/lib/api";
 import {
   AlertCircle,
   ArrowRight,
@@ -234,8 +235,7 @@ export default function PrioritiesLinearWorkspace() {
   // Fetch real ward population data on mount from backend context API
   // ---------------------------------------------------------------------------
   React.useEffect(() => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    fetch(`${API_BASE}/api/v1/context/wards`, { signal: AbortSignal.timeout(3000) })
+    fetch(`${API_PREFIX}/context/wards`, { signal: AbortSignal.timeout(3000) })
       .then((r) => r.json())
       .then((wardRecords: any[]) => {
         if (!Array.isArray(wardRecords) || wardRecords.length === 0) return;

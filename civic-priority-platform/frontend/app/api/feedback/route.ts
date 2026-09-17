@@ -12,7 +12,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const backendUrl =
+      process.env.BACKEND_INTERNAL_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://civico-backend-7cm1.onrender.com"
+        : "http://localhost:8000");
 
     // 1. Try forwarding to FastAPI feedback engine
     try {

@@ -64,17 +64,122 @@ class SubmissionService:
         self._db = db
 
 
+import os as _os
+import subprocess as _subprocess
+import tempfile as _tempfile
+import logging as _logging
+
+_media_logger = _logging.getLogger(__name__)
+
+# Try to locate ffmpeg from imageio-ffmpeg (bundled binary, no system install needed)
+def _get_ffmpeg() -> str | None:
+    try:
+        import imageio_ffmpeg  # type: ignore
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
+
+def _normalize_media(data: bytes, filename: str) -> tuple[bytes, str]:
+    """
+    Normalise uploaded media for browser playback:
+      - WebM audio-only → remux with ffmpeg to write Duration/Cues (fixes 0:00 display)
+      - AVI / non-web video → transcode to H.264 MP4 with faststart
+      - WebM with video stream → transcode to MP4 for widest codec support
+      - Everything else → pass through unchanged
+    Returns (processed_bytes, extension).
+    """
+    ffmpeg = _get_ffmpeg()
+    if not ffmpeg or not data:
+        suffix = Path(filename).suffix.lower() or ".bin"
+        return data, suffix
+
+    # Detect container by magic bytes
+    is_webm = data[:4] == b"\x1aE\xdf\xa3"
+    is_avi = data[:4] == b"RIFF" and len(data) > 12 and data[8:12] == b"AVI "
+    is_mp4_like = len(data) > 8 and data[4:8] in (b"ftyp", b"moov")
+
+    if not (is_webm or is_avi or is_mp4_like):
+        # Not a video/audio container — return as-is (e.g. JPEG photo)
+        suffix = Path(filename).suffix.lower() or ".bin"
+        return data, suffix
+
+    # Detect if WebM is audio-only (has Opus/Vorbis track, no video track)
+    webm_audio_only = False
+    if is_webm:
+        webm_audio_only = (b"A_OPUS" in data or b"A_VORBIS" in data) and \
+                          (b"V_VP8" not in data and b"V_VP9" not in data and b"V_AV1" not in data)
+
+    src_suffix = ".webm" if (is_webm or is_avi) else ".mp4"
+    src_fd, src_path = _tempfile.mkstemp(suffix=src_suffix)
+    try:
+        with _os.fdopen(src_fd, "wb") as f:
+            f.write(data)
+
+        if webm_audio_only:
+            # Transcode WebM/Opus audio → MP3 for universal browser support
+            dst_fd, dst_path = _tempfile.mkstemp(suffix=".mp3")
+            _os.close(dst_fd)
+            res = _subprocess.run(
+                [ffmpeg, "-y", "-i", src_path,
+                 "-vn",                          # no video
+                 "-c:a", "libmp3lame",
+                 "-b:a", "128k",
+                 "-ar", "44100",                 # standard sample rate
+                 dst_path],
+                capture_output=True, timeout=30,
+            )
+            if res.returncode == 0 and _os.path.getsize(dst_path) > 0:
+                with open(dst_path, "rb") as f:
+                    out = f.read()
+                _os.remove(dst_path)
+                return out, ".mp3"
+            _os.remove(dst_path)
+        else:
+            # Transcode to H.264 MP4 with faststart (widest browser support)
+            dst_fd, dst_path = _tempfile.mkstemp(suffix=".mp4")
+            _os.close(dst_fd)
+            res = _subprocess.run(
+                [ffmpeg, "-y", "-i", src_path,
+                 "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "veryfast",
+                 "-c:a", "aac", "-movflags", "+faststart",
+                 dst_path],
+                capture_output=True, timeout=120,
+            )
+            if res.returncode == 0 and _os.path.getsize(dst_path) > 0:
+                with open(dst_path, "rb") as f:
+                    out = f.read()
+                _os.remove(dst_path)
+                return out, ".mp4"
+            _os.remove(dst_path)
+            _media_logger.warning("ffmpeg transcode failed: %s", res.stderr[-300:])
+    except Exception as exc:
+        _media_logger.warning("Media normalisation error: %s", exc)
+    finally:
+        if _os.path.exists(src_path):
+            _os.remove(src_path)
+
+    # Fallback — store raw bytes
+    suffix = Path(filename).suffix.lower() or ".bin"
+    return data, suffix
+
+
+class SubmissionService:
+    def __init__(self, db: AsyncSession) -> None:
+        self._db = db
+
     @staticmethod
     def _store_media(data: bytes | None, filename: str) -> str | None:
         if not data:
             return None
         media_dir = Path(__file__).resolve().parents[2] / "data" / "uploads"
         media_dir.mkdir(parents=True, exist_ok=True)
-        suffix = Path(filename).suffix.lower() or ".bin"
+        processed, suffix = _normalize_media(data, filename)
         suffix = suffix if re.fullmatch(r"\.[a-z0-9]{1,8}", suffix) else ".bin"
         target = media_dir / f"{uuid4().hex}{suffix}"
-        target.write_bytes(data)
+        target.write_bytes(processed)
         return f"/media/{target.name}"
+
 
     async def create_submission(
         self,
@@ -85,13 +190,17 @@ class SubmissionService:
         video_filename: str = "report_video.webm",
         photo_bytes: bytes | None = None,
     ) -> SubmissionResponse:
-        raw_text = payload.content or ""
-        transcript: str | None = None
-        if payload.custom_location_text:
-            raw_text = f"{raw_text}\nLocation: {payload.custom_location_text}".strip()
+        user_complaint = (payload.content or "").strip()
+        is_placeholder = user_complaint in (
+            "[Voice Evidence Attached]",
+            "[Voice Recording Attached]",
+            "[Video Evidence Attached]",
+            "[Photo Evidence Attached]",
+            "",
+        )
 
         # 1. Voice Speech-to-Text Transcription & Multilingual Extraction Pipeline
-        text_hint = raw_text if "[Voice Recording Attached]" not in raw_text else ""
+        text_hint = user_complaint if not is_placeholder else ""
         if audio_bytes:
             voice_result = await transcribe_audio_bytes(
                 audio_bytes=audio_bytes,
@@ -100,12 +209,11 @@ class SubmissionService:
                 user_text_hint=text_hint,
             )
             transcript = voice_result.transcript
-            raw_text = voice_result.transcript
             theme_override = voice_result.detected_theme
         elif (
             payload.submission_type.value == "voice"
             or payload.audio_url
-            or "[Voice Recording Attached]" in raw_text
+            or "[Voice Recording Attached]" in user_complaint
         ):
             voice_result = await transcribe_and_extract_intent(
                 audio_base64=payload.audio_url,
@@ -113,10 +221,20 @@ class SubmissionService:
                 language=payload.language.value,
                 user_text_hint=text_hint,
             )
-            raw_text = voice_result.transcript
+            transcript = voice_result.transcript
             theme_override = voice_result.detected_theme
         else:
             theme_override = None
+
+        # Determine primary complaint text:
+        # NEVER overwrite what the citizen actually typed in the description box!
+        if not is_placeholder:
+            raw_text = user_complaint
+        else:
+            raw_text = transcript or "Citizen report submitted with attached media evidence."
+
+        if payload.custom_location_text:
+            raw_text = f"{raw_text}\nLocation: {payload.custom_location_text}".strip()
 
         # 2. Prompt Injection Detection
         is_injection, reason = detect_prompt_injection(raw_text)
@@ -213,6 +331,12 @@ class SubmissionService:
         await self._db.commit()
         await self._db.refresh(submission)
 
+        try:
+            from app.services.analytics_service import clear_dashboard_cache
+            clear_dashboard_cache()
+        except Exception:
+            pass
+
         return SubmissionResponse(
             submission_id=submission.id,
             status=SubmissionStatus(submission.status),
@@ -223,6 +347,16 @@ class SubmissionService:
             formatted_text=formatted_text,
             transcript=transcript,
             extracted=extracted,
+            full_name=submission.full_name,
+            email=submission.email,
+            phone=submission.phone,
+            audio_url=submission.audio_url,
+            photo_url=submission.photo_url,
+            video_url=submission.video_url,
+            content=submission.content,
+            ward=submission.ward,
+            block=submission.block,
+            created_at=submission.created_at,
         )
 
     async def get_submission(self, submission_id: UUID) -> SubmissionResponse:
@@ -258,6 +392,16 @@ class SubmissionService:
             formatted_text=formatted_text,
             transcript=transcript,
             extracted=extracted,
+            full_name=submission.full_name,
+            email=submission.email,
+            phone=submission.phone,
+            audio_url=submission.audio_url,
+            photo_url=submission.photo_url,
+            video_url=submission.video_url,
+            content=submission.content,
+            ward=submission.ward,
+            block=submission.block,
+            created_at=submission.created_at,
         )
 
     async def list_submissions(
@@ -304,6 +448,16 @@ class SubmissionService:
                     formatted_text=formatted_text,
                     transcript=transcript,
                     extracted=extracted,
+                    full_name=s.full_name,
+                    email=s.email,
+                    phone=s.phone,
+                    audio_url=s.audio_url,
+                    photo_url=s.photo_url,
+                    video_url=s.video_url,
+                    content=s.content,
+                    ward=s.ward,
+                    block=s.block,
+                    created_at=s.created_at,
                 )
             )
         return responses

@@ -87,6 +87,18 @@ def _base_filters(
     return " AND ".join(clauses), params
 
 
+import time
+
+_DASHBOARD_CACHE: dict[str, tuple[float, dict[str, Any]]] = {}
+_DASHBOARD_CACHE_TTL = 300.0  # seconds
+_POPULATION_CACHE: dict[str, dict[str, Any]] = {}
+
+
+def clear_dashboard_cache() -> None:
+    """Invalidate all cached dashboard analytics."""
+    _DASHBOARD_CACHE.clear()
+
+
 class AnalyticsService:
     """Build live dashboard analytics from the submissions database."""
 
@@ -100,8 +112,16 @@ class AnalyticsService:
         period: str = "30d",
         theme: str = "all",
         ward: str = "all",
+        force_refresh: bool = False,
     ) -> dict[str, Any]:
         constituency = constituency.strip().lower() or "khordha"
+        cache_key = f"{constituency}:{period}:{theme}:{ward}"
+
+        if not force_refresh and cache_key in _DASHBOARD_CACHE:
+            cached_time, cached_data = _DASHBOARD_CACHE[cache_key]
+            if (time.time() - cached_time) < _DASHBOARD_CACHE_TTL:
+                return cached_data
+
         days = _period_days(period)
         now = datetime.now(timezone.utc)
         current_start = now - timedelta(days=days)
@@ -151,7 +171,7 @@ class AnalyticsService:
         summary["recurringThemes"] = len(pulse)
         summary["candidateProjects"] = candidate_projects
 
-        return {
+        result = {
             "constituency": constituency,
             "constituencyLabel": constituency.replace("_", " ").title(),
             "state": "Odisha",
@@ -168,6 +188,8 @@ class AnalyticsService:
             "recentSubmissions": recent,
             "user_submissions": user_submissions,
         }
+        _DASHBOARD_CACHE[cache_key] = (time.time(), result)
+        return result
 
     async def _summary(
         self,
@@ -449,18 +471,71 @@ class AnalyticsService:
             SELECT
                 s.id,
                 COALESCE(s.ward, 'Unknown') AS ward,
+                COALESCE(s.block, 'Unknown') AS block,
                 {_theme_sql()} AS theme,
                 LOWER(s.language) AS language,
                 s.submission_type AS channel,
-                COALESCE(s.transcript, s.content, s.formatted_text ->> LOWER(s.language), '[Media evidence attached]') AS preview,
+                s.full_name,
+                s.email,
+                s.phone,
+                s.audio_url,
+                s.photo_url,
+                s.video_url,
+                s.content,
+                s.transcript,
+                s.extracted,
+                s.status,
+                s.latitude,
+                s.longitude,
+                COALESCE(NULLIF(s.content, ''), NULLIF(s.formatted_text ->> LOWER(s.language), ''), NULLIF(s.transcript, ''), '[Media evidence attached]') AS preview,
                 s.created_at
             FROM submissions s
             WHERE {where}
             ORDER BY s.created_at DESC
-            LIMIT 10
+            LIMIT 50
             """
         )
         rows = (await self._db.execute(query, params)).mappings().all()
+
+        # Resilient fallback: If no records match with the time constraint, fetch recent submissions without time constraint
+        if not rows:
+            no_time_where, no_time_params = _base_filters(
+                constituency=constituency,
+                start=datetime(1970, 1, 1, tzinfo=timezone.utc),
+                theme=theme,
+                ward=ward,
+            )
+            fallback_query = text(
+                f"""
+                SELECT
+                    s.id,
+                    COALESCE(s.ward, 'Unknown') AS ward,
+                    COALESCE(s.block, 'Unknown') AS block,
+                    {_theme_sql()} AS theme,
+                    LOWER(s.language) AS language,
+                    s.submission_type AS channel,
+                    s.full_name,
+                    s.email,
+                    s.phone,
+                    s.audio_url,
+                    s.photo_url,
+                    s.video_url,
+                    s.content,
+                    s.transcript,
+                    s.extracted,
+                    s.status,
+                    s.latitude,
+                    s.longitude,
+                    COALESCE(NULLIF(s.content, ''), NULLIF(s.formatted_text ->> LOWER(s.language), ''), NULLIF(s.transcript, ''), '[Media evidence attached]') AS preview,
+                    s.created_at
+                FROM submissions s
+                WHERE {no_time_where}
+                ORDER BY s.created_at DESC
+                LIMIT 50
+                """
+            )
+            rows = (await self._db.execute(fallback_query, no_time_params)).mappings().all()
+
         now = datetime.now(timezone.utc)
         output: list[dict[str, Any]] = []
         for row in rows:
@@ -469,19 +544,38 @@ class AnalyticsService:
                 submitted_mins = max(0, round((now - created.astimezone(timezone.utc)).total_seconds() / 60))
             else:
                 submitted_mins = 0
-            preview = str(row["preview"] or "")[:240]
+            preview = str(row["preview"] or "")[:500]
             if str(row["language"] or "").lower() == "odia":
                 preview = sanitize_odia_text(preview) or preview
             output.append(
                 {
                     "id": str(row["id"]),
                     "ward": row["ward"],
+                    "block": row["block"],
                     "theme": row["theme"],
                     "language": row["language"],
                     "channel": row["channel"],
+                    "fullName": row["full_name"],
+                    "full_name": row["full_name"],
+                    "email": row["email"],
+                    "phone": row["phone"],
+                    "audioUrl": row["audio_url"],
+                    "audio_url": row["audio_url"],
+                    "photoUrl": row["photo_url"],
+                    "photo_url": row["photo_url"],
+                    "videoUrl": row["video_url"],
+                    "video_url": row["video_url"],
+                    "content": row["content"],
+                    "transcript": row["transcript"],
                     "preview": preview,
                     "translatedPreview": preview,
+                    "latitude": float(row["latitude"]) if row["latitude"] is not None else None,
+                    "longitude": float(row["longitude"]) if row["longitude"] is not None else None,
+                    "status": row["status"],
                     "submittedMinsAgo": submitted_mins,
+                    "createdAt": _iso(row["created_at"]),
+                    "created_at": _iso(row["created_at"]),
+                    "extracted": row["extracted"],
                 }
             )
         return output
@@ -582,13 +676,18 @@ class AnalyticsService:
             """
         )
         district_name = "khordha" if constituency in {"khordha", "bhubaneswar"} else constituency
+        if district_name in _POPULATION_CACHE:
+            return _POPULATION_CACHE[district_name]
+
         try:
             row = (await self._db.execute(query, {"district_name": district_name})).mappings().one()
         except ProgrammingError:
             await self._db.rollback()
-            return {"available": False, "source": "PCA 2011", "referenceYear": None}
+            res = {"available": False, "source": "PCA 2011", "referenceYear": None}
+            _POPULATION_CACHE[district_name] = res
+            return res
         population = int(row["population_total"] or 0)
-        return {
+        res = {
             "available": population > 0,
             "source": "Primary Census Abstract 2011",
             "referenceYear": row["reference_year"],
@@ -602,6 +701,8 @@ class AnalyticsService:
             "totalWorkers": int(row["total_workers"] or 0),
             "geographicLevel": "subdistrict",
         }
+        _POPULATION_CACHE[district_name] = res
+        return res
 
     async def _candidate_project_count(self, constituency: str) -> int:
         query = text(

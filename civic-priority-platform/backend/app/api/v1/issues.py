@@ -30,12 +30,16 @@ async def list_issues(
     category: str | None = Query(default=None, max_length=100),
     service: IssueService = Depends(get_issue_service),
 ) -> IssueListResponse:
-    return await service.list_issues(
-        limit=limit,
-        cursor=cursor,
-        status=status_filter,
-        category=category,
-    )
+    try:
+        return await service.list_issues(
+            limit=limit,
+            cursor=cursor,
+            status_filter=status_filter,
+            category=category,
+        )
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{issue_id}", response_model=IssueResponse)

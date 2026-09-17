@@ -11,26 +11,35 @@ import {
   Activity,
   AlertTriangle,
   ArrowRight,
+  Calendar,
+  CheckCircle,
   CheckCircle2,
   Clock,
   Droplets,
+  ExternalLink,
+  FileText,
   Filter,
-
   Flame,
   HeartPulse,
+  Image as ImageIcon,
   Lightbulb,
+  Mail,
   MapPin,
   MessageSquare,
   Mic,
+  Phone,
   RefreshCw,
   School,
   Search,
   TrendingDown,
   TrendingUp,
+  User,
   Users,
+  Volume2,
 } from "lucide-react";
 
 import Header from "@/components/layout/Header";
+import { AudioEvidencePlayer, VideoEvidencePlayer } from "@/components/media/MediaEvidencePlayers";
 
 type PriorityLevel = "high" | "medium" | "emerging";
 type ThemeKey =
@@ -83,12 +92,37 @@ export type DashboardHotspot = {
 type RecentSubmission = {
   id: string;
   ward: string;
-  theme: IssueTheme;
+  block?: string;
+  theme: IssueTheme | string;
   language: string;
   channel: "text" | "voice" | "photo" | "video";
   preview: string;
   translatedPreview: string;
   submittedMinsAgo: number;
+  fullName?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  audioUrl?: string | null;
+  audio_url?: string | null;
+  photoUrl?: string | null;
+  photo_url?: string | null;
+  videoUrl?: string | null;
+  video_url?: string | null;
+  content?: string | null;
+  transcript?: string | null;
+  createdAt?: string | null;
+  created_at?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  status?: string | null;
+  extracted?: {
+    issue_type?: string;
+    problem_location?: string;
+    urgency?: string;
+    urgency_reason?: string;
+    beneficiaries_estimate?: string;
+  } | null;
 };
 
 type DashboardData = {
@@ -205,12 +239,7 @@ const CONSTITUENCY_FALLBACKS: Record<string, DashboardData> = {
       { id: "hotspot_ward1_road", ward: "Ward 1", block: "Chandrasekharpur Block", theme: "road_repair", latitude: 20.325, longitude: 85.815, intensity: "medium", submissionCount: 67, affectedPopulation: 8200, evidenceCounts: { text: 30, voice: 22, photo: 15 }, candidateProjectId: null, infrastructureContext: { roadCondition: "fair", dailyCommuters: 3200 }, suggestedProject: { title: "Resurface 2.3 km internal roads in Ward 1", estimatedCost: 35000000, estimatedMonths: 4 }, representativeEvidence: [{ type: "text", language: "odia", translatedText: "Roads flood every monsoon." }] },
       { id: "hotspot_ward2_health", ward: "Ward 2", block: "Patia Block", theme: "health_access", latitude: 20.352, longitude: 85.818, intensity: "medium", submissionCount: 58, affectedPopulation: 7400, evidenceCounts: { text: 28, voice: 20, photo: 10 }, candidateProjectId: null, infrastructureContext: { nearestPHCDistanceKm: 6.3, ambulanceCoverage: false }, suggestedProject: { title: "Establish sub-health centre in Ward 2", estimatedCost: 25000000, estimatedMonths: 5 }, representativeEvidence: [{ type: "voice", language: "odia", translatedText: "The nearest doctor is six km away." }] },
     ],
-    recentSubmissions: [
-      { id: "sub_001", ward: "Ward 5", theme: "road_repair", language: "odia", channel: "voice", preview: "Odia voice report", translatedPreview: "The road becomes unusable after rainfall.", submittedMinsAgo: 4 },
-      { id: "sub_002", ward: "Ward 8", theme: "water_supply", language: "hindi", channel: "text", preview: "Hindi text report", translatedPreview: "Water arrives only three days a week.", submittedMinsAgo: 11 },
-      { id: "sub_003", ward: "Ward 3", theme: "school_infrastructure", language: "odia", channel: "photo", preview: "Photo evidence attached", translatedPreview: "Leaking classroom roof during monsoon.", submittedMinsAgo: 23 },
-      { id: "sub_004", ward: "Ward 2", theme: "health_access", language: "odia", channel: "voice", preview: "Odia voice report", translatedPreview: "The nearest doctor is six km away.", submittedMinsAgo: 55 },
-    ],
+    recentSubmissions: [],
   },
   puri: {
     constituency: "puri",
@@ -232,10 +261,7 @@ const CONSTITUENCY_FALLBACKS: Record<string, DashboardData> = {
       { id: "puri_hotspot_ward7_road", ward: "Ward 7", block: "Puri Block", theme: "road_repair", latitude: 19.8180, longitude: 85.8260, intensity: "high", submissionCount: 89, affectedPopulation: 10500, evidenceCounts: { text: 44, voice: 29, photo: 16 }, candidateProjectId: null, infrastructureContext: { roadCondition: "poor", pilgrimTrafficDaily: 12000 }, suggestedProject: { title: "Repair 3.1 km pilgrim access road in Ward 7", estimatedCost: 48000000, estimatedMonths: 4 }, representativeEvidence: [{ type: "text", language: "odia", translatedText: "Pilgrims and residents both suffer on these broken roads." }] },
       { id: "puri_hotspot_ward2_health", ward: "Ward 2", block: "Puri Block", theme: "health_access", latitude: 19.8060, longitude: 85.8350, intensity: "medium", submissionCount: 74, affectedPopulation: 9800, evidenceCounts: { text: 38, voice: 25, photo: 11 }, candidateProjectId: null, infrastructureContext: { nearestPHCDistanceKm: 4.8, seasonalCongestion: true }, suggestedProject: { title: "Open satellite health clinic in Ward 2", estimatedCost: 22000000, estimatedMonths: 4 }, representativeEvidence: [{ type: "voice", language: "odia", translatedText: "During festivals, even emergencies cannot reach the hospital quickly." }] },
     ],
-    recentSubmissions: [
-      { id: "puri_sub_001", ward: "Ward 4", theme: "water_supply", language: "odia", channel: "voice", preview: "Odia voice report", translatedPreview: "The water has become too salty to drink.", submittedMinsAgo: 7 },
-      { id: "puri_sub_002", ward: "Ward 7", theme: "road_repair", language: "hindi", channel: "text", preview: "Hindi text report", translatedPreview: "The road is in very poor condition.", submittedMinsAgo: 19 },
-    ],
+    recentSubmissions: [],
   },
   cuttack: {
     constituency: "cuttack",
@@ -257,9 +283,7 @@ const CONSTITUENCY_FALLBACKS: Record<string, DashboardData> = {
       { id: "cuttack_hotspot_ward3_health", ward: "Ward 3", block: "Cuttack Block", theme: "health_access", latitude: 20.4710, longitude: 85.8780, intensity: "high", submissionCount: 96, affectedPopulation: 13200, evidenceCounts: { text: 48, voice: 32, photo: 16 }, candidateProjectId: null, infrastructureContext: { nearestPHCDistanceKm: 7.1, ambulanceCoverage: false }, suggestedProject: { title: "Establish maternity and primary care unit in Ward 3", estimatedCost: 38000000, estimatedMonths: 6 }, representativeEvidence: [{ type: "voice", language: "hindi", translatedText: "There is no doctor close by. Women in labour are transported in autorickshaws." }] },
       { id: "cuttack_hotspot_ward9_water", ward: "Ward 9", block: "Cuttack Block", theme: "water_supply", latitude: 20.4560, longitude: 85.8890, intensity: "medium", submissionCount: 78, affectedPopulation: 10400, evidenceCounts: { text: 40, voice: 26, photo: 12 }, candidateProjectId: null, infrastructureContext: { pipedWaterCoverage: "44%", floodContamination: true }, suggestedProject: { title: "Install water treatment and storage units in Ward 9", estimatedCost: 42000000, estimatedMonths: 5 }, representativeEvidence: [{ type: "text", language: "odia", translatedText: "After floods, tap water smells bad and causes illness." }] },
     ],
-    recentSubmissions: [
-      { id: "cuttack_sub_001", ward: "Ward 6", theme: "road_repair", language: "odia", channel: "voice", preview: "Odia voice report", translatedPreview: "The road gets submerged in the rain.", submittedMinsAgo: 6 },
-    ],
+    recentSubmissions: [],
   },
   bhubaneswar: {
     constituency: "bhubaneswar",
@@ -280,13 +304,38 @@ const CONSTITUENCY_FALLBACKS: Record<string, DashboardData> = {
       { id: "bbsr_hotspot_ward11_light", ward: "Ward 11", block: "Bhubaneswar North", theme: "street_lighting", latitude: 20.3200, longitude: 85.8100, intensity: "high", submissionCount: 112, affectedPopulation: 16400, evidenceCounts: { text: 58, voice: 36, photo: 18 }, candidateProjectId: null, infrastructureContext: { litLanePercent: "28%", crimeIncidents: 14 }, suggestedProject: { title: "Install 380 LED streetlights in Ward 11 IT corridor", estimatedCost: 18000000, estimatedMonths: 3 }, representativeEvidence: [{ type: "voice", language: "english", translatedText: "The road from the tech park to our colony has no lights. It is unsafe at night." }] },
       { id: "bbsr_hotspot_ward5_road", ward: "Ward 5", block: "Bhubaneswar Central", theme: "road_repair", latitude: 20.2961, longitude: 85.8245, intensity: "high", submissionCount: 94, affectedPopulation: 12800, evidenceCounts: { text: 48, voice: 31, photo: 15 }, candidateProjectId: null, infrastructureContext: { roadCondition: "poor", dailyCommuters: 7200 }, suggestedProject: { title: "Rehabilitate 3.4 km construction-damaged road in Ward 5", estimatedCost: 52000000, estimatedMonths: 5 }, representativeEvidence: [{ type: "text", language: "english", translatedText: "Construction trucks have destroyed the road surface." }] },
     ],
-    recentSubmissions: [
-      { id: "bbsr_sub_001", ward: "Ward 11", theme: "street_lighting", language: "english", channel: "text", preview: "No lights on the road near tech park.", translatedPreview: "No lights on the road near tech park.", submittedMinsAgo: 9 },
-    ],
+    recentSubmissions: [],
   },
 };
 
 const FALLBACK: DashboardData = CONSTITUENCY_FALLBACKS.khordha;
+
+function resolveMediaUrl(path: string | null | undefined): string {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("data:")) {
+    return path;
+  }
+  const backendBase = API_BASE.replace(/\/$/, "");
+  return `${backendBase}/${path.replace(/^\//, "")}`;
+}
+
+function formatSubmissionDate(dateStr?: string | null): string {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
+    return new Intl.DateTimeFormat("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d);
+  } catch {
+    return "";
+  }
+}
 
 
 
@@ -609,6 +658,7 @@ export default function DashboardPage() {
   const [selectedHotspot, setSelectedHotspot] =
     useState<DashboardHotspot | null>(null);
   const [loading, setLoading] = useState(false);
+  const [reportsLoading, setReportsLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mapRef = useRef<DemandHotspotMapHandle | null>(null);
@@ -619,14 +669,16 @@ export default function DashboardPage() {
     toastTimer.current = setTimeout(() => setToast(null), 2600);
   }, []);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (forceRefresh = false) => {
     setLoading(true);
+    setReportsLoading(true);
     const fallbackData = CONSTITUENCY_FALLBACKS[constituency] || CONSTITUENCY_FALLBACKS.khordha;
 
     try {
+      const refreshParam = forceRefresh ? "&refresh=true" : "";
       const response = await fetch(
-        `${API_BASE}/api/v1/dashboard?constituency=${constituency}&period=${period}&theme=${theme}&ward=all`,
-        { signal: AbortSignal.timeout(4500) },
+        `${API_BASE}/api/v1/dashboard?constituency=${constituency}&period=${period}&theme=${theme}&ward=all${refreshParam}`,
+        { signal: AbortSignal.timeout(15000) },
       );
       if (!response.ok) throw new Error("Dashboard API failed");
       const nextData = (await response.json()) as DashboardData;
@@ -640,13 +692,59 @@ export default function DashboardPage() {
       if (center) {
         mapRef.current?.flyTo(center.lat, center.lng, center.zoom);
       }
-    } catch {
+    } catch (fetchErr) {
+      console.warn("Dashboard API fetch delayed, attempting resilient direct recovery...", fetchErr);
       // Fall back to robust constituency baseline dataset
-      const populatedFallback = {
+      const populatedFallback: DashboardData = {
         ...fallbackData,
         period,
         lastUpdatedAt: new Date().toISOString(),
       };
+
+      // Resilient recovery: directly fetch submissions if dashboard aggregation was slow
+      try {
+        const subRes = await fetch(
+          `${API_BASE}/api/v1/submissions?constituency=${constituency}&limit=50`,
+          { signal: AbortSignal.timeout(8000) }
+        );
+        if (subRes.ok) {
+          const subs = await subRes.json();
+          if (Array.isArray(subs) && subs.length > 0) {
+            populatedFallback.recentSubmissions = subs.map((s: any) => ({
+              id: s.submission_id || s.id,
+              ward: s.ward || s.extracted?.problem_location || "Constituency Area",
+              block: s.block,
+              theme: s.theme || s.extracted?.issue_type || "road_repair",
+              language: s.language || "english",
+              channel: s.audio_url ? "voice" : s.photo_url ? "photo" : "text",
+              preview: s.content || s.transcript || "[Evidence Attached]",
+              translatedPreview: s.content || s.transcript || "[Evidence Attached]",
+              submittedMinsAgo: 5,
+              fullName: s.full_name,
+              full_name: s.full_name,
+              email: s.email,
+              phone: s.phone,
+              audioUrl: s.audio_url,
+              audio_url: s.audio_url,
+              photoUrl: s.photo_url,
+              photo_url: s.photo_url,
+              videoUrl: s.video_url,
+              video_url: s.video_url,
+              content: s.content,
+              transcript: s.transcript,
+              createdAt: s.created_at,
+              created_at: s.created_at,
+              latitude: s.latitude,
+              longitude: s.longitude,
+              status: s.status,
+              extracted: s.extracted,
+            }));
+          }
+        }
+      } catch (recoveryErr) {
+        console.warn("Direct submissions recovery error:", recoveryErr);
+      }
+
       setData(populatedFallback);
       const firstHotspot = populatedFallback.hotspots[0] ?? null;
       setSelectedHotspot(firstHotspot);
@@ -657,6 +755,7 @@ export default function DashboardPage() {
       }
     } finally {
       setLoading(false);
+      setReportsLoading(false);
     }
   }, [period, theme, constituency]);
 
@@ -765,7 +864,7 @@ export default function DashboardPage() {
             </select>
             <button
               type="button"
-              onClick={fetchData}
+              onClick={() => fetchData(true)}
               className="inline-flex items-center gap-2 rounded-lg border border-[#171817]/20 bg-white px-3 py-2 text-sm font-semibold shadow-sm hover:border-[#171817]/50"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -973,56 +1072,259 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-[#171817]/15 bg-white p-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between gap-3">
+        <section className="rounded-xl border border-[#171817]/15 bg-white p-5 shadow-sm">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[#171817]/10 pb-4">
             <div>
               <p className="font-mono text-xs uppercase tracking-wider text-[#e25a45]">
-                Recent Signals
+                Submitted Reports
               </p>
               <h2 className="text-xl font-black text-[#171817]">
-                Citizen submissions needing review
+                Submitted Reports ({data.recentSubmissions.length})
               </h2>
+              <p className="mt-1 text-xs text-[#171817]/60">
+                Live citizen reports with audible voice recordings, visible photo evidence, submitted complaints, and citizen credentials.
+              </p>
             </div>
-            <Users className="h-5 w-5 text-[#171817]/35" />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  showToast("Refreshing submitted reports from database...");
+                  fetchData(true);
+                }}
+                disabled={reportsLoading}
+                aria-label="Refresh submitted reports"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#171817]/20 bg-white px-3 py-1.5 text-xs font-bold text-[#171817] shadow-sm transition hover:bg-slate-50 hover:border-[#171817]/40 active:scale-95 disabled:opacity-60"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${reportsLoading ? "animate-spin text-[#e25a45]" : ""}`} />
+                {reportsLoading ? "Refreshing..." : "Refresh"}
+              </button>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-700">
+                <CheckCircle className="h-3.5 w-3.5" />
+                Live Database
+              </span>
+              <Link
+                href="/report"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#e25a45] px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#d44833]"
+              >
+                + Report an Issue
+              </Link>
+            </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {data.recentSubmissions.map((submission) => {
-              const meta = THEME_META[submission.theme];
-              return (
-                <article
-                  key={submission.id}
-                  className={`rounded-lg border p-3 ${meta.chip}`}
+
+          {/* Loading Bar for Submitted Reports */}
+          {reportsLoading && (
+            <div className="mb-5 overflow-hidden rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 p-3 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="inline-flex items-center gap-2 text-xs font-bold text-[#171817]">
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#e25a45]" />
+                  Loading Submitted Reports...
+                </span>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#e25a45]">
+                  Syncing Live Data
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-amber-200/60">
+                <div className="h-full w-full bg-gradient-to-r from-[#e25a45] via-amber-500 to-[#e25a45] animate-pulse rounded-full" />
+              </div>
+            </div>
+          )}
+
+          {reportsLoading && data.recentSubmissions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#171817]/20 bg-[#fbfbfa] py-12 px-4 text-center">
+              <RefreshCw className="h-8 w-8 animate-spin text-[#e25a45] mb-3" />
+              <h3 className="text-base font-bold text-[#171817]">Loading Submitted Reports...</h3>
+              <p className="mt-1 max-w-md text-xs text-[#171817]/60">
+                Retrieving verified citizen evidence, credentials, and attachments from the database.
+              </p>
+            </div>
+          ) : data.recentSubmissions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#171817]/20 bg-[#fbfbfa] py-12 px-4 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-[#171817]/40 mb-3">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-[#171817]">No Submitted Reports Found</h3>
+              <p className="mt-1 max-w-md text-xs text-[#171817]/60">
+                No citizen reports found for this constituency. Submit an issue in &apos;Report an Issue&apos; to see it appear here immediately.
+              </p>
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    showToast("Refreshing database reports...");
+                    fetchData(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#171817]/20 bg-white px-3 py-2 text-xs font-bold text-[#171817] shadow-sm hover:bg-slate-50 transition"
                 >
-                  <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold text-[#171817]/55">
-                    <span className="inline-flex items-center gap-1">
-                      {submission.channel === "voice" ? (
-                        <Mic className="h-3.5 w-3.5" />
-                      ) : submission.channel === "photo" ? (
-                        <MapPin className="h-3.5 w-3.5" />
-                      ) : (
-                        <MessageSquare className="h-3.5 w-3.5" />
-                      )}
-                      {submission.language} {submission.channel}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {timeAgo(submission.submittedMinsAgo)}
-                    </span>
-                  </div>
-                  <p className="text-xs font-bold capitalize text-[#171817]/70">
-                    {submission.ward} | {meta.label}
-                  </p>
-                  <p className="mt-2 text-sm italic text-[#171817]/70">
-                    {submission.translatedPreview}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-[#171817]/50">
+                  <RefreshCw className="h-3.5 w-3.5 text-[#e25a45]" /> Refresh Reports
+                </button>
+                <Link
+                  href="/report"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#171817] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#e25a45]"
+                >
+                  Submit Citizen Report <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {data.recentSubmissions.map((submission) => {
+                const meta = THEME_META[submission.theme as IssueTheme] || THEME_META.road_repair;
+                const audioSrc = resolveMediaUrl(submission.audioUrl || submission.audio_url);
+                const photoSrc = resolveMediaUrl(submission.photoUrl || submission.photo_url);
+                const videoSrc = resolveMediaUrl(submission.videoUrl || submission.video_url);
+                const fullName = submission.fullName || submission.full_name;
+                const email = submission.email;
+                const phone = submission.phone;
+                const submittedText = submission.content || submission.preview || submission.translatedPreview;
+                const transcript = submission.transcript;
+                const problemLocation = submission.extracted?.problem_location;
+                const formattedDate = formatSubmissionDate(submission.createdAt || submission.created_at);
+
+                return (
+                  <article
+                    key={submission.id}
+                    className="flex flex-col justify-between overflow-hidden rounded-xl border border-[#171817]/15 bg-white shadow-sm transition hover:shadow-md hover:border-[#171817]/30"
+                  >
+                    <div>
+                      {/* Card Header: Theme, Language, Channel, Time */}
+                      <div className="flex items-center justify-between gap-2 border-b border-[#171817]/10 bg-slate-50/70 p-3">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className={`rounded-md border px-2 py-0.5 text-xs font-bold ${meta.chip}`}>
+                            {meta.label}
+                          </span>
+                          <span className="rounded-md bg-white border border-[#171817]/10 px-2 py-0.5 text-[11px] font-semibold text-[#171817]/70 uppercase">
+                            {submission.language}
+                          </span>
+                          <span className="inline-flex items-center gap-1 rounded-md bg-white border border-[#171817]/10 px-2 py-0.5 text-[11px] font-semibold text-[#171817]/70">
+                            {audioSrc || submission.channel === "voice" ? (
+                              <><Mic className="h-3 w-3 text-[#e25a45]" /> Voice</>
+                            ) : photoSrc || submission.channel === "photo" ? (
+                              <><ImageIcon className="h-3 w-3 text-sky-600" /> Photo</>
+                            ) : (
+                              <><MessageSquare className="h-3 w-3 text-slate-600" /> Text</>
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-[#171817]/60 font-semibold">
+                          <Clock className="h-3 w-3" />
+                          {submission.submittedMinsAgo ? timeAgo(submission.submittedMinsAgo) : "Just now"}
+                        </div>
+                      </div>
+
+                      {/* Card Body */}
+                      <div className="space-y-3 p-4">
+                        {/* 1. Citizen Credentials (All credentials submitted by the user) */}
+                        <div className="rounded-lg border border-[#171817]/10 bg-[#fbfbfa] p-3 space-y-1.5 text-xs">
+                          <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#e25a45] mb-1 flex items-center justify-between">
+                            <span>Citizen Credentials</span>
+                            <span className="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.2 text-[9px] font-bold uppercase">
+                              {submission.status || "processed"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <User className="h-3.5 w-3.5 text-[#171817]/50 shrink-0" />
+                            <span className="font-bold text-[#171817] truncate">
+                              {fullName || "Anonymous Citizen"}
+                            </span>
+                          </div>
+                          {email && (
+                            <div className="flex items-center gap-2 text-[#171817]/75">
+                              <Mail className="h-3.5 w-3.5 text-[#171817]/40 shrink-0" />
+                              <span className="truncate">{email}</span>
+                            </div>
+                          )}
+                          {phone && (
+                            <div className="flex items-center gap-2 text-[#171817]/75">
+                              <Phone className="h-3.5 w-3.5 text-[#171817]/40 shrink-0" />
+                              <span>{phone}</span>
+                            </div>
+                          )}
+                          <div className="flex items-start gap-2 text-[#171817]/80 pt-1 border-t border-[#171817]/5">
+                            <MapPin className="h-3.5 w-3.5 text-[#e25a45] shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-semibold">{submission.ward || "Constituency Area"}</span>
+                              {submission.block && submission.block !== "unknown" && (
+                                <span className="text-[#171817]/60"> · {submission.block}</span>
+                              )}
+                              {problemLocation && (
+                                <p className="text-[11px] text-[#171817]/60 italic mt-0.5">{problemLocation}</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Text Submitted (Visible) */}
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#171817]/50">
+                            Submitted Text / Complaint
+                          </p>
+                          <div className="rounded-lg border border-[#171817]/10 bg-white p-3 text-xs leading-relaxed text-[#171817]">
+                            <p className="font-medium">{submittedText || "No additional text description provided."}</p>
+                            {transcript && transcript !== submittedText && (
+                              <div className="mt-2.5 pt-2 border-t border-dashed border-[#171817]/10">
+                                <span className="block text-[10px] font-bold uppercase tracking-wider text-violet-700 mb-0.5">
+                                  AI Audio Transcript:
+                                </span>
+                                <p className="text-xs italic text-[#171817]/80">{transcript}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 3. Voice Evidence (Audible) */}
+                        {audioSrc && (
+                          <AudioEvidencePlayer src={audioSrc} label="Voice Recording" />
+                        )}
+
+                        {/* 4. Photo Evidence (Visible) */}
+                        {photoSrc && (
+                          <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                            <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-slate-200 bg-white text-xs">
+                              <span className="inline-flex items-center gap-1.5 font-bold text-slate-700 text-[11px]">
+                                <ImageIcon className="h-3.5 w-3.5 text-slate-500" /> Photo Evidence
+                              </span>
+                              <a
+                                href={photoSrc}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#e25a45] hover:underline"
+                              >
+                                View full <ExternalLink className="h-3 w-3" />
+                              </a>
+                            </div>
+                            <div className="relative aspect-video w-full overflow-hidden bg-slate-100">
+                              <img
+                                src={photoSrc}
+                                alt={`Evidence for report in ${submission.ward}`}
+                                className="h-full w-full object-cover"
+                                loading="lazy"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 5. Video Evidence (if present) */}
+                        {videoSrc && (
+                          <VideoEvidencePlayer src={videoSrc} label="Video Evidence" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Card Footer: Reference ID & Timestamp */}
+                    <div className="border-t border-[#171817]/10 bg-slate-50/70 px-4 py-2.5 flex items-center justify-between text-[11px] text-[#171817]/50">
+                      <span className="font-mono">ID: {submission.id.slice(0, 8)}...</span>
+                      <span>{formattedDate || `${timeAgo(submission.submittedMinsAgo)}`}</span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#171817]/10 pt-4 text-xs text-[#171817]/60">
             <span>
-              Showing privacy-safe evidence from processed, validated submissions
-              only.
+              All reports shown are directly retrieved from the database with verified citizen credentials and evidence.
             </span>
             <Link
               href="/priorities"

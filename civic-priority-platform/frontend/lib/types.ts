@@ -63,6 +63,19 @@ export interface SubmissionResponse extends SubmissionAIResult {
   theme?: string;
   confidence?: number;
   message: string;
+  // Credentials
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  // Media
+  audio_url?: string;
+  photo_url?: string;
+  video_url?: string;
+  // Location
+  ward?: string;
+  block?: string;
+  // Timestamp
+  created_at?: string;
 }
 
 export interface HotspotItem {
@@ -209,12 +222,44 @@ export interface PortfolioResponse {
 export interface DashboardRecentSubmission {
   id: string;
   ward: string;
+  block?: string;
   theme: string;
   language?: string;
   channel?: SubmissionType;
   preview?: string;
   translatedPreview?: string;
   submittedMinsAgo?: number;
+  // Credentials
+  fullName?: string;
+  full_name?: string;
+  email?: string;
+  phone?: string;
+  // Media
+  audioUrl?: string;
+  audio_url?: string;
+  photoUrl?: string;
+  photo_url?: string;
+  videoUrl?: string;
+  video_url?: string;
+  // Content
+  content?: string;
+  transcript?: string;
+  // Location
+  latitude?: number;
+  longitude?: number;
+  // Status & time
+  status?: string;
+  createdAt?: string;
+  created_at?: string;
+  // AI extracted
+  extracted?: {
+    urgency?: string;
+    issue_type?: string;
+    problem_location?: string;
+    urgency_reason?: string;
+    beneficiaries_estimate?: string | null;
+    coordinates?: { lat: number; lng: number };
+  };
 }
 
 export interface DashboardResponse {

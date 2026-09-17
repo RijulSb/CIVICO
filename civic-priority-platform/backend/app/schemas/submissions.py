@@ -68,3 +68,13 @@ class SubmissionResponse(APIModel):
     formatted_text: dict[str, str | None] | None = None
     transcript: str | None = None
     extracted: dict[str, object] | None = None
+    full_name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    audio_url: str | None = None
+    photo_url: str | None = None
+    video_url: str | None = None
+    content: str | None = None
+    ward: str | None = None
+    block: str | None = None
+    created_at: datetime | None = None

@@ -23,6 +23,7 @@ import {
   subscribeQueueSync,
 } from "@/lib/offlineQueue";
 import { getReportCopy, type ReportUILanguage } from "@/lib/reportI18n";
+import { useAuth } from "@/lib/authContext";
 
 export type IntakeLanguage = ReportUILanguage;
 
@@ -47,12 +48,22 @@ export function CitizenSubmissionForm({
   onSubmitSuccess,
   className = "",
 }: CitizenSubmissionFormProps) {
+  const { user, isAuthenticated } = useAuth();
   const [text, setText] = React.useState("");
   const [language, setLanguage] = React.useState<IntakeLanguage>("english");
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [consent, setConsent] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.full_name && !fullName) setFullName(user.full_name);
+      if (user.email && !email) setEmail(user.email);
+      if (user.phone && !phone) setPhone(user.phone);
+      setConsent(true);
+    }
+  }, [isAuthenticated, user]);
   const [video, setVideo] = React.useState<File | null>(null);
   const [wardId] = React.useState("");
   const [photo, setPhoto] = React.useState<File | null>(null);
@@ -185,7 +196,7 @@ export function CitizenSubmissionForm({
           gps_accuracy_m: confirmedLocation?.accuracyMeters,
           gps_timestamp: confirmedLocation?.capturedAt,
           consent,
-
+          citizen_id: user?.id,
         });
         setSubmitStatus("processing");
         await new Promise<void>((resolve) => window.setTimeout(resolve, 2000));

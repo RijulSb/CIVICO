@@ -18,8 +18,7 @@ interface AddressSearchResponse {
   attribution: string;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_PREFIX = `${API_BASE}/api/v1`;
+import { API_PREFIX } from "@/lib/api";
 
 const CLIENT_LANDMARKS: Array<{ name: string; lat: number; lng: number }> = [
   { name: "Saheed Nagar, Bhubaneswar", lat: 20.2874, lng: 85.8378 },
@@ -87,10 +86,54 @@ export async function searchAddresses(
     attribution: "CIVICO Local Landmark Index",
   }));
 
-  return {
+    return {
     query: trimmed,
     results: fallbackResults,
     source: "Offline Client Landmark Fallback",
+    attribution: "CIVICO Local Landmark Index",
+  };
+}
+
+export async function reverseGeocode(
+  lat: number,
+  lng: number,
+  signal?: AbortSignal,
+): Promise<AddressSuggestion> {
+  try {
+    const params = new URLSearchParams({
+      lat: String(lat),
+      lng: String(lng),
+    });
+    const response = await fetch(`${API_PREFIX}/geocoding/reverse?${params}`, {
+      method: "GET",
+      signal,
+      headers: { Accept: "application/json" },
+    });
+
+    if (response.ok) {
+      return (await response.json()) as AddressSuggestion;
+    }
+  } catch (err) {
+    if ((err as Error).name === "AbortError") throw err;
+  }
+
+  let nearest = "Bhubaneswar, Odisha";
+  let minD = Infinity;
+  for (const lm of CLIENT_LANDMARKS) {
+    const d = (lat - lm.lat) ** 2 + (lng - lm.lng) ** 2;
+    if (d < minD) {
+      minD = d;
+      nearest = lm.name;
+    }
+  }
+
+  return {
+    id: `client-rev-${lat.toFixed(4)}-${lng.toFixed(4)}`,
+    display_name: `${nearest} (${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E)`,
+    latitude: lat,
+    longitude: lng,
+    precision: "place",
+    source: "Offline Client Landmark Index",
     attribution: "CIVICO Local Landmark Index",
   };
 }

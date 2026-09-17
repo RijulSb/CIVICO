@@ -12,9 +12,7 @@ import {
   Upload,
 } from "lucide-react";
 import Link from "next/link";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_PREFIX = `${API_BASE}/api/v1`;
+import { API_PREFIX } from "@/lib/api";
 
 type OutputFormat = "pdf" | "csv";
 type ReportLanguage = "en" | "hi" | "or";
@@ -24,6 +22,8 @@ const REPORT_LANGUAGES: Record<ReportLanguage, { label: string; title: string; s
   hi: { label: "हिंदी", title: "खोरधा विकास प्राथमिकता निर्णय संक्षेप", status: "प्रारूप अनुशंसा - प्राधिकरण की समीक्षा आवश्यक", generated: "निर्णय संक्षेप बनाएँ", selector: "रिपोर्ट भाषा", preview: "रिपोर्ट पूर्वावलोकन" },
   or: { label: "ଓଡ଼ିଆ", title: "ଖୋର୍ଦ୍ଧା ବିକାଶ ପ୍ରାଥମିକତା ନିଷ୍ପତ୍ତି ସଂକ୍ଷିପ୍ତ", status: "ଖସଡ଼ା ସୁପାରିଶ - କର୍ତ୍ତୃପକ୍ଷଙ୍କ ସମୀକ୍ଷା ଆବଶ୍ୟକ", generated: "ନିଷ୍ପତ୍ତି ସଂକ୍ଷିପ୍ତ ପ୍ରସ୍ତୁତ କରନ୍ତୁ", selector: "ରିପୋର୍ଟ ଭାଷା", preview: "ରିପୋର୍ଟ ପୂର୍ବାବଲୋକନ" },
 };
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 type SourceRun = {
   runId: string;

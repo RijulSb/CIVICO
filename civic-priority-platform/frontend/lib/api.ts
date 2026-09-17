@@ -15,8 +15,44 @@ import type {
   UserProfile,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_PREFIX = `${API_BASE}/api/v1`;
+export function getResolvedApiBase(): string {
+  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim()) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
+  }
+  if (typeof window !== "undefined") {
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return "http://localhost:8000";
+    }
+    // Deployed to production (e.g. Vercel) -> relative path routes through Next.js proxy rewrites
+    return "";
+  }
+  return process.env.NODE_ENV === "production"
+    ? "https://civico-backend-7cm1.onrender.com"
+    : "http://localhost:8000";
+}
+
+export const API_PREFIX = `${getResolvedApiBase()}/api/v1`;
+
+function getAlternateUrls(currentUrl: string): string[] {
+  const alts: string[] = [];
+  const remote = (process.env.NEXT_PUBLIC_REMOTE_API_URL || "https://civico-backend-7cm1.onrender.com").replace(/\/+$/, "");
+  const local = "http://localhost:8000";
+
+  if (currentUrl.startsWith("http")) {
+    // 1. Also try relative proxy via current origin
+    const relative = currentUrl.replace(/^https?:\/\/[^/]+/, "");
+    if (relative && relative !== currentUrl) alts.push(relative);
+  }
+
+  // 2. Cross-host failover between local and remote
+  if (currentUrl.includes("onrender.com")) {
+    alts.push(currentUrl.replace(remote, local));
+  } else if (currentUrl.includes("localhost:8000") || currentUrl.includes("127.0.0.1:8000")) {
+    alts.push(currentUrl.replace(local, remote));
+  }
+
+  return alts;
+}
 
 function getStoredToken(): string | null {
   if (typeof window !== "undefined") {
@@ -33,21 +69,46 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const isFormData =
     typeof FormData !== "undefined" && options?.body instanceof FormData;
   const token = getStoredToken();
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options?.headers || {}),
-    },
-  });
+  const reqHeaders = {
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options?.headers || {}),
+  };
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`API call failed: ${res.status} ${res.statusText} - ${errorText}`);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: reqHeaders,
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`API call failed: ${res.status} ${res.statusText} - ${errorText}`);
+    }
+
+    return (await res.json()) as T;
+  } catch (err: any) {
+    if (err instanceof TypeError || err.message?.includes("fetch")) {
+      const alternates = getAlternateUrls(url);
+      for (const altUrl of alternates) {
+        console.warn(
+          `[CIVICO API] Network call to ${url} failed. Attempting resilient failover to ${altUrl}...`
+        );
+        try {
+          const altRes = await fetch(altUrl, {
+            ...options,
+            headers: reqHeaders,
+          });
+          if (altRes.ok) {
+            return (await altRes.json()) as T;
+          }
+        } catch {
+          // Continue to next alternate failover
+        }
+      }
+    }
+    throw err;
   }
-
-  return res.json() as Promise<T>;
 }
 
 // ---------------------------------------------------------------------------
@@ -103,9 +164,18 @@ export async function createSubmission(
     if (payload.photo_url) formData.append("photo_url", payload.photo_url);
     if (payload.category) formData.append("category", payload.category);
     if (payload.citizen_id) formData.append("citizen_id", payload.citizen_id);
-    if (payload.audio_file) formData.append("audio", payload.audio_file, "civico-voice.webm");
-    if (payload.video_file) formData.append("video", payload.video_file, "civico-video.webm");
-    if (payload.photo_file) formData.append("photo", payload.photo_file, "civico-photo.jpg");
+    if (payload.audio_file) {
+      const audioName = (payload.audio_file as File)?.name || "civico-voice.webm";
+      formData.append("audio", payload.audio_file, audioName);
+    }
+    if (payload.video_file) {
+      const videoName = (payload.video_file as File)?.name || "civico-video.mp4";
+      formData.append("video", payload.video_file, videoName);
+    }
+    if (payload.photo_file) {
+      const photoName = (payload.photo_file as File)?.name || "civico-photo.jpg";
+      formData.append("photo", payload.photo_file, photoName);
+    }
 
     return fetchJson<SubmissionResponse>(`${API_PREFIX}/submissions`, {
       method: "POST",

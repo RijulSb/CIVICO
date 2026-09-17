@@ -34,13 +34,7 @@ CONSTITUENCY_DATA: dict[str, dict] = {
             {"id": "hotspot_ward1_road", "ward": "Ward 1", "block": "Chandrasekharpur Block", "theme": "road_repair", "latitude": 20.3250, "longitude": 85.8150, "intensity": "medium", "submissionCount": 67, "affectedPopulation": 8200, "evidenceCounts": {"text": 30, "voice": 22, "photo": 15}, "candidateProjectId": None, "infrastructureContext": {"roadCondition": "fair", "dailyCommuters": 3200, "nearestMarketDistanceKm": 2.1}, "suggestedProject": {"title": "Resurface 2.3 km internal roads in Ward 1", "estimatedCost": 35000000, "estimatedMonths": 4}, "representativeEvidence": [{"type": "text", "language": "odia", "translatedText": "Roads flood every monsoon. Residents have requested repair for 3 years."}]},
             {"id": "hotspot_ward2_health", "ward": "Ward 2", "block": "Patia Block", "theme": "health_access", "latitude": 20.3520, "longitude": 85.8180, "intensity": "medium", "submissionCount": 58, "affectedPopulation": 7400, "evidenceCounts": {"text": 28, "voice": 20, "photo": 10}, "candidateProjectId": None, "infrastructureContext": {"nearestPHCDistanceKm": 6.3, "ambulanceCoverage": False, "maternalHealthIncidents": 12}, "suggestedProject": {"title": "Establish sub-health centre in Ward 2", "estimatedCost": 25000000, "estimatedMonths": 5}, "representativeEvidence": [{"type": "voice", "language": "odia", "translatedText": "The nearest doctor is 6 km away. Pregnant women suffer during night emergencies."}]},
         ],
-        "recentSubmissions": [
-            {"id": "sub_001", "ward": "Ward 5", "theme": "road_repair", "language": "odia", "channel": "voice", "preview": "ରାସ୍ତା ବର୍ଷା ପରେ ଚଳାଚଳ ଅଯୋଗ୍ୟ ହୋଇଯାଏ।", "translatedPreview": "The road becomes unusable after rainfall.", "submittedMinsAgo": 4},
-            {"id": "sub_002", "ward": "Ward 8", "theme": "water_supply", "language": "hindi", "channel": "text", "preview": "पानी केवल 3 दिन आता है।", "translatedPreview": "Water arrives only 3 days a week.", "submittedMinsAgo": 11},
-            {"id": "sub_003", "ward": "Ward 3", "theme": "school_infrastructure", "language": "odia", "channel": "photo", "preview": "[Photo evidence attached]", "translatedPreview": "Leaking roof in classroom during monsoon.", "submittedMinsAgo": 23},
-            {"id": "sub_004", "ward": "Ward 1", "theme": "road_repair", "language": "english", "channel": "text", "preview": "Roads flood every monsoon.", "translatedPreview": "Roads flood every monsoon.", "submittedMinsAgo": 38},
-            {"id": "sub_005", "ward": "Ward 2", "theme": "health_access", "language": "odia", "channel": "voice", "preview": "ନିକଟସ୍ଥ ଡାକ୍ତର ୬ କିମି ଦୂରରେ।", "translatedPreview": "The nearest doctor is 6 km away.", "submittedMinsAgo": 55},
-        ],
+        "recentSubmissions": [],
     },
     "puri": {
         "label": "Puri",
@@ -58,11 +52,7 @@ CONSTITUENCY_DATA: dict[str, dict] = {
             {"id": "puri_hotspot_ward7_road", "ward": "Ward 7", "block": "Puri Block", "theme": "road_repair", "latitude": 19.8180, "longitude": 85.8260, "intensity": "high", "submissionCount": 89, "affectedPopulation": 10500, "evidenceCounts": {"text": 44, "voice": 29, "photo": 16}, "candidateProjectId": None, "infrastructureContext": {"roadCondition": "poor", "pilgrimTrafficDaily": 12000, "lastRepairYear": 2019}, "suggestedProject": {"title": "Repair 3.1 km pilgrim access road in Ward 7", "estimatedCost": 48000000, "estimatedMonths": 4}, "representativeEvidence": [{"type": "text", "language": "odia", "translatedText": "Pilgrims and residents both suffer on these broken roads."}]},
             {"id": "puri_hotspot_ward2_health", "ward": "Ward 2", "block": "Puri Block", "theme": "health_access", "latitude": 19.8060, "longitude": 85.8350, "intensity": "medium", "submissionCount": 74, "affectedPopulation": 9800, "evidenceCounts": {"text": 38, "voice": 25, "photo": 11}, "candidateProjectId": None, "infrastructureContext": {"nearestPHCDistanceKm": 4.8, "ambulanceCoverage": False, "seasonalCongestion": True}, "suggestedProject": {"title": "Open satellite health clinic in Ward 2", "estimatedCost": 22000000, "estimatedMonths": 4}, "representativeEvidence": [{"type": "voice", "language": "odia", "translatedText": "During festivals, even emergencies cannot reach the hospital quickly."}]},
         ],
-        "recentSubmissions": [
-            {"id": "puri_sub_001", "ward": "Ward 4", "theme": "water_supply", "language": "odia", "channel": "voice", "preview": "ପାଣି ଲୁଣ ହୋଇଗଲାଣି।", "translatedPreview": "The water has become too salty to drink.", "submittedMinsAgo": 7},
-            {"id": "puri_sub_002", "ward": "Ward 7", "theme": "road_repair", "language": "hindi", "channel": "text", "preview": "सड़क बहुत खराब है।", "translatedPreview": "The road is in very poor condition.", "submittedMinsAgo": 19},
-            {"id": "puri_sub_003", "ward": "Ward 2", "theme": "health_access", "language": "odia", "channel": "voice", "preview": "ଡାକ୍ତରଖାନା ବହୁ ଦୂରରେ।", "translatedPreview": "The hospital is very far away.", "submittedMinsAgo": 41},
-        ],
+        "recentSubmissions": [],
     },
     "cuttack": {
         "label": "Cuttack",
@@ -80,11 +70,7 @@ CONSTITUENCY_DATA: dict[str, dict] = {
             {"id": "cuttack_hotspot_ward3_health", "ward": "Ward 3", "block": "Cuttack Block", "theme": "health_access", "latitude": 20.4710, "longitude": 85.8780, "intensity": "high", "submissionCount": 96, "affectedPopulation": 13200, "evidenceCounts": {"text": 48, "voice": 32, "photo": 16}, "candidateProjectId": None, "infrastructureContext": {"nearestPHCDistanceKm": 7.1, "ambulanceCoverage": False, "maternalDeathRate": "high"}, "suggestedProject": {"title": "Establish maternity and primary care unit in Ward 3", "estimatedCost": 38000000, "estimatedMonths": 6}, "representativeEvidence": [{"type": "voice", "language": "hindi", "translatedText": "There is no doctor close by. Women in labour are transported in autorickshaws."}]},
             {"id": "cuttack_hotspot_ward9_water", "ward": "Ward 9", "block": "Cuttack Block", "theme": "water_supply", "latitude": 20.4560, "longitude": 85.8890, "intensity": "medium", "submissionCount": 78, "affectedPopulation": 10400, "evidenceCounts": {"text": 40, "voice": 26, "photo": 12}, "candidateProjectId": None, "infrastructureContext": {"pipedWaterCoverage": "44%", "floodContamination": True, "testingFrequency": "monthly"}, "suggestedProject": {"title": "Install water treatment and storage units in Ward 9", "estimatedCost": 42000000, "estimatedMonths": 5}, "representativeEvidence": [{"type": "text", "language": "odia", "translatedText": "After floods, the tap water smells bad and causes illness."}]},
         ],
-        "recentSubmissions": [
-            {"id": "cuttack_sub_001", "ward": "Ward 6", "theme": "road_repair", "language": "odia", "channel": "voice", "preview": "ବର୍ଷାରେ ରାସ୍ତା ଡୁବି ଯାଏ।", "translatedPreview": "The road gets submerged in the rain.", "submittedMinsAgo": 6},
-            {"id": "cuttack_sub_002", "ward": "Ward 3", "theme": "health_access", "language": "hindi", "channel": "text", "preview": "अस्पताल बहुत दूर है।", "translatedPreview": "The hospital is very far away.", "submittedMinsAgo": 22},
-            {"id": "cuttack_sub_003", "ward": "Ward 9", "theme": "water_supply", "language": "odia", "channel": "photo", "preview": "[Photo evidence attached]", "translatedPreview": "Flood water mixed with tap water after heavy rains.", "submittedMinsAgo": 48},
-        ],
+        "recentSubmissions": [],
     },
     "bhubaneswar": {
         "label": "Bhubaneswar",
@@ -102,11 +88,7 @@ CONSTITUENCY_DATA: dict[str, dict] = {
             {"id": "bbsr_hotspot_ward5_road", "ward": "Ward 5", "block": "Bhubaneswar Central", "theme": "road_repair", "latitude": 20.2961, "longitude": 85.8245, "intensity": "high", "submissionCount": 94, "affectedPopulation": 12800, "evidenceCounts": {"text": 48, "voice": 31, "photo": 15}, "candidateProjectId": None, "infrastructureContext": {"roadCondition": "poor", "constructionDamage": True, "dailyCommuters": 7200}, "suggestedProject": {"title": "Rehabilitate 3.4 km construction-damaged road in Ward 5", "estimatedCost": 52000000, "estimatedMonths": 5}, "representativeEvidence": [{"type": "text", "language": "english", "translatedText": "Construction trucks have destroyed the road surface. Commute takes twice as long."}]},
             {"id": "bbsr_hotspot_ward8_water", "ward": "Ward 8", "block": "Bhubaneswar South", "theme": "water_supply", "latitude": 20.2720, "longitude": 85.8150, "intensity": "medium", "submissionCount": 68, "affectedPopulation": 8900, "evidenceCounts": {"text": 34, "voice": 22, "photo": 12}, "candidateProjectId": None, "infrastructureContext": {"pipelineConnected": False, "tankerCostPerDay": 350, "householdsAffected": 2200}, "suggestedProject": {"title": "Lay 2.1 km water distribution pipeline in Ward 8", "estimatedCost": 28000000, "estimatedMonths": 4}, "representativeEvidence": [{"type": "voice", "language": "hindi", "translatedText": "We pay Rs 350 daily for tanker water. Pipeline connection has been promised for 2 years."}]},
         ],
-        "recentSubmissions": [
-            {"id": "bbsr_sub_001", "ward": "Ward 11", "theme": "street_lighting", "language": "english", "channel": "text", "preview": "No lights on the road near tech park.", "translatedPreview": "No lights on the road near tech park.", "submittedMinsAgo": 9},
-            {"id": "bbsr_sub_002", "ward": "Ward 5", "theme": "road_repair", "language": "hindi", "channel": "voice", "preview": "सड़क बिल्कुल टूट गई है।", "translatedPreview": "The road is completely broken.", "submittedMinsAgo": 27},
-            {"id": "bbsr_sub_003", "ward": "Ward 8", "theme": "water_supply", "language": "hindi", "channel": "text", "preview": "पाइपलाइन नहीं है।", "translatedPreview": "There is no water pipeline here.", "submittedMinsAgo": 51},
-        ],
+        "recentSubmissions": [],
     },
 }
 
@@ -151,6 +133,7 @@ async def get_dashboard(
     period: str = Query(default="30d"),
     theme: str = Query(default="all"),
     ward: str = Query(default="all"),
+    refresh: bool = Query(default=False),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     """Return live constituency analytics derived from persisted submissions."""
@@ -159,6 +142,7 @@ async def get_dashboard(
         period=period,
         theme=theme,
         ward=ward,
+        force_refresh=refresh,
     )
 
     c_key = constituency.lower().strip()

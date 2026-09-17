@@ -30,9 +30,40 @@ class TranscribedVoiceResult:
     source: str
 
 
+WHISPER_SILENCE_HALLUCINATIONS = {
+    "thank you",
+    "thank you.",
+    "thank you!",
+    "thank you very much",
+    "thank you very much.",
+    "thank you so much",
+    "thank you so much.",
+    "thanks for watching",
+    "thanks for watching.",
+    "thanks for watching!",
+    "thank you for watching",
+    "thank you for watching.",
+    "thank you for watching!",
+    "please subscribe",
+    "subscribe",
+    "bye",
+    "bye.",
+    "goodbye",
+    "you",
+    "you.",
+}
+
+
 def _is_usable_transcript(text: str) -> bool:
-    """Reject silence/noise artifacts such as '.', empty strings, or symbols only."""
-    return sum(1 for char in text if char.isalnum()) >= MIN_TRANSCRIPT_ALNUM_CHARS
+    """Reject silence/noise artifacts such as '.', empty strings, or known Whisper silence hallucinations."""
+    if sum(1 for char in text if char.isalnum()) < MIN_TRANSCRIPT_ALNUM_CHARS:
+        return False
+    cleaned = text.strip().lower()
+    if cleaned in WHISPER_SILENCE_HALLUCINATIONS or cleaned.rstrip(".!?,") in {
+        h.rstrip(".!?,") for h in WHISPER_SILENCE_HALLUCINATIONS
+    }:
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------

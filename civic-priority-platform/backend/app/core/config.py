@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     readiness_timeout_seconds: float = 1.0
     cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,https://civico.vercel.app"
-    cors_origin_regex: str = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+    cors_origin_regex: str = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$|^https://([a-zA-Z0-9_-]+\.)*vercel\.app$"
     log_level: str = "INFO"
     jwt_secret_key: str = "development-only-change-me"
     civico_api_key: str = "civ_dev_secret_key_change-me"
@@ -23,9 +23,9 @@ class Settings(BaseSettings):
     rate_limit_per_minute: int = 10
     max_content_length_bytes: int = 10 * 1024 * 1024
     database_url: str = "postgresql+asyncpg://civico:change-me-local-only@127.0.0.1:5432/civico"
-    database_pool_size: int = 5
-    database_max_overflow: int = 10
-    database_pool_timeout: float = 30.0
+    database_pool_size: int = 2
+    database_max_overflow: int = 5
+    database_pool_timeout: float = 60.0
 
     @field_validator("rate_limit_per_minute")
     @classmethod

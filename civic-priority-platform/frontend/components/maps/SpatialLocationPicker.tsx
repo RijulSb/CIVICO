@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import {
+  reverseGeocode,
   searchAddresses,
   type AddressSuggestion,
   type IntakeLanguage,
@@ -188,69 +189,126 @@ export function SpatialLocationPicker({
     setIsConfirmed(false);
   };
 
-  const useGpsSuggestion = () => {
+  const useGpsSuggestion = async () => {
     if (!gpsSuggestion) return;
-    setCurrentCoords({ lat: gpsSuggestion.lat, lng: gpsSuggestion.lng });
-    setAccuracyMeters(gpsSuggestion.accuracyMeters);
+    const { lat, lng, accuracyMeters: acc } = gpsSuggestion;
+    setCurrentCoords({ lat, lng });
+    setAccuracyMeters(acc);
     setLocationSource("gps");
     setPrecision("gps");
-    setIsConfirmed(false);
     setLocationError("");
+    try {
+      const rev = await reverseGeocode(lat, lng);
+      if (rev?.display_name) {
+        setSelectedAddress(rev.display_name);
+        setAddressQuery(rev.display_name);
+        setIsConfirmed(true);
+        onLocationConfirmed({
+          lat,
+          lng,
+          address: rev.display_name,
+          customText: rev.display_name,
+          accuracyMeters: acc,
+          capturedAt: new Date().toISOString(),
+          source: "gps",
+          precision: "gps",
+        });
+        return;
+      }
+    } catch {
+      // Fall through to fallback coordinate label
+    }
+    const fallbackText = `GPS Location (${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E)`;
+    setSelectedAddress(fallbackText);
+    setAddressQuery(fallbackText);
+    setIsConfirmed(true);
+    onLocationConfirmed({
+      lat,
+      lng,
+      address: fallbackText,
+      customText: fallbackText,
+      accuracyMeters: acc,
+      capturedAt: new Date().toISOString(),
+      source: "gps",
+      precision: "gps",
+    });
   };
 
   const handleGetCurrentLocation = () => {
     if (!("geolocation" in navigator)) {
-      setLocationError(
-        ui.location.gpsUnavailable,
-      );
+      setLocationError(ui.location.gpsUnavailable);
       return;
     }
 
     setIsLocating(true);
     setLocationError("");
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCurrentCoords({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        setAccuracyMeters(
-          Number.isFinite(position.coords.accuracy)
-            ? position.coords.accuracy
-            : undefined,
-        );
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const acc = Number.isFinite(position.coords.accuracy)
+          ? position.coords.accuracy
+          : undefined;
+
+        setCurrentCoords({ lat, lng });
+        setAccuracyMeters(acc);
         setLocationSource("gps");
         setPrecision("gps");
-        setIsConfirmed(false);
-        setIsLocating(false);
+
+        try {
+          const rev = await reverseGeocode(lat, lng);
+          const resolvedAddress = rev?.display_name || `GPS Location (${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E)`;
+          setSelectedAddress(resolvedAddress);
+          setAddressQuery(resolvedAddress);
+          setIsConfirmed(true);
+          onLocationConfirmed({
+            lat,
+            lng,
+            address: resolvedAddress,
+            customText: resolvedAddress,
+            accuracyMeters: acc,
+            capturedAt: new Date().toISOString(),
+            source: "gps",
+            precision: "gps",
+          });
+        } catch {
+          const fallbackText = `GPS Location (${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E)`;
+          setSelectedAddress(fallbackText);
+          setAddressQuery(fallbackText);
+          setIsConfirmed(true);
+          onLocationConfirmed({
+            lat,
+            lng,
+            address: fallbackText,
+            customText: fallbackText,
+            accuracyMeters: acc,
+            capturedAt: new Date().toISOString(),
+            source: "gps",
+            precision: "gps",
+          });
+        } finally {
+          setIsLocating(false);
+        }
       },
       (err) => {
         if (err.code === err.PERMISSION_DENIED) {
-          setLocationError(
-            ui.location.gpsDenied,
-          );
+          setLocationError(ui.location.gpsDenied);
         } else if (err.code === err.POSITION_UNAVAILABLE) {
-          setLocationError(
-            ui.location.gpsUnavailable,
-          );
+          setLocationError(ui.location.gpsUnavailable);
         } else {
-          setLocationError(
-            ui.location.gpsFailed,
-          );
+          setLocationError(ui.location.gpsFailed);
         }
         setIsLocating(false);
       },
-
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 },
     );
   };
 
   const handleConfirm = () => {
-    const customText = selectedAddress || addressQuery.trim();
-    if (!customText) {
-      setLocationError("Add a nearby landmark, road, ward, or address before confirming.");
-      return;
-    }
+    const customText =
+      selectedAddress ||
+      addressQuery.trim() ||
+      `GPS Location (${currentCoords.lat.toFixed(4)}° N, ${currentCoords.lng.toFixed(4)}° E)`;
     setIsConfirmed(true);
     onLocationConfirmed({
       lat: currentCoords.lat,

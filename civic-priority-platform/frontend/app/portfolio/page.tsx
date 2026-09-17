@@ -6,28 +6,37 @@ import {
   AlertTriangle,
   ArrowRight,
   BarChart3,
+  Calendar,
   CheckCircle2,
   ChevronRight,
   CircleHelp,
+  ExternalLink,
   FileText,
   Gauge,
+  Image as ImageIcon,
   IndianRupee,
   Info,
   Layers3,
   LockKeyhole,
+  Mail,
   MapPin,
+  Phone,
   RefreshCw,
   Scale,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   Target,
+  User,
   Users,
+  Volume2,
   X,
   XCircle,
 } from "lucide-react";
 
+
 import Header from "@/components/layout/Header";
+import { AudioEvidencePlayer } from "@/components/media/MediaEvidencePlayers";
 import { useAuth } from "@/lib/authContext";
 import { createPortfolio, generateRanking, getDashboard, getSubmissions } from "@/lib/api";
 import { sanitizeOdiaDisplay } from "@/lib/reportI18n";
@@ -118,56 +127,12 @@ function ConstraintExplanationsPanel({ explanations }: { explanations: Constrain
 }
 
 // ---------------------------------------------------------------------------
-// Fallback data
+// Fallback data — empty so only real DB data is displayed
 // ---------------------------------------------------------------------------
 
-const fallbackReports: SubmissionResponse[] = [
-  {
-    submission_id: "CIV-2845",
-    status: "processed",
-    theme: "Road safety",
-    confidence: 0.94,
-    message: "Validated citizen report",
-    formatted_text: { en: "Potholes and broken shoulders make the road unsafe for school buses and daily commuters." },
-    extracted: {
-      issue_type: "Road repair",
-      problem_location: "Ward 5, Saheed Nagar connector",
-      urgency: "high",
-      urgency_reason: "Frequent near-misses during school and office hours.",
-      beneficiaries_estimate: "15,000 residents",
-    },
-  },
-  {
-    submission_id: "CIV-2814",
-    status: "processed",
-    theme: "School infrastructure",
-    confidence: 0.89,
-    message: "Validated citizen report",
-    formatted_text: { en: "The government school needs a science lab and additional classrooms for the current enrolment." },
-    extracted: {
-      issue_type: "School upgrade",
-      problem_location: "Ward 12, School Sector",
-      urgency: "medium",
-      urgency_reason: "Capacity is below current enrolment.",
-      beneficiaries_estimate: "1,100 students",
-    },
-  },
-  {
-    submission_id: "CIV-2772",
-    status: "processed",
-    theme: "Health access",
-    confidence: 0.86,
-    message: "Validated citizen report",
-    formatted_text: { en: "The nearest hospital is too far for older residents and families without reliable transport." },
-    extracted: {
-      issue_type: "Health access",
-      problem_location: "Ward 8, Bhauma Nagar",
-      urgency: "high",
-      urgency_reason: "Long travel distance to secondary care.",
-      beneficiaries_estimate: "28,000 residents",
-    },
-  },
-];
+const fallbackReports: SubmissionResponse[] = [];
+
+
 
 // ---------------------------------------------------------------------------
 // Utility helpers
@@ -200,20 +165,67 @@ function reportTheme(report: SubmissionResponse) {
   return report.theme || report.extracted?.issue_type || "Unclassified issue";
 }
 
+function resolveMediaUrl(path?: string | null): string | null {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  // proxy via Next.js rewrite (next.config.ts maps /media/* → backend)
+  return path.startsWith("/media") ? path : `/media/${path}`;
+}
+
+function formatSubmissionDate(iso?: string | null): string {
+  if (!iso) return "";
+  try {
+    return new Intl.DateTimeFormat("en-IN", {
+      day: "numeric", month: "short", year: "numeric",
+      hour: "2-digit", minute: "2-digit",
+    }).format(new Date(iso));
+  } catch {
+    return iso;
+  }
+}
+
 function normalizeRecentSubmission(report: DashboardRecentSubmission): SubmissionResponse {
-  const text = report.translatedPreview || report.preview || "Citizen report received for validation.";
+  const text =
+    report.content ||
+    report.translatedPreview ||
+    report.preview ||
+    "Citizen report received for validation.";
   return {
     submission_id: report.id,
-    status: "processed",
+    status: (report.status as "pending" | "processed" | "rejected") ?? "processed",
     theme: report.theme,
     message: "Submission received from live dashboard analytics.",
     formatted_text: { en: text },
+    transcript: report.transcript ?? undefined,
+    // Credentials
+    full_name: report.fullName ?? report.full_name,
+    email: report.email,
+    phone: report.phone,
+    // Media
+    audio_url: report.audioUrl ?? report.audio_url,
+    photo_url: report.photoUrl ?? report.photo_url,
+    video_url: report.videoUrl ?? report.video_url,
+    // Location
+    ward: report.ward,
+    block: report.block,
+    // Time
+    created_at: report.createdAt ?? report.created_at,
     extracted: {
-      issue_type: report.theme,
-      problem_location: report.ward,
-      urgency: "medium",
-      urgency_reason: "Urgency requires review from the persisted submission record.",
-      beneficiaries_estimate: "Pending population-context calculation",
+      issue_type: report.extracted?.issue_type ?? report.theme,
+      problem_location:
+        report.extracted?.problem_location ??
+        [report.ward, report.block].filter(Boolean).join(", ") ??
+        "Location pending verification",
+      urgency: (report.extracted?.urgency as "low" | "medium" | "high") ?? "medium",
+      urgency_reason:
+        report.extracted?.urgency_reason ??
+        "Urgency requires review from the persisted submission record.",
+      beneficiaries_estimate:
+        report.extracted?.beneficiaries_estimate ?? "Pending population-context calculation",
+      coordinates: report.extracted?.coordinates ??
+        (report.latitude && report.longitude
+          ? { lat: report.latitude, lng: report.longitude }
+          : undefined),
     },
   };
 }
@@ -538,13 +550,251 @@ export default function PortfolioPage() {
 
         {/* Evidence intake section */}
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,23,42,0.04)] sm:p-7">
-          <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center"><div><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500"><FileText className="h-4 w-4" /> Evidence intake</div><h2 className="mt-2 text-2xl font-black">Submitted reports powering this scenario</h2><p className="mt-1 text-sm text-slate-500">These records originate in the <Link href="/report" className="font-bold text-emerald-700 hover:underline">Report an Issue</Link> workflow and are shown here as planning evidence, not as raw votes.</p></div><div className="flex rounded-xl bg-slate-100 p-1 text-sm font-bold"><button onClick={() => setActiveTab("portfolio")} className={`rounded-lg px-3 py-2 ${activeTab === "portfolio" ? "bg-white shadow-sm" : "text-slate-500"}`}>Portfolio view</button><button onClick={() => setActiveTab("reports")} className={`rounded-lg px-3 py-2 ${activeTab === "reports" ? "bg-white shadow-sm" : "text-slate-500"}`}>All reports</button></div></div>
-          <div className="mt-5 grid gap-3 rounded-2xl bg-slate-50 p-3 sm:grid-cols-[1fr_180px_150px]"><label className="relative block"><span className="sr-only">Search submitted reports</span><FileText className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input value={reportSearch} onChange={(event) => setReportSearch(event.target.value)} placeholder="Search ID, theme or text" className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-emerald-600" /></label><label><span className="sr-only">Filter by theme</span><select value={reportThemeFilter} onChange={(event) => setReportThemeFilter(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-emerald-600"><option value="all">All themes</option>{reportThemes.map((theme) => <option key={theme} value={theme}>{theme}</option>)}</select></label><label><span className="sr-only">Filter by status</span><select value={reportStatusFilter} onChange={(event) => setReportStatusFilter(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-emerald-600"><option value="all">All statuses</option><option value="processed">Processed</option><option value="pending">Pending</option><option value="rejected">Rejected</option></select></label></div>
-          {activeTab === "portfolio" ? <div className="mt-5 grid gap-3 md:grid-cols-3">{filteredReports.slice(0, 3).map((report) => <button key={report.submission_id} onClick={() => setSelectedReport(report)} className="rounded-2xl border border-slate-200 p-4 text-left transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md"><div className="flex items-center justify-between"><span className="font-mono text-xs text-slate-500">{report.submission_id}</span><span className={`rounded-full px-2 py-1 text-[10px] font-black uppercase ${reportUrgency(report) === "high" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"}`}>{reportUrgency(report)} urgency</span></div><div className="mt-3 font-bold">{reportTheme(report)}</div><p className="mt-2 line-clamp-2 text-sm leading-5 text-slate-600">{reportSnippet(report)}</p><div className="mt-4 flex items-center gap-1 text-xs font-bold text-emerald-700">View evidence <ArrowRight className="h-3 w-3" /></div></button>)}</div> : <div className="mt-5 overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead><tr className="border-b border-slate-100 text-[11px] uppercase tracking-wider text-slate-500"><th className="pb-3">ID</th><th className="pb-3">Theme</th><th className="pb-3">Location</th><th className="pb-3">Urgency</th><th className="pb-3">Confidence</th><th className="pb-3">Status</th></tr></thead><tbody>{filteredReports.map((report) => <tr key={report.submission_id} onClick={() => setSelectedReport(report)} className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50"><td className="py-3 font-mono text-xs">{report.submission_id}</td><td className="py-3 font-semibold">{reportTheme(report)}</td><td className="py-3 text-slate-600">{reportWard(report)}</td><td className="py-3 capitalize">{reportUrgency(report)}</td><td className="py-3">{report.confidence ? `${Math.round(report.confidence * 100)}%` : "Pending"}</td><td className="py-3"><span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700">{report.status}</span></td></tr>)}</tbody></table></div>}
+          <div className="flex flex-col justify-between gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500"><FileText className="h-4 w-4" /> Evidence intake</div>
+              <h2 className="mt-2 text-2xl font-black">Submitted reports powering this scenario</h2>
+              <p className="mt-1 text-sm text-slate-500">These records originate in the <Link href="/report" className="font-bold text-emerald-700 hover:underline">Report an Issue</Link> workflow and are shown here as planning evidence, not as raw votes.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-emerald-700">Live Database</span>
+              <div className="flex rounded-xl bg-slate-100 p-1 text-sm font-bold">
+                <button onClick={() => setActiveTab("portfolio")} className={`rounded-lg px-3 py-2 ${activeTab === "portfolio" ? "bg-white shadow-sm" : "text-slate-500"}`}>Portfolio view</button>
+                <button onClick={() => setActiveTab("reports")} className={`rounded-lg px-3 py-2 ${activeTab === "reports" ? "bg-white shadow-sm" : "text-slate-500"}`}>All reports</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="mt-5 grid gap-3 rounded-2xl bg-slate-50 p-3 sm:grid-cols-[1fr_180px_150px]">
+            <label className="relative block">
+              <span className="sr-only">Search submitted reports</span>
+              <FileText className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <input value={reportSearch} onChange={(event) => setReportSearch(event.target.value)} placeholder="Search ID, theme, name or text" className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-emerald-600" />
+            </label>
+            <label>
+              <span className="sr-only">Filter by theme</span>
+              <select value={reportThemeFilter} onChange={(event) => setReportThemeFilter(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-emerald-600">
+                <option value="all">All themes</option>
+                {reportThemes.map((theme) => <option key={theme} value={theme}>{theme}</option>)}
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">Filter by status</span>
+              <select value={reportStatusFilter} onChange={(event) => setReportStatusFilter(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold outline-none focus:border-emerald-600">
+                <option value="all">All statuses</option>
+                <option value="processed">Processed</option>
+                <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </label>
+          </div>
+
+          {/* Portfolio card grid */}
+          {activeTab === "portfolio" ? (
+            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {filteredReports.slice(0, 6).map((report) => {
+                const audioSrc = resolveMediaUrl(report.audio_url);
+                const photoSrc = resolveMediaUrl(report.photo_url);
+                const submitterName = report.full_name;
+                const submitterEmail = report.email;
+                const submitterPhone = report.phone;
+                const location = reportWard(report);
+                const ward = report.ward;
+                const block = report.block;
+                return (
+                  <div key={report.submission_id} className="flex flex-col rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-400 hover:shadow-md">
+                    {/* Photo banner */}
+                    {photoSrc && (
+                      <a href={photoSrc} target="_blank" rel="noopener noreferrer" className="block">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={photoSrc} alt="Submitted photo" className="h-40 w-full object-cover" />
+                      </a>
+                    )}
+                    <div className="flex flex-1 flex-col gap-3 p-4">
+                      {/* Header */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono text-[10px] text-slate-400">{report.submission_id.slice(0, 8)}…</span>
+                        <span className={`rounded-full px-2 py-1 text-[10px] font-black uppercase ${reportUrgency(report) === "high" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"}`}>{reportUrgency(report)} urgency</span>
+                      </div>
+
+                      {/* Theme badge */}
+                      <div className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">{reportTheme(report)}</div>
+
+                      {/* Complaint text */}
+                      <p className="line-clamp-3 text-sm leading-5 text-slate-700">{reportSnippet(report)}</p>
+
+                      {/* Audio player */}
+                      {audioSrc && (
+                        <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 p-2">
+                          <Volume2 className="h-4 w-4 shrink-0 text-emerald-700" />
+                          <audio controls src={audioSrc} className="h-8 w-full min-w-0" preload="none" />
+                        </div>
+                      )}
+
+                      {/* Citizen credentials */}
+                      {(submitterName || submitterEmail || submitterPhone) && (
+                        <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-1.5 text-xs">
+                          {submitterName && <div className="flex items-center gap-2 font-semibold"><User className="h-3.5 w-3.5 text-slate-500" />{submitterName}</div>}
+                          {submitterEmail && <div className="flex items-center gap-2 text-slate-600"><Mail className="h-3.5 w-3.5 text-slate-400" />{submitterEmail}</div>}
+                          {submitterPhone && <div className="flex items-center gap-2 text-slate-600"><Phone className="h-3.5 w-3.5 text-slate-400" />{submitterPhone}</div>}
+                        </div>
+                      )}
+
+                      {/* Location */}
+                      <div className="flex items-start gap-2 text-xs text-slate-600">
+                        <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                        <span>{location}{block && block !== ward ? ` · ${block}` : ""}</span>
+                      </div>
+
+                      {/* Footer */}
+                      <button onClick={() => setSelectedReport(report)} className="mt-auto flex items-center gap-1 text-xs font-bold text-emerald-700 hover:underline">
+                        View full evidence <ArrowRight className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+              {filteredReports.length === 0 && (
+                <div className="col-span-3 py-12 text-center text-slate-500">
+                  <FileText className="mx-auto mb-3 h-8 w-8 text-slate-300" />
+                  <p className="font-semibold">No submitted reports found</p>
+                  <p className="mt-1 text-xs">Use the <Link href="/report" className="font-bold text-emerald-700 hover:underline">Report an Issue</Link> page to submit the first report.</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* All reports table */
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[780px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[11px] uppercase tracking-wider text-slate-500">
+                    <th className="pb-3">ID</th>
+                    <th className="pb-3">Citizen</th>
+                    <th className="pb-3">Theme</th>
+                    <th className="pb-3">Location</th>
+                    <th className="pb-3">Media</th>
+                    <th className="pb-3">Urgency</th>
+                    <th className="pb-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredReports.map((report) => (
+                    <tr key={report.submission_id} onClick={() => setSelectedReport(report)} className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                      <td className="py-3 font-mono text-xs text-slate-400">{report.submission_id.slice(0, 8)}…</td>
+                      <td className="py-3">
+                        <div className="font-semibold">{report.full_name || "—"}</div>
+                        <div className="text-xs text-slate-500">{report.phone || report.email || ""}</div>
+                      </td>
+                      <td className="py-3 font-semibold">{reportTheme(report)}</td>
+                      <td className="py-3 text-slate-600">{reportWard(report)}</td>
+                      <td className="py-3">
+                        <div className="flex items-center gap-1.5">
+                          {report.audio_url && <Volume2 className="h-3.5 w-3.5 text-emerald-600" />}
+                          {report.photo_url && <ImageIcon className="h-3.5 w-3.5 text-blue-500" />}
+                          {report.video_url && <ExternalLink className="h-3.5 w-3.5 text-violet-500" />}
+                          {!report.audio_url && !report.photo_url && !report.video_url && <span className="text-xs text-slate-400">Text</span>}
+                        </div>
+                      </td>
+                      <td className="py-3 capitalize">{reportUrgency(report)}</td>
+                      <td className="py-3"><span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700">{report.status}</span></td>
+                    </tr>
+                  ))}
+                  {filteredReports.length === 0 && (
+                    <tr><td colSpan={7} className="py-8 text-center text-slate-500">No reports match your filters.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       </div>
 
-      {selectedReport && <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/40 p-0 sm:items-center sm:p-6" onClick={() => setSelectedReport(null)}><div role="dialog" aria-modal="true" aria-label="Submitted report details" onClick={(event) => event.stopPropagation()} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl sm:p-8"><div className="flex items-start justify-between gap-4"><div><div className="font-mono text-xs text-slate-500">{selectedReport.submission_id}</div><h2 className="mt-2 text-2xl font-black">{reportTheme(selectedReport)}</h2></div><button onClick={() => setSelectedReport(null)} aria-label="Close report details" className="rounded-xl p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button></div><div className="mt-6 grid gap-3 sm:grid-cols-3"><div className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-bold uppercase text-slate-500">Status</div><div className="mt-2 font-bold capitalize">{selectedReport.status}</div></div><div className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-bold uppercase text-slate-500">Urgency</div><div className="mt-2 font-bold capitalize">{reportUrgency(selectedReport)}</div></div><div className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-bold uppercase text-slate-500">AI confidence</div><div className="mt-2 font-bold">{selectedReport.confidence ? `${Math.round(selectedReport.confidence * 100)}%` : "Pending"}</div></div></div><div className="mt-6"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500"><MapPin className="h-4 w-4" /> Normalized location</div><p className="mt-2 text-sm font-semibold">{reportWard(selectedReport)}</p></div><div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500"><Info className="h-4 w-4" /> Formatted citizen statement</div><p className="mt-3 text-sm leading-6 text-slate-700">{reportSnippet(selectedReport)}</p></div><div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-5"><div className="text-xs font-bold uppercase tracking-wider text-emerald-700">Extracted planning signal</div><p className="mt-2 text-sm leading-6 text-emerald-950">{selectedReport.extracted?.urgency_reason || "This report is retained as evidence for theme aggregation and review."}</p><div className="mt-3 text-xs font-semibold text-emerald-800">Beneficiary hint: {selectedReport.extracted?.beneficiaries_estimate || "Pending estimation"}</div></div></div></div>}
+      {/* Report detail modal */}
+      {selectedReport && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/40 p-0 sm:items-center sm:p-6" onClick={() => setSelectedReport(null)}>
+          <div role="dialog" aria-modal="true" aria-label="Submitted report details" onClick={(event) => event.stopPropagation()} className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl sm:rounded-3xl sm:p-8">
+            {/* Modal header */}
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="font-mono text-xs text-slate-400">{selectedReport.submission_id}</div>
+                <h2 className="mt-2 text-2xl font-black">{reportTheme(selectedReport)}</h2>
+                {selectedReport.created_at && (
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                    <Calendar className="h-3.5 w-3.5" />{formatSubmissionDate(selectedReport.created_at)}
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setSelectedReport(null)} aria-label="Close report details" className="rounded-xl p-2 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button>
+            </div>
+
+            {/* Status pills */}
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-bold uppercase text-slate-500">Status</div><div className="mt-2 font-bold capitalize">{selectedReport.status}</div></div>
+              <div className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-bold uppercase text-slate-500">Urgency</div><div className="mt-2 font-bold capitalize">{reportUrgency(selectedReport)}</div></div>
+              <div className="rounded-2xl bg-slate-50 p-4"><div className="text-xs font-bold uppercase text-slate-500">AI confidence</div><div className="mt-2 font-bold">{selectedReport.confidence ? `${Math.round(selectedReport.confidence * 100)}%` : "Pending"}</div></div>
+            </div>
+
+            {/* Citizen credentials */}
+            {(selectedReport.full_name || selectedReport.email || selectedReport.phone) && (
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-3"><User className="h-4 w-4" /> Citizen credentials</div>
+                <div className="space-y-2">
+                  {selectedReport.full_name && <div className="flex items-center gap-2 text-sm font-semibold"><User className="h-4 w-4 text-slate-400" />{selectedReport.full_name}</div>}
+                  {selectedReport.email && <div className="flex items-center gap-2 text-sm text-slate-600"><Mail className="h-4 w-4 text-slate-400" />{selectedReport.email}</div>}
+                  {selectedReport.phone && <div className="flex items-center gap-2 text-sm text-slate-600"><Phone className="h-4 w-4 text-slate-400" />{selectedReport.phone}</div>}
+                </div>
+              </div>
+            )}
+
+            {/* Location */}
+            <div className="mt-5">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500"><MapPin className="h-4 w-4" /> Location</div>
+              <p className="mt-2 text-sm font-semibold">{reportWard(selectedReport)}</p>
+              {selectedReport.ward && <p className="mt-0.5 text-xs text-slate-500">{[selectedReport.ward, selectedReport.block].filter(Boolean).join(" · ")}</p>}
+              {selectedReport.extracted?.coordinates && (
+                <p className="mt-1 font-mono text-xs text-slate-400">
+                  {selectedReport.extracted.coordinates.lat.toFixed(5)}, {selectedReport.extracted.coordinates.lng.toFixed(5)}
+                </p>
+              )}
+            </div>
+
+            {/* Complaint text */}
+            <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-3"><Info className="h-4 w-4" /> Citizen statement</div>
+              <p className="text-sm leading-6 text-slate-700">{reportSnippet(selectedReport)}</p>
+            </div>
+
+            {/* Audio */}
+            {resolveMediaUrl(selectedReport.audio_url) && (
+              <div className="mt-5">
+                <AudioEvidencePlayer src={resolveMediaUrl(selectedReport.audio_url)!} label="Voice Recording" />
+              </div>
+            )}
+
+            {/* Photo */}
+            {resolveMediaUrl(selectedReport.photo_url) && (
+              <div className="mt-5">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-2"><ImageIcon className="h-4 w-4" /> Submitted photo</div>
+                <a href={resolveMediaUrl(selectedReport.photo_url)!} target="_blank" rel="noopener noreferrer" className="group relative block overflow-hidden rounded-2xl border border-slate-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={resolveMediaUrl(selectedReport.photo_url)!} alt="Submitted photo" className="max-h-72 w-full object-cover" />
+                  <div className="absolute inset-0 flex items-end justify-end bg-transparent p-3 group-hover:bg-slate-950/10">
+                    <ExternalLink className="h-5 w-5 text-white drop-shadow-md opacity-0 group-hover:opacity-100 transition" />
+                  </div>
+                </a>
+              </div>
+            )}
+
+            {/* AI planning signal */}
+            <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+              <div className="text-xs font-bold uppercase tracking-wider text-emerald-700">Extracted planning signal</div>
+              <p className="mt-2 text-sm leading-6 text-emerald-950">{selectedReport.extracted?.urgency_reason || "This report is retained as evidence for theme aggregation and review."}</p>
+              <div className="mt-3 text-xs font-semibold text-emerald-800">Beneficiary hint: {selectedReport.extracted?.beneficiaries_estimate || "Pending estimation"}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
