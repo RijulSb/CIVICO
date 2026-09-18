@@ -49,7 +49,7 @@ type ThemeKey =
   | "school_infrastructure"
   | "health_access"
   | "street_lighting";
-type IssueTheme = Exclude<ThemeKey, "all">;
+type IssueTheme = Exclude<ThemeKey, "all"> | "health_clinic";
 
 type PulseTopic = {
   theme: IssueTheme;
@@ -187,6 +187,13 @@ const THEME_META = {
     fill: "#7c3aed",
   },
   health_access: {
+    label: "Health access",
+    icon: HeartPulse,
+    chip: "border-rose-200 bg-rose-50 text-rose-700",
+    fill: "#e11d48",
+  },
+  // Older backend records use health_clinic for the same category.
+  health_clinic: {
     label: "Health access",
     icon: HeartPulse,
     chip: "border-rose-200 bg-rose-50 text-rose-700",
@@ -1004,7 +1011,11 @@ export default function DashboardPage() {
                             );
                             if (hotspot) {
                               setSelectedHotspot(hotspot);
-                              setTheme(topic.theme);
+                              setTheme(
+                                topic.theme === "health_clinic"
+                                  ? "health_access"
+                                  : topic.theme,
+                              );
                               mapRef.current?.flyTo(hotspot.latitude, hotspot.longitude, 14);
                             }
                           }}
